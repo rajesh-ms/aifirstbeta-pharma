@@ -1,0 +1,561 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Grounded in the Customer — Merck (MSD): Business Pressures First</title>
+<meta name="description" content="Merck (MSD) — Business Pressures First. A customer-grounded AI report-out: pressures, where AI moves each one, C-suite map, benefit dependency canvas, assumptions vs facts, and opening questions." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+:root{
+  --green-900:#0b3526; --green-800:#0e3b2c; --green-700:#13503b; --green-600:#1b6a4b;
+  --teal-700:#0f766e; --teal-600:#0d8a80; --olive-600:#5f7d33;
+  --gold-500:#d8a431; --gold-600:#c2871d;
+  --ink:#16241d; --muted:#5c6b62; --line:#e3e8e2;
+  --surface:#f6f8f4; --sage-50:#eef3ea; --card:#ffffff;
+  --font-display:"Fraunces","Georgia",serif;
+  --font-sans:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{
+  background:#0a2c20;
+  color:var(--ink);
+  font-family:var(--font-sans);
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+  overflow:hidden;
+}
+#viewport{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(120% 120% at 50% -10%, #0e3b2c 0%, #0a2c20 60%, #082018 100%);}
+#stage{position:relative;width:min(100vw,177.78vh);aspect-ratio:16/9;
+  box-shadow:0 40px 120px -40px rgba(0,0,0,.75);overflow:hidden;background:var(--surface);}
+
+/* ---- slide scaffold (fixed 1280x720 design space, scaled) ---- */
+.slide{position:absolute;inset:0;opacity:0;pointer-events:none;
+  transition:opacity .5s ease, transform .5s ease;transform:translateX(24px);}
+.slide.active{opacity:1;pointer-events:auto;transform:none;}
+.slide-inner{position:absolute;top:0;left:0;width:1280px;height:720px;
+  transform:scale(var(--s,1));transform-origin:top left;}
+.pad{position:absolute;inset:0;padding:56px 68px;}
+
+/* light slide texture */
+.slide--light .slide-inner{background:
+  radial-gradient(60% 70% at 100% 0%, rgba(27,106,75,.07), transparent 60%),
+  radial-gradient(50% 60% at 0% 100%, rgba(15,118,110,.06), transparent 55%),
+  var(--surface);}
+
+/* ---- shared header ---- */
+.eyebrow{font:600 12px/1 var(--font-sans);letter-spacing:.2em;text-transform:uppercase;color:var(--teal-700);}
+.chip{display:inline-block;background:var(--teal-700);color:#fff;font:700 13px/1 var(--font-sans);
+  letter-spacing:.14em;text-transform:uppercase;padding:9px 14px;border-radius:4px;}
+.kgroup{display:flex;align-items:center;gap:18px;margin-bottom:18px;}
+.h1{font-family:var(--font-display);font-weight:600;color:var(--green-900);
+  font-size:50px;line-height:1.02;letter-spacing:-.01em;margin:0;}
+.h1.small{font-size:42px;}
+.rule{width:74px;height:5px;border-radius:3px;background:var(--gold-500);margin:16px 0 0;}
+.subtitle{font-family:var(--font-display);font-style:italic;color:var(--muted);font-size:20px;margin:14px 0 0;}
+
+/* ---- footer ---- */
+.sfoot{position:absolute;left:68px;right:68px;bottom:26px;display:flex;justify-content:space-between;
+  align-items:center;font:500 12px/1 var(--font-sans);color:#9aa79f;letter-spacing:.02em;}
+.sfoot .num{font-variant-numeric:tabular-nums;color:var(--green-700);font-weight:600;letter-spacing:.1em;}
+
+/* ---- tables ---- */
+.tblwrap{border-radius:14px;overflow:hidden;box-shadow:0 1px 0 var(--line),0 26px 50px -34px rgba(11,53,38,.55);
+  border:1px solid var(--line);}
+.tbl{width:100%;border-collapse:separate;border-spacing:0;}
+.tbl th{background:var(--green-800);color:#fff;text-align:left;
+  font:600 14px/1.2 var(--font-sans);letter-spacing:.01em;padding:15px 18px;vertical-align:bottom;
+  border-top:3px solid var(--gold-500);}
+.tbl th.tealtop{border-top-color:var(--teal-600);}
+.tbl th.goldtop{border-top-color:var(--gold-500);}
+.tbl td{padding:13px 18px;border-bottom:1px solid var(--line);vertical-align:top;color:var(--ink);}
+.tbl tbody tr:last-child td{border-bottom:0;}
+.tbl tbody tr:nth-child(even) td{background:rgba(238,243,234,.6);}
+.tbl td.lead{font-weight:600;color:var(--green-900);}
+.src{color:var(--muted);font-style:italic;}
+.b{margin:0;padding-left:18px;}
+.b li{margin:5px 0;}
+ol.b{padding-left:20px;}
+
+/* slide 2 — dense brief, compressed to fit */
+.slide--brief .pad{padding:32px 64px 26px;}
+.slide--brief .h1{font-size:34px;}
+.slide--brief .rule{margin-top:9px;height:4px;}
+.slide--brief .tblwrap{margin-top:12px;}
+.slide--brief .tbl{font-size:11px;}
+.slide--brief .tbl th{padding:8px 14px;}
+.slide--brief .tbl td{padding:8px 14px;line-height:1.33;}
+.slide--brief .tbl .b li{margin:3px 0;}
+.slide--brief .sfoot{bottom:12px;}
+
+/* ---- callout ---- */
+.callout{margin-top:18px;border-left:5px solid var(--gold-500);background:#fff;border-radius:0 12px 12px 0;
+  padding:14px 18px;box-shadow:0 16px 36px -30px rgba(11,53,38,.6);}
+.callout .lbl{color:var(--gold-600);font-weight:700;letter-spacing:.12em;text-transform:uppercase;font-size:12px;margin-right:8px;}
+.callout .punch{color:var(--teal-700);font-weight:700;font-style:italic;}
+.sources{margin-top:14px;color:var(--muted);font-style:italic;font-size:12.5px;}
+
+/* ---- title slide ---- */
+.slide--title .slide-inner{background:
+  radial-gradient(80% 90% at 88% -10%, rgba(216,164,49,.16), transparent 55%),
+  radial-gradient(70% 80% at 0% 110%, rgba(15,118,110,.22), transparent 55%),
+  linear-gradient(135deg,#0e3f2e 0%, #0b3526 55%, #082018 100%);}
+.slide--title .goldbar{position:absolute;left:0;top:0;bottom:0;width:14px;background:var(--gold-500);}
+.title-wrap{position:absolute;left:96px;right:96px;top:50%;transform:translateY(-50%);}
+.title-eyebrow{color:#7fd0bf;letter-spacing:.22em;}
+.title-h1{font-family:var(--font-display);font-weight:600;color:#fff;font-size:92px;line-height:.98;
+  letter-spacing:-.015em;margin:22px 0 0;}
+.title-sub{font-family:var(--font-display);font-weight:500;color:var(--gold-500);font-size:38px;margin:22px 0 0;}
+.title-quote{color:#cfe0d6;font-size:19px;line-height:1.5;margin:30px 0 0;max-width:880px;}
+.title-quote i{color:#eaf2ec;}
+.title-byline{color:#8aa094;font-size:15px;letter-spacing:.04em;margin:46px 0 0;}
+
+/* ---- two-card (slide 7) ---- */
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:26px;margin-top:6px;}
+.card{border-radius:14px;overflow:hidden;background:#fff;border:1px solid var(--line);
+  box-shadow:0 26px 50px -34px rgba(11,53,38,.55);}
+.card__h{padding:15px 22px;color:#fff;font:700 18px/1.2 var(--font-sans);letter-spacing:.01em;}
+.card--teal .card__h{background:var(--teal-700);}
+.card--gold .card__h{background:var(--gold-500);color:#3a2b06;}
+.card__b{padding:8px 22px 20px;}
+.qlist{margin:0;padding:0;list-style:none;counter-reset:q;}
+.qlist li{counter-increment:q;position:relative;padding:16px 0 16px 46px;border-bottom:1px solid var(--line);
+  font-size:17px;line-height:1.42;color:var(--ink);}
+.qlist li:last-child{border-bottom:0;}
+.qlist li::before{content:counter(q);position:absolute;left:0;top:14px;width:30px;height:30px;border-radius:50%;
+  display:grid;place-items:center;font:700 14px/1 var(--font-sans);}
+.card--teal .qlist li::before{background:rgba(15,118,110,.12);color:var(--teal-700);}
+.card--gold .qlist li::before{background:rgba(216,164,49,.18);color:var(--gold-600);}
+
+/* ---- benefit dependency canvas (slide 5) ---- */
+.bdc{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-top:8px;}
+.bdc__h{display:flex;align-items:center;gap:6px;font:700 14px/1.1 var(--font-sans);color:var(--green-900);
+  margin-bottom:10px;min-height:34px;}
+.bdc__h .arr{color:var(--gold-500);font-weight:700;font-size:18px;}
+.bdc__items{display:flex;flex-direction:column;gap:8px;}
+.node{font:500 11.5px/1.28 var(--font-sans);padding:9px 11px;border-radius:10px;color:var(--ink);
+  background:#fff;border:1px solid var(--line);min-height:46px;display:flex;align-items:center;}
+.node--ell{border-radius:999px;background:rgba(15,118,110,.08);border-color:rgba(15,118,110,.35);color:var(--teal-700);font-weight:600;}
+.node--enable{border-color:rgba(27,106,75,.4);}
+.node--change{background:#cfe0b8;border-color:#b6cf97;color:#36481f;font-weight:600;}
+.node--benefit{border-left:4px solid var(--gold-500);}
+.node--obj{border-radius:999px;background:rgba(27,106,75,.08);border-color:rgba(27,106,75,.4);color:var(--green-700);font-weight:600;}
+.node--drive{border-radius:999px;background:rgba(216,164,49,.13);border-color:rgba(216,164,49,.5);color:var(--gold-600);font-weight:600;justify-content:center;text-align:center;min-height:40px;font-size:11px;}
+.bdc__cap{margin-top:9px;font:500 9.5px/1.32 var(--font-sans);color:var(--muted);}
+.metachips{position:absolute;top:56px;right:68px;display:flex;gap:8px;}
+.metachip{background:#fff;border:1px solid var(--line);border-radius:8px;padding:7px 11px;font-size:11px;color:var(--muted);}
+.metachip b{display:block;color:var(--green-900);font-size:12px;font-weight:600;}
+
+/* slide 6 quality check */
+.qcheck{margin-top:16px;font:500 13.5px/1.5 var(--font-sans);color:var(--muted);}
+.qcheck b{color:var(--green-800);}
+.qcheck .box{color:var(--teal-700);font-weight:700;margin:0 4px 0 14px;}
+.must{color:var(--gold-600);font-weight:600;}
+
+/* note line */
+.note{margin-top:16px;color:var(--muted);font-style:italic;font-size:14px;}
+
+/* ===== chrome (outside scaled stage) ===== */
+#progress{position:fixed;top:0;left:0;height:3px;background:var(--gold-500);width:0;z-index:40;
+  transition:width .45s ease;box-shadow:0 0 12px rgba(216,164,49,.6);}
+.nav-arrow{position:fixed;top:50%;transform:translateY(-50%);width:54px;height:54px;border-radius:50%;
+  border:1px solid rgba(255,255,255,.22);background:rgba(8,32,24,.45);color:#fff;cursor:pointer;
+  display:grid;place-items:center;z-index:35;opacity:0;transition:opacity .25s, background .2s;backdrop-filter:blur(6px);}
+#viewport:hover .nav-arrow{opacity:.55;}
+.nav-arrow:hover{opacity:1;background:rgba(15,118,110,.7);}
+.nav-arrow.left{left:22px;} .nav-arrow.right{right:22px;}
+.nav-arrow svg{width:22px;height:22px;}
+.dock{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:35;display:flex;align-items:center;
+  gap:6px;padding:7px 9px;border-radius:999px;background:rgba(8,32,24,.55);border:1px solid rgba(255,255,255,.16);
+  backdrop-filter:blur(10px);box-shadow:0 16px 40px -16px rgba(0,0,0,.6);}
+.dock button{appearance:none;border:0;background:transparent;color:#dfeae3;cursor:pointer;border-radius:999px;
+  height:34px;min-width:34px;padding:0 10px;display:grid;place-items:center;font:600 13px/1 var(--font-sans);}
+.dock button:hover{background:rgba(255,255,255,.12);color:#fff;}
+.dock .count{font-variant-numeric:tabular-nums;letter-spacing:.12em;color:#cfe0d6;padding:0 8px;}
+.dock .sep{width:1px;height:20px;background:rgba(255,255,255,.16);margin:0 2px;}
+.dock svg{width:18px;height:18px;}
+
+/* TOC overlay */
+#toc{position:fixed;inset:0;z-index:50;background:rgba(7,26,19,.82);backdrop-filter:blur(8px);
+  display:none;align-items:center;justify-content:center;}
+body.toc-open #toc{display:flex;}
+.toc-card{width:min(720px,90vw);background:#0e3b2c;border:1px solid rgba(255,255,255,.12);border-radius:18px;
+  padding:30px 34px;box-shadow:0 40px 100px -30px rgba(0,0,0,.7);}
+.toc-card h2{font-family:var(--font-display);color:#fff;margin:0 0 4px;font-size:26px;font-weight:600;}
+.toc-card p{color:#8aa094;margin:0 0 18px;font-size:13px;}
+.toc-list{display:grid;gap:8px;}
+.toc-list button{display:flex;gap:16px;align-items:baseline;text-align:left;width:100%;cursor:pointer;
+  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:13px 16px;color:#eaf2ec;
+  font:500 16px/1.3 var(--font-sans);transition:background .15s,border-color .15s;}
+.toc-list button:hover{background:rgba(15,118,110,.35);border-color:rgba(216,164,49,.5);}
+.toc-list button .n{color:var(--gold-500);font-weight:700;font-variant-numeric:tabular-nums;min-width:26px;}
+.toc-hint{margin-top:18px;color:#7f9388;font-size:12px;text-align:center;}
+kbd{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);border-radius:5px;padding:1px 6px;font:600 11px/1.4 var(--font-sans);color:#dfeae3;}
+
+#hint{position:fixed;bottom:74px;left:50%;transform:translateX(-50%);z-index:34;color:#cfe0d6;
+  font-size:12.5px;letter-spacing:.04em;background:rgba(8,32,24,.5);padding:7px 14px;border-radius:999px;
+  border:1px solid rgba(255,255,255,.14);transition:opacity .6s ease;}
+
+@media (max-width:640px){ .title-h1{font-size:78px} }
+
+/* print → clean PDF, one slide per page */
+@page{size:1280px 720px;margin:0;}
+@media print{
+  body{overflow:visible;background:#fff;}
+  #viewport{position:static;display:block;}
+  #stage{width:1280px;height:auto;box-shadow:none;}
+  .slide{position:relative;opacity:1!important;transform:none!important;page-break-after:always;height:720px;}
+  .slide-inner{transform:none!important;}
+  #progress,.nav-arrow,.dock,#hint,#toc{display:none!important;}
+}
+</style>
+</head>
+<body>
+<div id="progress"></div>
+
+<div id="viewport">
+  <button class="nav-arrow left" aria-label="Previous" onclick="prev()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+
+  <div id="stage">
+
+    <!-- ===================== SLIDE 1 — TITLE ===================== -->
+    <section class="slide slide--title active" aria-label="Title">
+      <div class="slide-inner">
+        <div class="goldbar"></div>
+        <div class="title-wrap">
+          <div class="eyebrow title-eyebrow">Architect Transformation Program &nbsp;|&nbsp; Team Exercise</div>
+          <h1 class="title-h1">Grounded in the Customer</h1>
+          <div class="title-sub">Merck (MSD): Business Pressures First</div>
+          <p class="title-quote">Answering the readiness standard: <i>“What do you know about this customer’s business pressures — not their technology, their business?”</i></p>
+          <div class="title-byline">Team Pharma &nbsp;·&nbsp; June 24, 2026</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== SLIDE 2 — CUSTOMER PRESSURE BRIEF ===================== -->
+    <section class="slide slide--light slide--brief" aria-label="Customer Pressure Brief">
+      <div class="slide-inner"><div class="pad">
+        <h1 class="h1 small">Customer Pressure Brief</h1>
+        <div class="rule"></div>
+        <div class="tblwrap">
+          <table class="tbl">
+            <colgroup><col style="width:220px"><col></colgroup>
+            <thead><tr><th>Element</th><th>Notes</th></tr></thead>
+            <tbody>
+              <tr>
+                <td class="lead">One-line problem statement</td>
+                <td>Merck must get medicines to market faster without losing audit credibility with the FDA/EMA — just as the 2028 Keytruda patent cliff (~$29.5B, ~46% of 2024 sales) forces it to defend revenue, cost-of-goods and speed-to-patient at once. <span class="src">(BioSpace, Sep 2025; Pharmaceutical Technology / JPM26, Jan 2026)</span></td>
+              </tr>
+              <tr>
+                <td class="lead">2–3 measurable business outcomes</td>
+                <td><ul class="b">
+                  <li>Clinical study report (CSR) cycle: 2–3 weeks → 3–4 days; human-reviewed first draft 180→80 hrs, 50% fewer errors — Merck + McKinsey QuantumBlack <span class="src">(McKinsey/Merck, Jun 2025)</span>.</li>
+                  <li>Trial cost &amp; manual effort cut ~70% with ~90% accuracy across 300+ concurrent trials — AWS Clinical Trial Optimization Studio <span class="src">(AWS case study, 2025)</span>.</li>
+                  <li>Batch-record documentation errors down ~70% <span class="src">(Acodis, Dec 2025)</span>.</li>
+                </ul></td>
+              </tr>
+              <tr>
+                <td class="lead">Top 5 business pressures</td>
+                <td><ol class="b">
+                  <li>AI-at-scale arms race — P. Hudson, CEO Sanofi: “…become the first pharma company powered by AI at scale” <span class="src">(Sanofi, Jun 2023)</span>.</li>
+                  <li>Submission speed = revenue — T. Coleman, CIO Med. Dev., Lilly: “Each day a drug gets to market sooner creates $1–3M in accelerated revenue” <span class="src">(Yseop, 2026)</span>.</li>
+                  <li>Scientists stuck copyediting — R. Kim, CTO Merck: “Some of our scientists were taking time being copyeditors. That’s not what they trained for” <span class="src">(NAM, Mar 2025)</span>.</li>
+                  <li>Investigations &amp; documentation are top regulatory pain — FDA 2024 data: both remain top-five most-cited deficiencies <span class="src">(ISPE iSpeak, Nov 2025)</span>.</li>
+                  <li>Data integrity gates everything — “Efficiency must go hand in hand with validation, traceability and human accountability” <span class="src">(Rephine, Sep 2025)</span>.</li>
+                </ol></td>
+              </tr>
+              <tr>
+                <td class="lead">Strategy vs execution tensions (1–2)</td>
+                <td><ul class="b">
+                  <li>Paper-compliant pilots ≠ process-healthy reality: “a fast answer is worth nothing if it cannot be trusted and traced… a confident summary it cannot source… has handed [QA] a new liability” <span class="src">(Fierce Pharma, Jun 2026)</span>.</li>
+                  <li>Value capture is rare: only 24% of companies have created value from GenAI — just 10% in medtech <span class="src">(BCG, Mar 2025)</span>.</li>
+                </ul></td>
+              </tr>
+              <tr>
+                <td class="lead">What has already been tried?</td>
+                <td><ul class="b">
+                  <li>Merck CSR automation w/ McKinsey QuantumBlack (180→80 hrs, 50% fewer errors), scaling across late-stage pipeline <span class="src">(eMarketer, Aug 2025)</span>.</li>
+                  <li>Deviation management GenAI on AWS Bedrock + OpenSearch (RAG) over past deviations, “maintaining the rigorous standards demanded by GMP” <span class="src">(AWS/MSD, Nov 2025)</span>.</li>
+                  <li>GPTeal secure enterprise LLM platform <span class="src">(NAM, Mar 2025)</span>; batch records ~70% fewer doc errors <span class="src">(Acodis, Dec 2025)</span>.</li>
+                  <li>Competitors: AstraZeneca protocol tool across 240+ trials; Bayer coding LLM 96% accuracy under “four-eyes”; Pfizer “Charlie.”</li>
+                </ul></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="sfoot"><span>Grounded in the Customer — Pharmaceuticals · Merck (MSD)</span><span class="num">02 / 07</span></div>
+      </div></div>
+    </section>
+
+    <!-- ===================== SLIDE 3 — WHERE AI MOVES EACH PRESSURE ===================== -->
+    <section class="slide slide--light" aria-label="Where AI moves each pressure">
+      <div class="slide-inner"><div class="pad">
+        <div class="kgroup"><span class="chip">Detail</span><span class="eyebrow">Report-out · AI trends by pressure</span></div>
+        <h1 class="h1 small">Where AI moves each pressure</h1>
+        <div class="rule"></div>
+        <div class="tblwrap" style="margin-top:18px">
+          <table class="tbl" style="font-size:13.5px">
+            <colgroup><col style="width:300px"><col><col style="width:340px"></colgroup>
+            <thead><tr><th>Business pressure</th><th class="tealtop">Top AI trend acting on it</th><th class="goldtop">Proof point</th></tr></thead>
+            <tbody>
+              <tr><td class="lead">R&amp;D productivity + time-to-market</td><td>AI target discovery, molecule design, portfolio decisioning</td><td>12–18 mo to clinic vs 4–6 yr; 173 AI programs in clinic (2026)</td></tr>
+              <tr><td class="lead">Quality + deviation / CAPA burden</td><td>AI batch-record review, deviation root-cause, predictive quality</td><td>30–50% faster deviation closure</td></tr>
+              <tr><td class="lead">Regulatory documentation + auditability</td><td>AI eCTD authoring, CTD drafting, submission consistency review</td><td>FDA AI guidance: validation, audit trails, explainability</td></tr>
+              <tr><td class="lead">Supply resilience: cold chain, shortages</td><td>Predictive quality + demand forecasting to cut disruption</td><td>Fewer batch failures; steadier release &amp; launch readiness</td></tr>
+              <tr><td class="lead">Safety surveillance + trust</td><td>AI adverse-event intake, case triage, signal detection</td><td>Up to 10x AE throughput; FDA/EMA require human oversight</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="callout">
+          <span class="lbl">Competitor moves</span>Peers are racing the same AI levers to refill pipelines before loss of exclusivity — BMS (Opdivo vs. Keytruda), Lilly (GLP-1 obesity gap Merck lacks), AstraZeneca (oncology + AI).
+          <div style="margin-top:6px"><span class="punch">Yet only 24% of firms capture value from GenAI — audit-credible execution, not ambition, is the differentiator.</span> [2]</div>
+        </div>
+        <div class="sources">Sources: FirstWord [1]; FiercePharma [2]; Deloitte [3]; McKinsey [4]; Axis Intelligence [5]; IntuitionLabs [6]; BioSpace [7][9]; StudyFinds [8]; PatSnap [10]; PharmaceuticalOnline [11]; Merck 10-K [12]</div>
+        <div class="sfoot"><span>Grounded in the Customer — Pharmaceuticals · Merck (MSD)</span><span class="num">03 / 07</span></div>
+      </div></div>
+    </section>
+
+    <!-- ===================== SLIDE 4 — C-SUITE INFLUENCE MAP ===================== -->
+    <section class="slide slide--light" aria-label="C-suite influence map">
+      <div class="slide-inner"><div class="pad">
+        <div class="kgroup"><span class="chip">Report-out</span></div>
+        <h1 class="h1 small">C-suite influence map</h1>
+        <div class="rule"></div>
+        <div class="tblwrap" style="margin-top:18px">
+          <table class="tbl" style="font-size:14.5px">
+            <colgroup><col style="width:420px"><col style="width:300px"><col></colgroup>
+            <thead><tr><th>Leader / Role</th><th class="tealtop">Role in the deal</th><th class="goldtop">What they measure</th></tr></thead>
+            <tbody>
+              <tr><td class="lead">Stelios Tsinontides — VP Global Quality (ex-FDA)</td><td>Champion / regulatory bar</td><td>Inspection-readiness, audit trails, Annex 22</td></tr>
+              <tr><td class="lead">Dave Maraldo — EVP, Manufacturing Division</td><td>Economic buyer</td><td>Release time, deviation rates, supply</td></tr>
+              <tr><td class="lead">Dave Williams — CIO &amp; Chief Digital Officer</td><td>Platform owner</td><td>Data/AI backbone, responsible AI</td></tr>
+              <tr><td class="lead">Dean Li — President, Merck Research Labs</td><td>R&amp;D proof-point</td><td>Pipeline replenishment, speed-to-insight</td></tr>
+              <tr><td class="lead">Caroline Litchfield — EVP &amp; CFO</td><td>Money gate</td><td>Release time = working capital; scrap = cost</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="note">Sponsor / air cover: Rob Davis (CEO). &nbsp; Validate live — titles and remits move; confirm before outreach.</div>
+        <div class="sfoot"><span>Grounded in the Customer — Pharmaceuticals · Merck (MSD)</span><span class="num">04 / 07</span></div>
+      </div></div>
+    </section>
+
+    <!-- ===================== SLIDE 5 — BENEFIT DEPENDENCY CANVAS ===================== -->
+    <section class="slide slide--light" aria-label="Benefit Dependency Canvas">
+      <div class="slide-inner"><div class="pad" style="padding:44px 56px">
+        <h1 class="h1 small" style="font-size:38px">Benefit Dependency Canvas</h1>
+        <div class="metachips">
+          <div class="metachip"><b>Pharmaceuticals</b>Domain</div>
+          <div class="metachip"><b>Team Pharma</b>Designed by</div>
+          <div class="metachip"><b>6/24/2026</b>Date</div>
+        </div>
+        <div class="bdc">
+          <div class="bdc__col">
+            <div class="bdc__h">Digital Enablers <span class="arr">→</span></div>
+            <div class="bdc__items">
+              <div class="node node--ell">Generative AI / LLMs</div>
+              <div class="node node--ell">Retrieval-Augmented Generation (RAG)</div>
+              <div class="node node--ell">Secure enterprise LLM gateway (e.g. GPTeal)</div>
+              <div class="node node--ell">Azure OpenAI and Foundry</div>
+              <div class="node node--ell">Vector databases / knowledge graphs</div>
+            </div>
+            <div class="bdc__cap">Tech required to enable the changes and realize the benefits.</div>
+          </div>
+          <div class="bdc__col">
+            <div class="bdc__h">Enabling Changes <span class="arr">→</span></div>
+            <div class="bdc__items">
+              <div class="node node--enable">Human-in-the-loop “first draft for review”</div>
+              <div class="node node--enable">Validation: GAMP 5 / 21 CFR Part 11 / ALCOA+</div>
+              <div class="node node--enable">Audit trail on every prompt &amp; output</div>
+              <div class="node node--enable">“Four-eyes” sign-off on AI content</div>
+              <div class="node node--enable">Annex 22 critical vs. non-critical classification</div>
+            </div>
+            <div class="bdc__cap">Prerequisite changes to operate effectively in the org.</div>
+          </div>
+          <div class="bdc__col">
+            <div class="bdc__h">Business Changes <span class="arr">→</span></div>
+            <div class="bdc__items">
+              <div class="node node--change">Writers shift from authoring to reviewing</div>
+              <div class="node node--change">Investigations: manual search → AI-surfaced precedent</div>
+              <div class="node node--change">Batch records: paper → structured / machine-readable</div>
+              <div class="node node--change">Quality: “verify everything” → review-by-exception</div>
+              <div class="node node--change">Deviation knowledge shared across the network</div>
+            </div>
+            <div class="bdc__cap">New ways of working that realize the benefits.</div>
+          </div>
+          <div class="bdc__col">
+            <div class="bdc__h">Business Benefits</div>
+            <div class="bdc__items">
+              <div class="node node--benefit">CSR first draft 180→80 hrs, 50% fewer errors</div>
+              <div class="node node--benefit">Documentation errors down ~70%</div>
+              <div class="node node--benefit">Release cycle: weeks → days</div>
+              <div class="node node--benefit">Deviation investigation time −up to 40%</div>
+              <div class="node node--benefit">Faster, consistent, auditable submissions</div>
+            </div>
+            <div class="bdc__cap">An advantage for a stakeholder or stakeholder group.</div>
+          </div>
+          <div class="bdc__col">
+            <div class="bdc__h"><span class="arr">←</span> Investment Objectives</div>
+            <div class="bdc__items">
+              <div class="node node--obj">Speed-to-market with regulatory defensibility</div>
+              <div class="node node--obj">Cost-of-goods (COGS) defense</div>
+              <div class="node node--obj">Offset the 2028 Keytruda patent cliff</div>
+              <div class="node node--obj">Inspection-ready auditability (ALCOA+)</div>
+              <div class="node node--obj">Support ~$3B savings by 2027</div>
+            </div>
+            <div class="bdc__cap">Agreed organizational targets for the project.</div>
+          </div>
+          <div class="bdc__col">
+            <div class="bdc__h"><span class="arr">←</span> Drives</div>
+            <div class="bdc__items">
+              <div class="node node--drive">Keytruda 2028 cliff</div>
+              <div class="node node--drive">~$3B savings by 2027</div>
+              <div class="node node--drive">Speed-to-patient</div>
+              <div class="node node--drive">FDA / EMA AI scrutiny</div>
+              <div class="node node--drive">~20 launches ahead</div>
+            </div>
+            <div class="bdc__cap">Senior view of what must change in the business, and why.</div>
+          </div>
+        </div>
+        <div class="sfoot"><span>Grounded in the Customer — Pharmaceuticals · Merck (MSD)</span><span class="num">05 / 07</span></div>
+      </div></div>
+    </section>
+
+    <!-- ===================== SLIDE 6 — ASSUMPTIONS vs FACTS vs MUST-VALIDATE ===================== -->
+    <section class="slide slide--light" aria-label="Assumptions vs Facts vs Must-Validate">
+      <div class="slide-inner"><div class="pad">
+        <h1 class="h1 small">Assumptions vs Facts vs Must-Validate</h1>
+        <div class="subtitle">Be honest about what you know, what you assume, and what you must ask the customer.</div>
+        <div class="tblwrap" style="margin-top:16px">
+          <table class="tbl" style="font-size:12px">
+            <colgroup><col style="width:30%"><col style="width:42%"><col style="width:28%"></colgroup>
+            <thead><tr><th>What we ASSUME</th><th class="tealtop">What we KNOW (facts + source)</th><th class="goldtop">What we MUST VALIDATE LIVE</th></tr></thead>
+            <tbody>
+              <tr><td class="lead">Merck uses GenAI broadly across manufacturing docs</td><td>Public cases are specific: CSR automation (180→80 hrs, 50% fewer errors) and AWS RAG deviation management <span class="src">(eMarketer, Aug 2025; AWS/MSD, Nov 2025)</span></td><td class="must">Is MBR/SOP GenAI actually in production, or still paper/manual?</td></tr>
+              <tr><td class="lead">Competitors are clearly “ahead” of Merck</td><td>Disclosure is asymmetric; Merck is at/near the front in the two hardest workflows (CSR + deviations)</td><td class="must">Where does Merck self-assess vs. AZ, Lilly, Novartis?</td></tr>
+              <tr><td class="lead">Auditability is already solved</td><td>Regulators insist “AI = decision support, not decision maker” <span class="src">(Rephine, Sep 2025)</span>; EU GMP Annex 22 reserves critical decisions for humans <span class="src">(EU Commission, 7 Jul 2025)</span></td><td class="must">Is every AI output traceable &amp; validated under GAMP 5 + Part 11?</td></tr>
+              <tr><td class="lead">FDA AI guidance is final</td><td>FDA Jan 2025 draft (credibility / context-of-use framework) is the first AI drug-development guidance; comment closed Apr 2025 <span class="src">(FDA, 6 Jan 2025)</span></td><td class="must">How is Merck preparing for final FDA + EU GMP Annex 22 (enforcement 2027–28)?</td></tr>
+              <tr><td class="lead">GenAI pilots reliably create value</td><td>BCG: only 24% of firms — just 10% in medtech — capture value from GenAI <span class="src">(BCG, Mar 2025)</span></td><td class="must">What’s Merck’s value-capture rate and exit-pilot bar?</td></tr>
+              <tr><td class="lead">One clear tech owner drives AI</td><td>Public sources name Dave Williams (CIO &amp; CDO) on the CSR platform; a separate “CTO” (Ron Kim) is also cited <span class="src">(Merck/McKinsey, Jun 2025; NAM, Mar 2025)</span></td><td class="must">Who owns the quality-data backbone across AWS / Google / Azure?</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="qcheck"><b>Quality check:</b><span class="box">☐</span>Every claim tied to a source<span class="box">☐</span>Quotes are accurate<span class="box">☐</span>Anything uncertain is labeled as an assumption</div>
+        <div class="sfoot"><span>Grounded in the Customer — Pharmaceuticals · Merck (MSD)</span><span class="num">06 / 07</span></div>
+      </div></div>
+    </section>
+
+    <!-- ===================== SLIDE 7 — PROVOCATIONS & OPENING QUESTIONS ===================== -->
+    <section class="slide slide--light" aria-label="Provocations and opening questions">
+      <div class="slide-inner"><div class="pad">
+        <div class="kgroup"><span class="chip">Report-out</span></div>
+        <h1 class="h1 small">Provocations &amp; opening questions</h1>
+        <div class="rule"></div>
+        <div class="cards" style="margin-top:24px">
+          <div class="card card--teal">
+            <div class="card__h">Bold provocations</div>
+            <div class="card__b"><ol class="qlist">
+              <li>Every week you cut from a filing is revenue — until a regulator asks how. Can you explain the “how” as fast as you moved?</li>
+              <li>Where are you winning the audit but losing the weeks — “compliant” but still slow?</li>
+              <li>Rivals file in days, not weeks. Are you re-engineering the work — or just paying more to be fast at a broken process?</li>
+            </ol></div>
+          </div>
+          <div class="card card--gold">
+            <div class="card__h">Top 3 questions to ask first</div>
+            <div class="card__b"><ol class="qlist">
+              <li>What’s your release-to-filing cycle time today — and what would halving it be worth in revenue and working capital?</li>
+              <li>Where does slow, manual work cost you most — release, investigations, or documentation?</li>
+              <li>What has to be true on trust and auditability before you’d let those speed gains scale?</li>
+            </ol></div>
+          </div>
+        </div>
+        <div class="sfoot"><span>Grounded in the Customer — Pharmaceuticals · Merck (MSD)</span><span class="num">07 / 07</span></div>
+      </div></div>
+    </section>
+
+  </div><!-- /#stage -->
+
+  <button class="nav-arrow right" aria-label="Next" onclick="next()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button>
+</div>
+
+<div id="hint">Use <kbd>←</kbd> <kbd>→</kbd> to navigate · <kbd>O</kbd> overview · <kbd>F</kbd> fullscreen</div>
+
+<div class="dock">
+  <button aria-label="Previous slide" onclick="prev()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+  <span class="count" id="counter">01 / 07</span>
+  <button aria-label="Next slide" onclick="next()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button>
+  <span class="sep"></span>
+  <button aria-label="Overview" title="Overview (O)" onclick="toggleToc()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></button>
+  <button aria-label="Fullscreen" title="Fullscreen (F)" onclick="toggleFs()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3m13-5v3a2 2 0 0 1-2 2h-3"/></svg></button>
+</div>
+
+<div id="toc" onclick="if(event.target.id==='toc')toggleToc()">
+  <div class="toc-card">
+    <h2>Grounded in the Customer</h2>
+    <p>Merck (MSD): Business Pressures First — jump to a slide</p>
+    <div class="toc-list" id="tocList"></div>
+    <div class="toc-hint">Press <kbd>O</kbd> or <kbd>Esc</kbd> to close</div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var titles = ['Title','Customer Pressure Brief','Where AI moves each pressure','C-suite influence map','Benefit Dependency Canvas','Assumptions vs Facts vs Must-Validate','Provocations & opening questions'];
+  var i = 0;
+  var stage = document.getElementById('stage');
+  var prog = document.getElementById('progress');
+  var counter = document.getElementById('counter');
+  var hint = document.getElementById('hint');
+  var pad2 = function(n){return (n<10?'0':'')+n;};
+
+  function fit(){ var s = stage.clientWidth/1280; stage.style.setProperty('--s', s); }
+
+  function go(n){
+    i = Math.max(0, Math.min(slides.length-1, n));
+    slides.forEach(function(s,k){ s.classList.toggle('active', k===i); });
+    prog.style.width = ((i+1)/slides.length*100) + '%';
+    counter.textContent = pad2(i+1) + ' / ' + pad2(slides.length);
+    try{ history.replaceState(null,'','#'+(i+1)); }catch(e){}
+  }
+  window.next = function(){ go(i+1); };
+  window.prev = function(){ go(i-1); };
+  window.goTo = go;
+  window.toggleFs = function(){ if(!document.fullscreenElement){ (document.documentElement.requestFullscreen||function(){})(); } else { (document.exitFullscreen||function(){})(); } };
+  window.toggleToc = function(){ document.body.classList.toggle('toc-open'); };
+
+  // build TOC
+  var tl = document.getElementById('tocList');
+  titles.forEach(function(t,k){
+    var b = document.createElement('button');
+    b.innerHTML = '<span class="n">'+pad2(k+1)+'</span><span>'+t+'</span>';
+    b.onclick = function(){ go(k); document.body.classList.remove('toc-open'); };
+    tl.appendChild(b);
+  });
+
+  document.addEventListener('keydown', function(e){
+    var k = e.key;
+    if(k==='ArrowRight'||k==='PageDown'||k===' '){ e.preventDefault(); next(); }
+    else if(k==='ArrowLeft'||k==='PageUp'){ e.preventDefault(); prev(); }
+    else if(k==='Home'){ e.preventDefault(); go(0); }
+    else if(k==='End'){ e.preventDefault(); go(slides.length-1); }
+    else if(k==='Escape'){ document.body.classList.remove('toc-open'); }
+    else if(k && k.toLowerCase()==='o'){ toggleToc(); }
+    else if(k && k.toLowerCase()==='f'){ toggleFs(); }
+  });
+
+  window.addEventListener('resize', fit);
+  window.addEventListener('hashchange', function(){
+    var h = parseInt((location.hash||'').replace('#',''),10);
+    if(!isNaN(h) && h-1 !== i){ go(h-1); }
+  });
+  fit();
+  var start = parseInt((location.hash||'').replace('#',''),10);
+  go(isNaN(start)?0:start-1);
+  setTimeout(function(){ if(hint){ hint.style.opacity='0'; } }, 4200);
+})();
+</script>
+</body>
+</html>
