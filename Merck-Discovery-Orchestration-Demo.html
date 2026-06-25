@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Discovery Orchestration Workbench — Merck × Microsoft (Demo)</title>
+<style>
+  :root{
+    --ms-blue:#0078D4; --ms-blue-dk:#005A9E; --navy:#1B3A5B;
+    --teal:#0F7B8A; --teal-dk:#0B6673;
+    --red:#F25022; --green:#7FBA00; --cyan:#00A4EF; --yellow:#FFB900;
+    --ink:#201F1E; --ink-2:#3B3A39; --muted:#605E5C; --faint:#8A8886;
+    --line:#E1DFDD; --line-2:#EDEBE9;
+    --bg:#EAF1F8; --surface:#FFFFFF; --surface-2:#F6FAFD;
+    --amber:#9A5B00; --amber-bg:#FFF3E0; --amber-bd:#F2C786;
+    --teal-bg:#E6F4F6; --teal-bd:#A9D7DD;
+    --green-bg:#EAF4D9; --green-ink:#3E6B00; --green-bd:#C5DF92;
+    --blue-bg:#EAF2FB; --blue-bd:#BBD6F2;
+    --radius:14px; --radius-sm:10px; --radius-xs:7px;
+    --shadow:0 1px 2px rgba(16,24,40,.06), 0 8px 22px rgba(16,24,40,.10);
+    --shadow-lg:0 6px 14px rgba(16,24,40,.10), 0 22px 60px rgba(16,24,40,.18);
+    --font:"Segoe UI Variable","Segoe UI",system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;
+    --mono:"Cascadia Code","Consolas",ui-monospace,SFMono-Regular,Menlo,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    font-family:var(--font); color:var(--ink);
+    background:
+      radial-gradient(1200px 600px at 12% -10%, #DCEAFB 0%, rgba(220,234,251,0) 60%),
+      radial-gradient(1000px 700px at 110% 120%, #E2F1F3 0%, rgba(226,241,243,0) 55%),
+      var(--bg);
+    display:flex; flex-direction:column; height:100vh; overflow:hidden;
+    -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+  }
+
+  /* ============ App bar ============ */
+  .appbar{
+    height:56px; flex:0 0 auto; display:flex; align-items:center; gap:14px;
+    padding:0 20px; background:rgba(255,255,255,.86); backdrop-filter:saturate(140%) blur(10px);
+    border-bottom:1px solid var(--line); z-index:30;
+  }
+  .ms-logo{display:inline-block;vertical-align:middle}
+  .product{display:flex;align-items:center;gap:10px;font-weight:600;letter-spacing:.2px}
+  .product .pname{font-weight:600}
+  .product .ppill{font-size:11px;font-weight:700;color:var(--teal-dk);background:var(--teal-bg);
+    border:1px solid var(--teal-bd);border-radius:999px;padding:2px 9px;letter-spacing:.3px}
+  .ctxbar{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:12.5px;font-weight:500;
+    background:var(--surface-2);border:1px solid var(--line);border-radius:999px;padding:5px 12px}
+  .ctxbar b{color:var(--ink-2)}
+  .spacer{flex:1}
+  .cobrand{display:flex;align-items:center;gap:11px;white-space:nowrap}
+  .cobrand .msw{color:#4c5752;font-weight:600;font-size:14px}
+  .cobrand .bdiv{width:1px;height:20px;background:#cbd6d1;display:inline-block}
+  .cobrand .msd{color:var(--teal-dk);font-weight:800;font-size:15px;letter-spacing:.4px}
+  .cobrand .msd-sub{color:var(--muted);font-weight:600;font-size:11px;margin-left:5px;text-transform:uppercase;letter-spacing:.6px}
+  .who{display:flex;align-items:center;gap:9px;padding-left:6px}
+  .who .av{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--teal),var(--ms-blue));
+    color:#fff;display:grid;place-items:center;font-weight:700;font-size:12px}
+  .who .wn{font-size:12px;line-height:1.15}
+  .who .wn b{display:block;color:var(--ink)} .who .wn span{color:var(--faint);font-size:10.5px}
+  .entra{font-size:9.5px;font-weight:800;letter-spacing:.5px;color:var(--ms-blue-dk);background:var(--blue-bg);
+    border:1px solid var(--blue-bd);border-radius:999px;padding:3px 7px;margin-left:2px}
+
+  /* ============ App grid ============ */
+  .app{display:grid; grid-template-columns:302px minmax(0,1fr) 374px; flex:1 1 auto; min-height:0}
+
+  /* ---- Left rail ---- */
+  .rail{border-right:1px solid var(--line); background:rgba(255,255,255,.55); display:flex; flex-direction:column; min-height:0; overflow:auto}
+  .railhd{display:flex;align-items:center;gap:8px;padding:13px 16px 9px;font-size:11px;font-weight:800;letter-spacing:.7px;color:var(--muted);text-transform:uppercase}
+  .principle{margin:0 14px 12px;padding:11px 13px;border-radius:var(--radius-sm);color:#fff;
+    background:linear-gradient(135deg,var(--teal),var(--teal-dk));box-shadow:var(--shadow);font-weight:700;font-size:12.5px;line-height:1.35}
+  .pipe{display:flex;flex-direction:column;padding:0 12px 6px;gap:3px}
+  .pstep{display:grid;grid-template-columns:24px 1fr;gap:9px;align-items:start;padding:9px 9px;border-radius:var(--radius-sm);border:1px solid transparent;position:relative}
+  .pstep.active{background:var(--teal-bg);border-color:var(--teal-bd)}
+  .pstep.done .ptitle{color:var(--ink)}
+  .pstep .pdot{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:11px;
+    background:#fff;border:1.5px solid var(--line);color:var(--faint);margin-top:1px}
+  .pstep.active .pdot{border-color:var(--teal);color:var(--teal-dk);box-shadow:0 0 0 3px rgba(15,123,138,.14)}
+  .pstep.active .pdot{animation:pulse 1.4s ease-in-out infinite}
+  @keyframes pulse{0%,100%{box-shadow:0 0 0 3px rgba(15,123,138,.14)}50%{box-shadow:0 0 0 6px rgba(15,123,138,.05)}}
+  .pstep.done .pdot{border-color:var(--green);background:var(--green);color:#fff}
+  .pstep .pdot svg{width:13px;height:13px;fill:currentColor}
+  .ptitle{font-size:12.7px;font-weight:700;color:var(--ink-2);line-height:1.2}
+  .psub{font-size:10.8px;color:var(--faint);margin-top:2px;line-height:1.3}
+  .pchips{display:flex;flex-wrap:wrap;gap:3px;margin-top:5px}
+  .mchip{font-size:9.3px;font-weight:700;color:var(--ink-2);background:var(--surface-2);border:1px solid var(--line);border-radius:5px;padding:1.5px 5px;letter-spacing:.2px}
+  .cchip{font-size:9.3px;font-weight:800;border-radius:5px;padding:1.5px 5px;letter-spacing:.2px}
+  .cchip.azure{color:#1666b3;background:#EAF2FB;border:1px solid #BBD6F2}
+  .cchip.google{color:#1a73c2;background:#EAF1FE;border:1px solid #BBD0F2}
+  .cchip.aws{color:#9a5b00;background:#FFF4E2;border:1px solid #F2D6A0}
+  .cchip.a2a{color:var(--teal-dk);background:var(--teal-bg);border:1px solid var(--teal-bd)}
+  .pstat{position:absolute;right:9px;top:9px;font-size:9px;font-weight:800;letter-spacing:.4px;text-transform:uppercase}
+  .pstat.run{color:var(--teal-dk)} .pstat.don{color:var(--green-ink)}
+
+  .idbox{margin:6px 14px 16px;padding:11px 12px;border:1px dashed var(--line);border-radius:var(--radius-sm);background:var(--surface-2)}
+  .idl{font-size:10px;font-weight:800;letter-spacing:.6px;color:var(--muted);text-transform:uppercase;margin-bottom:7px}
+  .idr{display:flex;align-items:flex-start;gap:8px;font-size:11.4px;color:var(--ink-2);line-height:1.4;margin:5px 0}
+  .idr .d{width:7px;height:7px;border-radius:50%;flex:0 0 auto;margin-top:5px}
+  .idr code{font-family:var(--mono);font-size:10px;color:var(--teal-dk);background:var(--teal-bg);padding:.5px 4px;border-radius:4px}
+
+  /* ---- Center stage ---- */
+  .stage{min-height:0;overflow:auto;padding:20px 24px;display:flex;flex-direction:column}
+  .canvas{flex:1 1 auto;display:flex;flex-direction:column;gap:14px;min-height:0;animation:fade .35s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+  .chead{display:flex;align-items:center;gap:10px}
+  .chead .ci{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;background:var(--teal-bg);border:1px solid var(--teal-bd)}
+  .chead .ci svg{width:16px;height:16px;fill:var(--teal-dk)}
+  .chead h2{font-size:17px;font-weight:800;color:var(--navy);letter-spacing:.2px}
+  .chead .csub{font-size:11.5px;color:var(--muted);margin-top:1px}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px 18px}
+  .card.flush{padding:0;overflow:hidden}
+
+  /* brief */
+  .brief h3{font-size:15px;color:var(--navy);font-weight:800;margin-bottom:3px}
+  .brief .bl{font-size:12.5px;color:var(--muted);margin-bottom:13px}
+  .bgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+  .bkpi{background:var(--surface-2);border:1px solid var(--line);border-radius:var(--radius-sm);padding:11px 12px}
+  .bkpi .bv{font-size:16px;font-weight:800;color:var(--teal-dk)}
+  .bkpi .bk{font-size:10.7px;color:var(--muted);margin-top:2px;line-height:1.3}
+  .brow{display:flex;gap:9px;font-size:12.5px;color:var(--ink-2);padding:6px 0;border-top:1px solid var(--line-2);align-items:baseline}
+  .brow b{color:var(--navy);min-width:108px;display:inline-block}
+  .runbtn{margin-top:15px;display:inline-flex;align-items:center;gap:9px;background:linear-gradient(135deg,var(--teal),var(--teal-dk));
+    color:#fff;border:none;border-radius:10px;padding:12px 20px;font-size:13.5px;font-weight:800;cursor:pointer;box-shadow:var(--shadow);font-family:inherit}
+  .runbtn svg{width:16px;height:16px;fill:#fff}
+  .runbtn:hover{filter:brightness(1.05)}
+
+  /* candidate tiles */
+  .gencount{display:flex;align-items:center;gap:12px;font-size:13px;color:var(--ink-2);margin-bottom:4px}
+  .gencount b{font-size:22px;color:var(--teal-dk);font-weight:800}
+  .gencount .arrow{color:var(--faint);font-weight:800}
+  .tiles{display:grid;grid-template-columns:repeat(8,1fr);gap:7px}
+  .tile{height:34px;border-radius:7px;background:linear-gradient(135deg,#EAF4F6,#DCEFF2);border:1px solid var(--teal-bd);
+    display:grid;place-items:center;font-size:9.5px;font-weight:700;color:var(--teal-dk);animation:pop .4s ease both}
+  .tile.dim{background:var(--surface-2);border-color:var(--line);color:var(--faint)}
+  @keyframes pop{from{opacity:0;transform:scale(.8)}to{opacity:1;transform:none}}
+
+  /* structure viz */
+  .structwrap{display:grid;grid-template-columns:260px 1fr;gap:16px;align-items:center}
+  .structsvg{background:linear-gradient(160deg,#F6FAFD,#EAF4F6);border:1px solid var(--line);border-radius:var(--radius);padding:8px}
+  .poses{display:flex;flex-direction:column;gap:8px}
+  .pose{display:flex;align-items:center;gap:10px;background:var(--surface-2);border:1px solid var(--line);border-radius:var(--radius-sm);padding:9px 12px}
+  .pose .pn{font-weight:800;color:var(--navy);font-size:12.5px;width:52px}
+  .pose .bar{flex:1;height:7px;border-radius:4px;background:#E7EEF2;overflow:hidden}
+  .pose .bar i{display:block;height:100%;border-radius:4px;background:linear-gradient(90deg,var(--teal),var(--ms-blue))}
+  .pose .pv{font-size:11.5px;color:var(--muted);width:64px;text-align:right;font-variant-numeric:tabular-nums}
+
+  /* triage scoring */
+  .scoregrid{display:flex;flex-direction:column;gap:8px}
+  .srow{display:grid;grid-template-columns:64px repeat(3,1fr) auto;gap:10px;align-items:center;padding:8px 12px;border:1px solid var(--line);border-radius:var(--radius-sm);background:var(--surface)}
+  .srow.flagged{border-color:var(--amber-bd);background:var(--amber-bg)}
+  .srow .cn{font-weight:800;color:var(--navy);font-size:13px}
+  .smeter{display:flex;flex-direction:column;gap:3px}
+  .smeter .sl{font-size:9.5px;color:var(--faint);font-weight:700;text-transform:uppercase;letter-spacing:.3px}
+  .smeter .sb{height:6px;border-radius:4px;background:#E7EEF2;overflow:hidden}
+  .smeter .sb i{display:block;height:100%;border-radius:4px}
+  .sb i.good{background:var(--green)} .sb i.mid{background:var(--yellow)} .sb i.bad{background:#E8893B}
+  .sflag{font-size:10px;font-weight:800;color:var(--amber);background:#fff;border:1px solid var(--amber-bd);border-radius:6px;padding:3px 7px;white-space:nowrap}
+  .sflag.ok{color:var(--green-ink);border-color:var(--green-bd);background:var(--green-bg)}
+
+  /* shortlist table */
+  .sl{width:100%;border-collapse:collapse;font-size:12.7px}
+  .sl thead th{text-align:left;font-size:10px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:var(--muted);
+    padding:9px 12px;border-bottom:1.5px solid var(--line);background:var(--surface-2)}
+  .sl thead th.num{text-align:right}
+  .sl tbody td{padding:11px 12px;border-bottom:1px solid var(--line-2);vertical-align:middle}
+  .sl tbody td.num{text-align:right;font-variant-numeric:tabular-nums;font-weight:700;color:var(--ink-2)}
+  .sl tbody tr.rec{background:var(--green-bg)}
+  .sl tbody tr.flag{background:var(--amber-bg);cursor:pointer}
+  .sl tbody tr.flag:hover{background:#FFE9CC}
+  .sl .rk{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;font-size:10.5px;font-weight:800;background:#fff;border:1px solid var(--line);color:var(--muted)}
+  .sl tr.rec .rk{background:var(--green);color:#fff;border-color:var(--green)}
+  .sl .cid{font-weight:800;color:var(--navy)}
+  .sl .best{font-size:9px;font-weight:800;color:var(--ms-blue-dk);background:var(--blue-bg);border:1px solid var(--blue-bd);border-radius:5px;padding:1px 5px;margin-left:6px;letter-spacing:.2px}
+  .sl .pill{font-size:10px;font-weight:800;border-radius:6px;padding:3px 8px;white-space:nowrap}
+  .sl .pill.ok{color:var(--green-ink);background:#fff;border:1px solid var(--green-bd)}
+  .sl .pill.warn{color:var(--amber);background:#fff;border:1px solid var(--amber-bd)}
+  .slhint{display:inline-flex;align-items:center;gap:7px;font-size:11.5px;color:var(--teal-dk);background:var(--teal-bg);
+    border:1px solid var(--teal-bd);border-radius:999px;padding:6px 12px;white-space:nowrap;align-self:flex-start}
+  .slhint svg{width:13px;height:13px;fill:var(--teal-dk);flex:0 0 auto}
+
+  /* candidate detail / evidence */
+  .detgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .ev{border:1px solid var(--amber-bd);border-radius:var(--radius);background:#fff;overflow:hidden}
+  .ev .evh{display:flex;align-items:center;gap:8px;padding:10px 13px;background:var(--amber-bg);border-bottom:1px solid var(--amber-bd);font-weight:800;font-size:12.5px;color:var(--amber)}
+  .ev .evh svg{width:15px;height:15px;fill:var(--amber)}
+  .ev .evb{padding:13px;font-size:12px;color:var(--ink-2);line-height:1.5}
+  .ev .src{margin-top:9px;font-size:10.5px;color:var(--muted);display:flex;align-items:center;gap:6px}
+  .ev .src svg{width:12px;height:12px;flex:0 0 auto;fill:var(--teal-dk)}
+  .ev .src b{color:var(--teal-dk)}
+  .slchips{display:flex;gap:8px;flex-wrap:wrap}
+  .slchip{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:700;color:var(--ink-2);background:#fff;border:1px solid var(--line);border-radius:999px;padding:6px 13px}
+  .slchip b{color:var(--muted);font-weight:800}
+  .slchip .cm{font-weight:800}
+  .slchip.rec{background:var(--green-bg);border-color:var(--green-bd);color:var(--green-ink)}
+  .slchip.flag{background:var(--amber-bg);border-color:var(--amber-bd);color:var(--amber);box-shadow:0 0 0 2px rgba(242,199,134,.4)}
+  .epi{font-family:var(--mono);font-size:12px;letter-spacing:1px;margin:8px 0;padding:9px;background:var(--surface-2);border:1px solid var(--line);border-radius:8px;word-break:break-all;line-height:1.7}
+  .epi .hot{background:#F2C786;color:#5b3a00;border-radius:3px;padding:1px 2px;font-weight:800}
+  .verdict{margin-top:12px;padding:11px 14px;border-radius:var(--radius-sm);font-size:12.5px;font-weight:700;line-height:1.45}
+  .verdict.amber{background:var(--amber-bg);border:1px solid var(--amber-bd);color:var(--amber)}
+
+  /* selection summary */
+  .selgrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+  .selc{border-radius:var(--radius);border:1px solid var(--line);padding:13px;background:#fff}
+  .selc.promote{border-color:var(--green-bd);background:var(--green-bg)}
+  .selc.redesign{border-color:var(--amber-bd);background:var(--amber-bg)}
+  .selc .sct{font-weight:800;font-size:14px;color:var(--navy)}
+  .selc .sctag{font-size:10px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;margin-top:2px}
+  .selc.promote .sctag{color:var(--green-ink)} .selc.redesign .sctag{color:var(--amber)}
+  .selc .scl{font-size:11px;color:var(--muted);margin-top:8px;line-height:1.4}
+
+  /* lineage */
+  .lin{display:flex;flex-direction:column;gap:0}
+  .linrow{display:grid;grid-template-columns:22px 1fr;gap:11px;padding:9px 0;border-bottom:1px solid var(--line-2)}
+  .linrow:last-child{border-bottom:none}
+  .lindot{width:22px;display:grid;justify-items:center}
+  .lindot .dt{width:10px;height:10px;border-radius:50%;background:var(--teal);margin-top:4px;z-index:1}
+  .lindot .ln{width:2px;flex:1;background:var(--line);margin-top:2px}
+  .linrow.human .dt{background:var(--ms-blue)} .linrow.seal .dt{background:var(--green)}
+  .lintop{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .lintop b{font-size:12.7px;color:var(--ink)}
+  .lintop .lt{font-size:10px;color:var(--faint);font-family:var(--mono)}
+  .linmeta{font-size:11px;color:var(--muted);margin-top:3px;line-height:1.4}
+  .linmeta code{font-family:var(--mono);font-size:9.8px;color:var(--teal-dk)}
+  .worm{font-size:9px;font-weight:800;letter-spacing:.4px;color:var(--green-ink);background:var(--green-bg);border:1px solid var(--green-bd);border-radius:5px;padding:1.5px 6px;text-transform:uppercase}
+
+  /* ---- Right context panel ---- */
+  .ctx{border-left:1px solid var(--line);background:rgba(255,255,255,.62);min-height:0;overflow:auto;display:flex;flex-direction:column}
+  .ctxhd{display:flex;align-items:center;gap:8px;padding:14px 16px 10px;font-size:11px;font-weight:800;letter-spacing:.7px;color:var(--muted);text-transform:uppercase}
+  .ctxbody{padding:2px 16px 18px;display:flex;flex-direction:column;gap:11px}
+  .lead{font-size:12.5px;color:var(--ink-2);line-height:1.5}
+  .lead b{color:var(--navy)}
+  .agentcard{display:flex;gap:10px;align-items:flex-start;padding:11px 12px;border:1px solid var(--line);border-radius:var(--radius-sm);background:var(--surface)}
+  .agentcard .aav{width:30px;height:30px;border-radius:8px;flex:0 0 auto;display:grid;place-items:center;color:#fff;font-weight:800;font-size:11px;background:linear-gradient(135deg,var(--ms-blue),var(--teal))}
+  .agentcard .an{font-weight:800;font-size:12.5px;color:var(--ink)}
+  .agentcard .ad{font-size:10.6px;color:var(--muted);margin-top:1px;line-height:1.35}
+  .agentcard .aid{font-family:var(--mono);font-size:9.4px;color:var(--teal-dk);margin-top:3px}
+  .log{display:flex;flex-direction:column;gap:0;font-size:11.6px}
+  .logr{display:grid;grid-template-columns:16px 1fr;gap:8px;padding:6px 0;border-bottom:1px dashed var(--line-2);color:var(--ink-2);line-height:1.4}
+  .logr:last-child{border-bottom:none}
+  .logr .li{margin-top:2px}
+  .logr .li svg{width:12px;height:12px}
+  .logr.ok .li svg{fill:var(--green)} .logr.warn .li svg{fill:#E8893B} .logr.run .li svg{fill:var(--teal)}
+  .logr b{color:var(--ink)}
+  .agenttag{font-size:9.5px;font-weight:800;color:var(--ms-blue-dk);text-transform:uppercase;letter-spacing:.3px}
+  .panelbox{border:1px solid var(--line);border-radius:var(--radius-sm);padding:12px;background:var(--surface)}
+  .panelbox.amber{border-color:var(--amber-bd);background:var(--amber-bg)}
+  .panelbox.green{border-color:var(--green-bd);background:var(--green-bg)}
+  .pbh{font-weight:800;font-size:12.5px;color:var(--ink);margin-bottom:7px;display:flex;align-items:center;gap:7px}
+  .pbh svg{width:14px;height:14px}
+  .decols{display:flex;flex-direction:column;gap:8px;margin-top:4px}
+  .ownlist{list-style:none;font-size:11.7px;color:var(--ink-2);line-height:1.5}
+  .ownlist li{padding:5px 0;border-bottom:1px dashed var(--line-2);display:flex;gap:7px}
+  .ownlist li:last-child{border-bottom:none}
+  .ownlist li::before{content:"▸";color:var(--teal);font-weight:800}
+  .actbtn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;border-radius:10px;padding:11px 12px;font-size:12.7px;font-weight:800;cursor:pointer;font-family:inherit;border:1px solid}
+  .actbtn.primary{background:linear-gradient(135deg,var(--teal),var(--teal-dk));color:#fff;border-color:transparent;box-shadow:var(--shadow)}
+  .actbtn.ghost{background:#fff;color:var(--amber);border-color:var(--amber-bd)}
+  .actbtn.sign{background:linear-gradient(135deg,var(--ms-blue),var(--ms-blue-dk));color:#fff;border-color:transparent;box-shadow:var(--shadow)}
+  .actbtn svg{width:15px;height:15px;fill:currentColor}
+  .actbtn:hover{filter:brightness(1.05)}
+  .cosigner{display:flex;align-items:center;gap:10px}
+  .cosigner .cav{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#7a52c4,#5b6fb3);color:#fff;display:grid;place-items:center;font-weight:800;font-size:12px}
+  .cosigner .cn{font-weight:800;font-size:12.7px;color:var(--ink)} .cosigner .cd{font-size:10.6px;color:var(--muted)}
+  .note{font-size:11px;color:var(--muted);line-height:1.45}
+  .sealrow{display:flex;align-items:center;gap:9px;padding:10px 12px;border-radius:var(--radius-sm);background:var(--green-bg);border:1px solid var(--green-bd);font-size:12px;font-weight:700;color:var(--green-ink)}
+  .sealrow svg{width:16px;height:16px;fill:var(--green-ink)}
+  .stmp{display:inline-flex;align-items:center;gap:8px;align-self:flex-start;background:linear-gradient(135deg,var(--ms-blue),var(--teal));color:#fff;border-radius:8px;padding:7px 13px;font-size:11.5px;font-weight:800;box-shadow:var(--shadow)}
+  .stmp svg{width:14px;height:14px;fill:#fff}
+
+  /* ---- Toolbar ---- */
+  .toolbar{height:60px;flex:0 0 auto;display:flex;align-items:center;gap:9px;padding:0 18px;
+    background:rgba(255,255,255,.9);backdrop-filter:saturate(140%) blur(10px);border-top:1px solid var(--line);z-index:20}
+  .tbtn{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);background:#fff;color:var(--ink-2);
+    border-radius:9px;padding:9px 14px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit}
+  .tbtn:hover{background:var(--surface-2)}
+  .tbtn:disabled{opacity:.4;cursor:default}
+  .tbtn.primary{background:linear-gradient(135deg,var(--ms-blue),var(--ms-blue-dk));color:#fff;border-color:transparent}
+  .tbtn svg{width:13px;height:13px;fill:currentColor}
+  .steplbl{font-size:12px;color:var(--muted);font-weight:600;margin-left:6px}
+  .steplbl b{color:var(--ink)}
+  .roistrip{display:flex;align-items:center;gap:7px}
+  .roichip{display:flex;flex-direction:column;line-height:1.1;border:1px solid var(--line);background:var(--surface-2);border-radius:8px;padding:5px 11px;opacity:.45;transition:.3s}
+  .roichip.on{opacity:1;border-color:var(--teal-bd);background:var(--teal-bg)}
+  .roichip .rv{font-size:12px;font-weight:800;color:var(--teal-dk)}
+  .roichip .rk{font-size:9px;color:var(--muted);font-weight:600}
+</style>
+</head>
+<body>
+
+  <!-- ============ App bar ============ -->
+  <div class="appbar">
+    <svg class="ms-logo" width="22" height="22" viewBox="0 0 20 20" aria-hidden="true"><rect width="9" height="9" x="0" y="0" fill="#F25022"/><rect width="9" height="9" x="10.5" y="0" fill="#7FBA00"/><rect width="9" height="9" x="0" y="10.5" fill="#00A4EF"/><rect width="9" height="9" x="10.5" y="10.5" fill="#FFB900"/></svg>
+    <div class="product"><span class="pname">Discovery Orchestration Workbench</span><span class="ppill">DEMO</span></div>
+    <div class="ctxbar">Program <b>DSC-118</b> · target <b>CLDN18.2</b> · Biologics / Oncology</div>
+    <div class="spacer"></div>
+    <div class="cobrand">
+      <span class="msw">Microsoft</span><span class="bdiv"></span>
+      <span><span class="msd">MSD</span><span class="msd-sub">Merck</span></span>
+    </div>
+    <div class="who">
+      <div class="av">AK</div>
+      <div class="wn"><b>Dr. Aisha Khan</b><span>Discovery Scientist</span></div>
+      <span class="entra">ENTRA ID</span>
+    </div>
+  </div>
+
+  <!-- ============ App grid ============ -->
+  <div class="app">
+    <!-- Left rail -->
+    <aside class="rail">
+      <div class="railhd">⛓ Agent Orchestration</div>
+      <div class="principle">AI triages at portfolio scale.<br>The scientist owns the wet-lab call.</div>
+      <div class="pipe" id="pipe"></div>
+      <div class="idbox">
+        <div class="idl">Identity &amp; trust</div>
+        <div class="idr"><span class="d" style="background:var(--ms-blue)"></span><span>Every agent — <b>one Entra Agent ID</b></span></div>
+        <div class="idr"><span class="d" style="background:var(--teal)"></span><span>A2A across <b>Azure · Google · AWS</b></span></div>
+        <div class="idr"><span class="d" style="background:#6a7280"></span><span>Purview lineage · Defender · Part 11</span></div>
+      </div>
+    </aside>
+
+    <!-- Center stage -->
+    <main class="stage"><div class="canvas" id="canvas"></div></main>
+
+    <!-- Right context -->
+    <aside class="ctx">
+      <div class="ctxhd" id="ctxhd">Orchestration plan</div>
+      <div class="ctxbody" id="ctxbody"></div>
+    </aside>
+  </div>
+
+  <!-- ============ Toolbar ============ -->
+  <div class="toolbar">
+    <button class="tbtn" id="backBtn"><svg viewBox="0 0 24 24"><path d="M15 6 9 12 15 18Z"/></svg> Back</button>
+    <button class="tbtn primary" id="nextBtn">Next <svg viewBox="0 0 24 24"><path d="M9 6 15 12 9 18Z"/></svg></button>
+    <button class="tbtn" id="autoBtn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7Z"/></svg> Auto-run</button>
+    <button class="tbtn" id="resetBtn"><svg viewBox="0 0 24 24"><path d="M12 5V2L7 7l5 5V8a5 5 0 1 1-5 5H5a7 7 0 1 0 7-8Z"/></svg> Reset</button>
+    <span class="steplbl" id="steplbl"></span>
+    <div class="spacer"></div>
+    <div class="roistrip" id="roistrip"></div>
+  </div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------- icons ---------- */
+  const IC = {
+    spark:'<svg viewBox="0 0 24 24"><path d="M12 2 14 9 21 11 14 13 12 20 10 13 3 11 10 9Z"/></svg>',
+    check:'<svg viewBox="0 0 24 24"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4Z"/></svg>',
+    warn:'<svg viewBox="0 0 24 24"><path d="M1 21h22L12 2Zm12-3h-2v-2h2Zm0-4h-2V9h2Z"/></svg>',
+    run:'<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7Z"/></svg>',
+    target:'<svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2Zm0 16a6 6 0 1 1 6-6 6 6 0 0 1-6 6Zm0-9a3 3 0 1 0 3 3 3 3 0 0 0-3-3Z"/></svg>',
+    dna:'<svg viewBox="0 0 24 24"><path d="M7 3c0 4 10 6 10 11s-10 3-10 7M17 3c0 4-10 6-10 11s10 3 10 7M8 6h8M8 18h8M9 9h6M9 15h6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>',
+    cube:'<svg viewBox="0 0 24 24"><path d="M12 2 3 7v10l9 5 9-5V7Zm0 2.3 6.5 3.6L12 11.5 5.5 7.9ZM5 9.4l6 3.4v6.9l-6-3.3Zm8 10.3v-6.9l6-3.4v7Z"/></svg>',
+    scale:'<svg viewBox="0 0 24 24"><path d="M12 2a1 1 0 0 0-1 1v1H6v2h2.2l-3 6a4 4 0 0 0 7.6 0l-3-6H11v12H7v2h10v-2h-4V6h1.8l-3 6a4 4 0 0 0 7.6 0l-3-6H18V4h-5V3a1 1 0 0 0-1-1Z"/></svg>',
+    gate:'<svg viewBox="0 0 24 24"><path d="M12 1 3 5v6c0 5 3.8 9.7 9 11 5.2-1.3 9-6 9-11V5Zm-2 14-4-4 1.4-1.4L10 12.2l6.6-6.6L18 7Z"/></svg>',
+    flask:'<svg viewBox="0 0 24 24"><path d="M9 2v6.5l-5.3 9.2A2 2 0 0 0 5.4 21h13.2a2 2 0 0 0 1.7-3.3L15 8.5V2Zm2 2h2v5.1l1.6 2.9H9.4L11 9.1Z"/></svg>',
+    user:'<svg viewBox="0 0 24 24"><path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5Zm0 2c-4 0-8 2-8 5v1h16v-1c0-3-4-5-8-5Z"/></svg>',
+    shield:'<svg viewBox="0 0 24 24"><path d="M12 1 3 5v6c0 5 3.8 9.7 9 11 5.2-1.3 9-6 9-11V5Z"/></svg>',
+    lock:'<svg viewBox="0 0 24 24"><path d="M17 9V7a5 5 0 0 0-10 0v2H5v12h14V9Zm-8 0V7a3 3 0 0 1 6 0v2Z"/></svg>',
+    data:'<svg viewBox="0 0 24 24"><path d="M12 2C7 2 3 3.6 3 6v12c0 2.4 4 4 9 4s9-1.6 9-4V6c0-2.4-4-4-9-4Zm7 16c0 .9-2.9 2-7 2s-7-1.1-7-2v-2.3c1.7 1 4.3 1.3 7 1.3s5.3-.3 7-1.3Zm0-5c0 .9-2.9 2-7 2s-7-1.1-7-2v-2.3c1.7 1 4.3 1.3 7 1.3s5.3-.3 7-1.3ZM12 8C7.9 8 5 6.9 5 6s2.9-2 7-2 7 1.1 7 2-2.9 2-7 2Z"/></svg>'
+  };
+
+  /* ---------- pipeline definition ---------- */
+  // start = act at which node turns active; spans until next.start
+  const NODES = [
+    {ic:IC.target, t:'Target ID &amp; validation', s:'druggability · novelty', start:1, next:2,
+      models:['ESM','Gemini'], cloud:[['A2A · Google','a2a']]},
+    {ic:IC.dna, t:'Generative design', s:'scaffolds · sequences', start:2, next:3,
+      models:['RFdiffusion','IgLM'], cloud:[['Azure','azure']]},
+    {ic:IC.cube, t:'Structure &amp; docking', s:'fold · pose · affinity', start:3, next:4,
+      models:['AlphaFold3','ABodyBuilder','Boltz-2'], cloud:[['Azure HPC','azure']]},
+    {ic:IC.scale, t:'In-silico triage', s:'developability · immuno · tox', start:4, next:5,
+      models:['ImmunoScan','Quantum Elements'], cloud:[['Azure','azure']]},
+    {ic:IC.gate, t:'Rank → human gate', s:'composite · four-eyes', start:5, next:7,
+      models:['Rank Agent'], cloud:[['Foundry','azure']]},
+    {ic:IC.flask, t:'Wet-lab call', s:'scientist owns', start:7, next:8,
+      models:['Human'], cloud:[['Annex 22','a2a']]}
+  ];
+
+  /* ---------- agent roster (right panel, act 0) ---------- */
+  const AGENTS = [
+    {av:'T', n:'Target ID Agent', d:'Validates target & epitope via multimodal RAG', id:'Entra Agent ID · 7b21·a4'},
+    {av:'G', n:'Generative Design Agent', d:'RFdiffusion scaffolds + IgLM sequences', id:'Entra Agent ID · c9d0·1f'},
+    {av:'S', n:'Structure & Docking Agent', d:'AlphaFold3 / ABodyBuilder folds + Boltz-2 docking', id:'Entra Agent ID · 4e88·b2'},
+    {av:'X', n:'In-silico Triage Agent', d:'Developability · immunogenicity · tox', id:'Entra Agent ID · a3f7·9c'},
+    {av:'R', n:'Rank Agent', d:'Composite ranking → shortlist for human gate', id:'Entra Agent ID · 6f10·2e'}
+  ];
+
+  /* ---------- per-act agent log ---------- */
+  const LOG = {
+    1:[['run','<b>Target ID Agent</b> · pulling CLDN18.2 evidence'],
+       ['ok','Fabric / OneLake shortcuts read <b>S3 + GCS in place</b> (no copy)'],
+       ['ok','ESM features + AI Search hybrid-RAG over 1,284 assay records'],
+       ['ok','<b>Target validated</b> · druggable · novel epitope · go']],
+    2:[['run','<b>Generative Design Agent</b> · RFdiffusion + IgLM'],
+       ['ok','240 antibody candidates generated'],
+       ['ok','Diversity + liability pre-filter applied'],
+       ['ok','<b>24 candidates advanced</b>']],
+    3:[['run','<b>Structure &amp; Docking Agent</b> · AlphaFold3 + ABodyBuilder'],
+       ['ok','Azure HPC <b>ND-series GPU</b> · 24 structures + MD relax'],
+       ['ok','Boltz-2 docking poses + &Delta;G affinity estimates'],
+       ['ok','<b>24 structures + binding poses</b> ready']],
+    4:[['run','<b>In-silico Triage Agent</b> · developability + immuno + tox'],
+       ['ok','ImmunoScan · MHC-II / T-cell epitope sweep'],
+       ['ok','Azure <b>Quantum Elements</b> · tox + DFT (accel ~20×)'],
+       ['warn','<b>1 liability flagged</b> on best-affinity candidate (Ab-07)']],
+    5:[['run','<b>Rank Agent</b> · composite = affinity × developability × safety'],
+       ['ok','<b>Top-5 shortlist</b> ready'],
+       ['warn','Gate: four-eyes required before any wet-lab work (Annex 22)']]
+  };
+
+  /* ---------- candidates ---------- */
+  // composite-sorted order; Ab-07 best affinity but flagged
+  const CANDS = [
+    {id:'Ab-03', kd:'1.4 nM', kdv:1.4, dev:88, tm:'71°C', immuno:'Low', synth:'Yes', comp:91, flag:null, rank:1, rec:true},
+    {id:'Ab-11', kd:'2.1 nM', kdv:2.1, dev:84, tm:'69°C', immuno:'Low', synth:'Yes', comp:86, flag:null, rank:2, rec:true},
+    {id:'Ab-07', kd:'0.6 nM', kdv:0.6, dev:41, tm:'62°C', immuno:'High', synth:'Marginal', comp:58, flag:'T-cell epitope + aggregation', rank:3, best:true},
+    {id:'Ab-22', kd:'3.0 nM', kdv:3.0, dev:79, tm:'68°C', immuno:'Low', synth:'Yes', comp:80, flag:null, rank:4},
+    {id:'Ab-05', kd:'4.2 nM', kdv:4.2, dev:76, tm:'66°C', immuno:'Med', synth:'Yes', comp:74, flag:null, rank:5}
+  ];
+
+  const ROI = [
+    {v:'+ candidates', k:'validated / cycle', on:2},
+    {v:'12–18 mo', k:'to clinic vs 4–6 yr', on:5},
+    {v:'~46%', k:'revenue protected', on:7},
+    {v:'Azure·Google·AWS', k:'federated, not migrated', on:0}
+  ];
+
+  /* ---------- antibody schematic ---------- */
+  function antibody(highlight){
+    const hot = highlight ? '<g><circle cx="171" cy="58" r="16" fill="#F2C786" opacity=".55"/><circle cx="171" cy="58" r="16" fill="none" stroke="#9A5B00" stroke-width="1.5" stroke-dasharray="3 3"/></g>' : '';
+    const hotlbl = highlight ? '<text x="171" y="32" text-anchor="middle" font-size="9" font-weight="800" fill="#9A5B00">aggregation</text><text x="171" y="42" text-anchor="middle" font-size="9" font-weight="800" fill="#9A5B00">hotspot</text>' : '';
+    return '<svg class="structsvg" viewBox="0 0 240 200" width="100%">'
+      +'<g fill="none" stroke="#0F7B8A" stroke-width="13" stroke-linecap="round">'
+      +'<path d="M120 120 L69 58"/><path d="M120 120 L171 58"/>'   // Fab arms
+      +'</g>'
+      +'<rect x="113" y="118" width="14" height="62" rx="7" fill="#0B6673"/>' // Fc stem
+      +'<g fill="#1666b3" stroke="#fff" stroke-width="2">'
+      +'<rect x="55" y="44" width="28" height="28" rx="8"/><rect x="157" y="44" width="28" height="28" rx="8"/>' // VH domains
+      +'</g>'
+      + hot
+      +'<g fill="#FFB900" stroke="#9a6b00" stroke-width="1.5">'
+      +'<circle cx="62" cy="40" r="7"/><circle cx="76" cy="40" r="7"/>'
+      +'<circle cx="164" cy="40" r="7"/><circle cx="178" cy="40" r="7"/>' // CDR loops
+      +'</g>'
+      + hotlbl
+      +'<text x="69" y="92" text-anchor="middle" font-size="9" font-weight="700" fill="#605E5C">VH/VL</text>'
+      +'<text x="171" y="92" text-anchor="middle" font-size="9" font-weight="700" fill="#605E5C">VH/VL</text>'
+      +'<text x="120" y="195" text-anchor="middle" font-size="9" font-weight="700" fill="#605E5C">Fc</text>'
+      +'</svg>';
+  }
+
+  /* ---------- state ---------- */
+  let act = 0;            // 0..8
+  let running = false;
+  let runToken = 0;
+  const MAXACT = 8;
+
+  /* ---------- helpers ---------- */
+  function nodeStatus(n){ if(act < n.start) return 'queued'; if(act < n.next) return 'active'; return 'done'; }
+
+  function chips(n){
+    let h = '';
+    n.models.forEach(m => h += '<span class="mchip">'+m+'</span>');
+    n.cloud.forEach(c => h += '<span class="cchip '+c[1]+'">'+c[0]+'</span>');
+    return h;
+  }
+
+  function renderPipe(){
+    let h='';
+    NODES.forEach((n,i)=>{
+      const st = nodeStatus(n);
+      const dot = st==='done' ? IC.check : (i+1);
+      const tag = st==='active' ? '<span class="pstat run">running</span>' : (st==='done' ? '<span class="pstat don">done</span>' : '');
+      h += '<div class="pstep '+st+'">'
+        +'<div class="pdot">'+dot+'</div>'
+        +'<div><div class="ptitle">'+n.t+'</div><div class="psub">'+n.s+'</div>'
+        +'<div class="pchips">'+chips(n)+'</div></div>'+tag+'</div>';
+    });
+    document.getElementById('pipe').innerHTML = h;
+  }
+
+  /* ---------- center canvas per act ---------- */
+  function cHead(ic,title,sub){
+    return '<div class="chead"><div class="ci">'+ic+'</div><div><h2>'+title+'</h2><div class="csub">'+sub+'</div></div></div>';
+  }
+
+  function canvasHTML(){
+    if(act===0){
+      return cHead(IC.target,'Discovery run · CLDN18.2','Refill the pipeline before the 2028 cliff — design a therapeutic antibody')
+        +'<div class="card brief">'
+        +'<h3>Target brief</h3><div class="bl">Agentic orchestration over protein/antibody + foundation models — federated across Azure, Google &amp; AWS.</div>'
+        +'<div class="bgrid">'
+        +'<div class="bkpi"><div class="bv">CLDN18.2</div><div class="bk">gastric / GEJ solid-tumor antigen</div></div>'
+        +'<div class="bkpi"><div class="bv">Antibody</div><div class="bk">biologic · high-affinity + developable</div></div>'
+        +'<div class="bkpi"><div class="bv">5 agents</div><div class="bk">Target → Design → Structure → Triage → Rank</div></div>'
+        +'</div>'
+        +'<div class="brow"><b>Objective</b><span>Maximise binding affinity <i>and</i> developability; no immunogenicity or tox liabilities.</span></div>'
+        +'<div class="brow"><b>Constraints</b><span>Human-in-the-loop gate before any wet-lab work (four-eyes, Annex 22).</span></div>'
+        +'<div class="brow"><b>Data</b><span>Fabric / OneLake shortcuts read S3 + GCS in place · Mayo multimodal · assay precedent.</span></div>'
+        +'<button class="runbtn" data-go="1">'+IC.run+' Run discovery orchestration</button>'
+        +'</div>';
+    }
+    if(act===1){
+      return cHead(IC.target,'Target ID &amp; validation','Target ID Agent · ESM + Gemini (A2A) · hybrid RAG')
+        +'<div class="card"><div class="brow" style="border:none;padding-top:0"><b>CLDN18.2</b><span>Claudin-18 isoform 2 — tight-junction protein, tumour-restricted exposure on gastric / GEJ adenocarcinoma.</span></div>'
+        +'<div class="scoregrid" style="margin-top:6px">'
+        +'<div class="srow"><span class="cn">Druggable</span><div class="smeter"><span class="sl">surface epitope</span><div class="sb"><i class="good" style="width:86%"></i></div></div><div class="smeter"><span class="sl">tumour-restricted</span><div class="sb"><i class="good" style="width:80%"></i></div></div><div class="smeter"><span class="sl">novelty</span><div class="sb"><i class="good" style="width:74%"></i></div></div><span class="sflag ok">✓ Validated · go</span></div>'
+        +'</div>'
+        +'<div class="slhint" style="margin-top:13px">'+IC.data+' Evidence pulled in place from S3 + GCS via OneLake shortcuts — federate, don\u2019t migrate</div>'
+        +'</div>';
+    }
+    if(act===2){
+      let tiles=''; for(let i=0;i<24;i++){ tiles += '<div class="tile" style="animation-delay:'+(i*18)+'ms">Ab-'+String(i+1).padStart(2,'0')+'</div>'; }
+      return cHead(IC.dna,'Generative design','Generative Design Agent · RFdiffusion + IgLM · Azure')
+        +'<div class="card">'
+        +'<div class="gencount"><b>240</b><span class="arrow">→ diversity + liability pre-filter →</span><b>24</b><span style="font-size:12px;color:var(--muted)">candidate antibodies advanced</span></div>'
+        +'<div class="tiles" style="margin-top:12px">'+tiles+'</div></div>';
+    }
+    if(act===3){
+      const poses = CANDS.slice().sort((a,b)=>a.kdv-b.kdv).map(c=>{
+        const w = Math.round(100 - (c.kdv/4.5*72));
+        return '<div class="pose"><span class="pn">'+c.id+'</span><div class="bar"><i style="width:'+w+'%"></i></div><span class="pv">KD '+c.kd+'</span></div>';
+      }).join('');
+      return cHead(IC.cube,'Structure &amp; docking','Structure Agent · AlphaFold3 + ABodyBuilder + Boltz-2 · Azure HPC ND-GPU')
+        +'<div class="card"><div class="structwrap"><div>'+antibody(false)+'</div>'
+        +'<div><div style="font-size:12px;color:var(--muted);margin-bottom:8px;font-weight:600">Predicted binding affinity (Boltz-2 docking, top candidates)</div><div class="poses">'+poses+'</div></div></div></div>';
+    }
+    if(act===4){
+      const rows = CANDS.slice().sort((a,b)=>a.rank-b.rank).map(c=>{
+        const devcls = c.dev>=80?'good':(c.dev>=60?'mid':'bad');
+        const aff = Math.round(100-(c.kdv/4.5*70));
+        const imm = c.immuno==='Low'?{w:24,cls:'good'}:(c.immuno==='Med'?{w:55,cls:'mid'}:{w:90,cls:'bad'});
+        const flagged = c.flag?'flagged':'';
+        const badge = c.flag? '<span class="sflag">⚠ '+c.flag+'</span>' : '<span class="sflag ok">✓ clean</span>';
+        return '<div class="srow '+flagged+'"><span class="cn">'+c.id+'</span>'
+          +'<div class="smeter"><span class="sl">affinity</span><div class="sb"><i class="good" style="width:'+aff+'%"></i></div></div>'
+          +'<div class="smeter"><span class="sl">developability</span><div class="sb"><i class="'+devcls+'" style="width:'+c.dev+'%"></i></div></div>'
+          +'<div class="smeter"><span class="sl">immunogenicity risk</span><div class="sb"><i class="'+imm.cls+'" style="width:'+imm.w+'%"></i></div></div>'
+          + badge +'</div>';
+      }).join('');
+      return cHead(IC.scale,'In-silico triage','Triage Agent · ImmunoScan + Developability + Azure Quantum Elements (tox)')
+        +'<div class="card"><div class="scoregrid">'+rows+'</div>'
+        +'<div class="slhint" style="margin-top:13px;color:var(--amber);background:var(--amber-bg);border-color:var(--amber-bd)">'+IC.warn.replace(/fill="[^"]*"/,'')+' Best raw affinity (Ab-07) carries the worst developability — triage surfaces it before ranking</div></div>';
+    }
+    if(act===5){
+      return cHead(IC.gate,'Ranked shortlist → human gate','Rank Agent · composite = affinity × developability × safety × synthesizability')
+        +shortlistCard(true);
+    }
+    if(act===6){
+      const c = CANDS.find(x=>x.id==='Ab-07');
+      return cHead(IC.gate,'Inspect flagged candidate · Ab-07','Best binder (KD 0.6 nM) · composite 58 · trace every liability to its model')
+        +shortlistChips()
+        +'<div class="detgrid">'
+        +'<div class="ev"><div class="evh">'+IC.warn+' Immunogenicity — T-cell epitope</div><div class="evb">High-affinity <b>MHC-II binders</b> in <b>CDR-H3</b> — predicted anti-drug-antibody risk in patients.'
+        +'<div class="epi">…CASS<span class="hot">FGLYW</span>GQGT… <span style="color:var(--amber);font-weight:800">← 3 epitopes</span></div>'
+        +'<div class="src">'+IC.spark+' Source: <b>ImmunoScan epitope model v4</b> · Azure</div></div></div>'
+        +'<div class="ev"><div class="evh">'+IC.warn+' Developability — aggregation</div><div class="evb">Exposed <b>hydrophobic patch</b> on VH → predicted high viscosity &amp; aggregation; CMC / formulation risk.'
+        +'<div style="margin-top:8px">'+antibody(true)+'</div>'
+        +'<div class="src">'+IC.spark+' Source: <b>AlphaFold3 structure</b> + Developability model · Azure HPC</div></div></div>'
+        +'</div>'
+        +'<div class="verdict amber">Best binder, worst developability. <b>Affinity alone would have advanced a liability</b> — the agent ranked it 3rd, and the scientist owns the call.</div>';
+    }
+    if(act===7){
+      return cHead(IC.flask,'Wet-lab selection recorded','Dr. Aisha Khan · four-eyes co-sign required before synthesis (Annex 22)')
+        +'<div class="selgrid">'
+        +'<div class="selc promote"><div class="sct">Ab-03</div><div class="sctag">→ wet-lab</div><div class="scl">KD 1.4 nM · developability 88 · Tm 71°C · clean · synthesizable</div></div>'
+        +'<div class="selc promote"><div class="sct">Ab-11</div><div class="sctag">→ wet-lab</div><div class="scl">KD 2.1 nM · developability 84 · clean — diversity backup</div></div>'
+        +'<div class="selc redesign"><div class="sct">Ab-07</div><div class="sctag">→ redesign queue</div><div class="scl">Best affinity, but T-cell epitope + aggregation — back to generative design with constraints</div></div>'
+        +'</div>'
+        +'<div class="card" style="margin-top:4px"><div class="brow" style="border:none;padding-top:0"><b>Decision</b><span>Promote <b>Ab-03 + Ab-11</b> to wet-lab; send <b>Ab-07</b> to redesign. AI triaged 240 candidates at portfolio scale; the scientist made the wet-lab call.</span></div></div>';
+    }
+    // act 8 — lineage
+    const t = '14:0';
+    const lin = [
+      ['','Target ID Agent','ESM + Gemini · A2A','OneLake → S3+GCS · AI Search','7b21·a4'],
+      ['','Generative Design Agent','RFdiffusion + IgLM','240 → 24 candidates','c9d0·1f'],
+      ['','Structure &amp; Docking Agent','AlphaFold3 · ABodyBuilder · Boltz-2','Azure HPC ND-GPU','4e88·b2'],
+      ['','In-silico Triage Agent','ImmunoScan · Quantum Elements','developability · immuno · tox','a3f7·9c'],
+      ['','Rank Agent','composite ranking','top-5 shortlist','6f10·2e'],
+      ['human','Dr. Aisha Khan — wet-lab call','Ab-03 + Ab-11 → wet-lab · Ab-07 → redesign','Discovery Scientist','—'],
+      ['human','Dr. Marco Ferreira — four-eyes co-sign','selection countersigned','Protein-Design Engineer','—'],
+      ['seal','Microsoft Purview — lineage sealed','WORM · immutable · Part 11 / ALCOA+','tamper-evident audit','—']
+    ];
+    let rows='';
+    lin.forEach((r,i)=>{
+      const cls = r[0]?(' '+r[0]):'';
+      const worm = r[0]==='seal' ? '<span class="worm">WORM sealed</span>' : '';
+      rows += '<div class="linrow'+cls+'"><div class="lindot"><span class="dt"></span></div>'
+        +'<div><div class="lintop"><b>'+r[1]+'</b> '+worm+'<span class="lt">'+t+(2+i)+' UTC · sha256 '+Math.random().toString(16).slice(2,8)+'…</span></div>'
+        +'<div class="linmeta">'+r[2]+' · <code>'+(r[4]!=='—'?'agent '+r[4]:r[3])+'</code>'+(r[4]!=='—'?' · '+r[3]:'')+'</div></div></div>';
+    });
+    return cHead(IC.lock||IC.shield,'Purview lineage — inspection-ready','Every agent, model version, dataset, cross-cloud call &amp; human decision — immutable')
+      +'<div class="card"><div class="lin">'+rows+'</div></div>';
+  }
+
+  function shortlistCard(hintRow){
+    const rows = CANDS.map(c=>{
+      const cls = c.rec?'rec':(c.flag?'flag':'');
+      const dataGo = c.flag?' data-go="6"':'';
+      const best = c.best?'<span class="best">best KD</span>':'';
+      const pill = c.flag? '<span class="pill warn">⚠ '+c.flag+'</span>' : '<span class="pill ok">✓ clean</span>';
+      return '<tr class="'+cls+'"'+dataGo+'><td><span class="rk">'+c.rank+'</span></td>'
+        +'<td><span class="cid">'+c.id+'</span>'+best+'</td>'
+        +'<td class="num">'+c.kd+'</td><td class="num">'+c.dev+'</td><td class="num">'+c.tm+'</td><td class="num">'+c.immuno+'</td>'
+        +'<td class="num" style="color:var(--teal-dk);font-weight:800">'+c.comp+'</td>'
+        +'<td>'+pill+'</td></tr>';
+    }).join('');
+    const hint = hintRow ? '<div class="slhint" style="margin-top:13px">'+IC.spark+' The best raw binder isn\u2019t #1 — click the flagged <b>Ab-07</b> row to inspect why</div>' : '';
+    return '<div class="card flush"><table class="sl"><thead><tr>'
+      +'<th>#</th><th>Candidate</th><th class="num">Affinity KD</th><th class="num">Develop.</th><th class="num">Tm</th><th class="num">Immuno</th><th class="num">Composite</th><th>Status</th>'
+      +'</tr></thead><tbody>'+rows+'</tbody></table></div>'+hint;
+  }
+  function shortlistChips(){
+    return '<div class="slchips">'+CANDS.map(c=>{
+      const cls = c.flag?'flag':(c.rec?'rec':'');
+      const mark = c.flag?'⚠ flagged':'✓';
+      const best = c.best?' · best KD':'';
+      return '<span class="slchip '+cls+'"><b>#'+c.rank+'</b> '+c.id+best+' <span class="cm">'+mark+'</span></span>';
+    }).join('')+'</div>';
+  }
+
+  /* ---------- right context per act ---------- */
+  function ctxHTML(){
+    if(act===0){
+      let ag = AGENTS.map(a=>'<div class="agentcard"><div class="aav">'+a.av+'</div><div><div class="an">'+a.n+'</div><div class="ad">'+a.d+'</div><div class="aid">'+a.id+'</div></div></div>').join('');
+      return ['Orchestration plan',
+        '<div class="lead">Orchestrated by <b>Azure AI Foundry Agent Service</b>. Partner agents (Gemini · Protillion · Variational) join via <b>A2A</b> across clouds — all under one Entra identity.</div>'
+        +ag];
+    }
+    if(act>=1 && act<=5){
+      // cumulative log up to current act
+      let logh='';
+      for(let a=1;a<=Math.min(act,5);a++){
+        (LOG[a]||[]).forEach(l=>{
+          const ic = l[0]==='ok'?IC.check:(l[0]==='warn'?IC.warn:IC.run);
+          logh += '<div class="logr '+l[0]+'"><span class="li">'+ic+'</span><span>'+l[1]+'</span></div>';
+        });
+      }
+      const head = act===5 ? 'Gate · awaiting human' : 'Agent activity';
+      return [head, '<div class="agenttag">Live orchestration log</div><div class="log">'+logh+'</div>'];
+    }
+    if(act===6){
+      return ['Human gate · decide',
+        '<div class="panelbox amber"><div class="pbh">'+IC.warn+' Ab-07 — liabilities</div>'
+        +'<div class="note" style="color:var(--amber);font-weight:600">Best affinity (0.6 nM) but: T-cell epitope cluster (CDR-H3) + aggregation hotspot. Developability 41/100.</div></div>'
+        +'<div class="pbh" style="margin-top:4px">Decisions a human owns</div>'
+        +'<ul class="ownlist"><li>Which candidates advance to wet-lab?</li><li>Which scaffolds to re-synthesize?</li><li>Approve the ranked shortlist (four-eyes)</li></ul>'
+        +'<div class="decols"><button class="actbtn primary" data-go="7">'+IC.check+' Promote Ab-03 + Ab-11 → wet-lab</button>'
+        +'<button class="actbtn ghost" data-go="7">'+IC.dna+' Send Ab-07 → redesign queue</button></div>'
+        +'<div class="note">The human decides — the copilot only surfaces the evidence. Nothing advances to wet-lab without sign-off.</div>'];
+    }
+    if(act===7){
+      return ['Four-eyes co-sign',
+        '<div class="panelbox"><div class="cosigner"><div class="cav">MF</div><div><div class="cn">Dr. Marco Ferreira</div><div class="cd">Protein-Design Engineer · second pair of eyes</div></div></div></div>'
+        +'<div class="panelbox green"><div class="pbh">'+IC.check+' Selection recorded</div><div class="note" style="color:var(--green-ink);font-weight:600">Ab-03 + Ab-11 → wet-lab · Ab-07 → redesign. Awaiting countersignature.</div></div>'
+        +'<button class="actbtn sign" data-go="8">'+IC.gate+' Co-sign &amp; seal lineage</button>'
+        +'<div class="note">Four-eyes before any wet-lab work — Annex 22. Co-signature is identity-bound, timestamped, immutable.</div>'];
+    }
+    // act 8
+    return ['Lineage sealed',
+      '<div class="stmp">'+IC.lock+' Sealed · Purview WORM</div>'
+      +'<div class="sealrow">'+IC.shield+' Part 11 / ALCOA+ ready — inspection-ready by design</div>'
+      +'<div class="panelbox green"><div class="pbh">'+IC.check+' Run complete</div><div class="note" style="color:var(--green-ink);font-weight:600">AI triaged 240 candidates at portfolio scale across Azure · Google · AWS. The scientist owned the wet-lab call. Every step is traceable.</div></div>'
+      +'<div class="lead"><b>12–18 months</b> to clinic vs 4–6-year norm — more validated candidates per cycle, governed end to end.</div>'];
+  }
+
+  /* ---------- ROI strip ---------- */
+  function renderRoi(){
+    document.getElementById('roistrip').innerHTML = ROI.map(r=>{
+      const on = act>=r.on ? ' on' : '';
+      return '<div class="roichip'+on+'"><span class="rv">'+r.v+'</span><span class="rk">'+r.k+'</span></div>';
+    }).join('');
+  }
+
+  /* ---------- render ---------- */
+  const STEPLBL = ['Brief','Target ID','Generative design','Structure & docking','In-silico triage','Ranked shortlist','Inspect Ab-07','Wet-lab call','Lineage sealed'];
+  function render(){
+    renderPipe();
+    document.getElementById('canvas').innerHTML = canvasHTML();
+    const cx = ctxHTML();
+    document.getElementById('ctxhd').textContent = cx[0];
+    document.getElementById('ctxbody').innerHTML = cx[1];
+    renderRoi();
+    document.getElementById('steplbl').innerHTML = 'Step <b>'+act+'</b> / '+MAXACT+' · '+STEPLBL[act];
+    document.getElementById('backBtn').disabled = act===0;
+    document.getElementById('nextBtn').disabled = act===MAXACT;
+    location.hash = 's='+act;
+  }
+
+  /* ---------- actions ---------- */
+  function go(n){ stopRun(); act = Math.max(0, Math.min(MAXACT, n)); render(); }
+  function next(){ if(act<MAXACT){ go(act+1); } }
+  function back(){ if(act>0){ go(act-1); } }
+  function reset(){ stopRun(); act=0; render(); }
+  function stopRun(){ running=false; runToken++; const b=document.getElementById('autoBtn'); if(b) b.innerHTML='<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7Z"/></svg> Auto-run'; }
+  async function run(){
+    if(running){ stopRun(); return; }
+    running=true; const tok=++runToken;
+    document.getElementById('autoBtn').innerHTML='<svg viewBox="0 0 24 24"><path d="M6 6h4v12H6zM14 6h4v12h-4z"/></svg> Pause';
+    if(act===MAXACT){ act=0; render(); await wait(500); }
+    while(running && tok===runToken && act<MAXACT){
+      await wait(act===0?700:1150);
+      if(!running||tok!==runToken) break;
+      act++; render();
+    }
+    if(tok===runToken) stopRun();
+  }
+  function wait(ms){ return new Promise(r=>setTimeout(r,ms)); }
+
+  /* ---------- wiring ---------- */
+  document.getElementById('nextBtn').addEventListener('click', next);
+  document.getElementById('backBtn').addEventListener('click', back);
+  document.getElementById('resetBtn').addEventListener('click', reset);
+  document.getElementById('autoBtn').addEventListener('click', run);
+  document.addEventListener('click', e=>{
+    const el = e.target.closest('[data-go]');
+    if(el){ go(parseInt(el.getAttribute('data-go'),10)); }
+  });
+  document.addEventListener('keydown', e=>{
+    if(e.key==='ArrowRight'){ next(); } else if(e.key==='ArrowLeft'){ back(); }
+    else if(e.key.toLowerCase()==='r'){ reset(); } else if(e.key===' '){ e.preventDefault(); run(); }
+  });
+
+  /* ---------- deep link ---------- */
+  function fromHash(){
+    const m = (location.hash||'').match(/s=(\d+)/);
+    if(m){ const n=parseInt(m[1],10); if(n>=0&&n<=MAXACT) act=n; }
+  }
+  fromHash();
+  render();
+})();
+</script>
+</body>
+</html>
