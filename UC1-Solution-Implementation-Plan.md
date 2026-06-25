@@ -19,6 +19,8 @@ Provide a phased, low-risk path to deliver the UC1 target state defined in the S
 
 This plan is grounded in the customer report-out deck — *["Grounded in the Customer — Merck (MSD): Business Pressures First"](https://rajesh-ms.github.io/aifirstbeta-pharma/)* (slides 2–5 for pressures, outcomes and drivers; slide 8 for the Azure stack mapping; slide 9 for the "federate, don't migrate" four-plane model) — and the research `.md` files behind it.
 
+It is **sized by a bottom-up estimate** (see Section 7) captured in the companion workbook **`UC1-WBS-Estimates-Staffing.xlsx`** — a work-breakdown structure of **11,190 hours / ~$3.21M total investment** across the five phases, built on the FY25 IS estimate model (workstreams × roles × per-phase hours at Americas list rates). Every phase, gate and team decision below ties back to that WBS.
+
 ---
 
 ## 2. Approach & guiding principles
@@ -69,22 +71,27 @@ gantt
 ### Phase 0 — Foundation & governance baseline (≈ Months 0–3)
 - **Deliverables:** Azure landing zone established as the deck's **four federation planes** (slide 9) — **Identity** (Entra + Agent ID), **Governance** (Purview lineage + Defender for Cloud + Part 11/ALCOA+ control mapping), **Data** (Fabric/OneLake shortcuts to S3/GCS), **Control** (Azure Arc); plus an AI Search index over assay/precedent data.
 - **Exit criteria:** every planned agent identity provisioned; lineage captured on a test dataset; S3/GCS readable in place; security review passed.
+- **Effort:** ≈ 1,530 hrs · ≈ 2.9 FTE blended (13 wk).
 
 ### Phase 1 — Single-pipeline pilot (≈ Months 3–6)
 - **Deliverables:** end-to-end pipeline for **one target class** (Target ID → Rank) with a working **human gate**; open models served (ESM, AlphaFold3, RFdiffusion, IgLM); manual **baseline metrics** captured for Annex 22.
 - **Exit criteria:** ranked shortlist approved by a scientist via four-eyes; full audit trail; AI shown ≥ manual baseline on agreed metrics.
+- **Effort:** ≈ 2,170 hrs · ≈ 4.2 FTE blended (13 wk).
 
 ### Phase 2 — Multi-agent orchestration (≈ Months 6–9)
 - **Deliverables:** all five agents on Foundry Agent Service; Azure Quantum Elements triage; HPC/Batch burst; retries/state/observability.
 - **Exit criteria:** automated multi-stage runs with one human gate; reproducible runs (versioned models/prompts/data).
+- **Effort:** ≈ 2,410 hrs · ≈ 4.6 FTE blended (13 wk).
 
 ### Phase 3 — Multicloud federation (≈ Months 9–11)
 - **Deliverables:** A2A/MCP integration of **Gemini, Protillion, Variational** agents as governed tools; lineage across clouds; Arc-governed resources.
 - **Exit criteria:** partner-model outputs captured with full provenance; data residency validated; SLAs agreed.
+- **Effort:** ≈ 1,950 hrs · ≈ 5.4 FTE blended (9 wk) — **peak staffing**.
 
 ### Phase 4 — Scale to production & portfolio (≈ Months 11–15)
 - **Deliverables:** concurrent portfolio-scale pipelines; HPC cost-steward controls; operational runbooks; production support model.
 - **Exit criteria:** sustained throughput at portfolio scale; cost within budget; production governance sign-off.
+- **Effort:** ≈ 3,130 hrs · ≈ 4.6 FTE blended (17 wk).
 
 ---
 
@@ -106,7 +113,54 @@ gantt
 
 ---
 
-## 7. Governance & human-in-the-loop gates
+## 7. Estimates, staffing & investment
+
+*Sized bottom-up in the companion workbook **`UC1-WBS-Estimates-Staffing.xlsx`** (FY25 IS estimate model: 5 workstreams × 17 roles × per-phase hours at Americas list rates). Figures are **professional-services delivery effort**; Azure/partner consumption is separate (Section 10).*
+
+**At a glance**
+
+| Measure | Value |
+|---|---|
+| Total delivery effort | **11,190 hours** |
+| Professional fees | **$2.92M** |
+| + Risk reserve (7%) + reimbursable (3%) | **$0.29M** |
+| **Total investment (sell)** | **$3.21M** |
+| Blended rate | **≈ $261 / hr** |
+| Named delivery roles | **17** (onshore-led + offshore) |
+| Duration / phases | **≈ 15 months · 5 phases** |
+| Peak team size | **≈ 5.4 FTE** (Phase 3) |
+
+**By workstream**
+
+| # | Workstream | Hours | Fees | % Fees |
+|---|---|---:|---:|---:|
+| 1 | Governance & Program Mgmt | 1,050 | $288,200 | 9.9% |
+| 2 | Security & Compliance | 1,040 | $278,200 | 9.5% |
+| 3 | Data Foundation | 2,940 | $629,500 | 21.5% |
+| 4 | Agentic AI Discovery UC | 5,600 | $1,676,400 | 57.4% |
+| 5 | SecureByDefault & Ops | 560 | $50,400 | 1.7% |
+| | **Total** | **11,190** | **$2,922,700** | **100%** |
+
+**By phase**
+
+| Phase | Window | Weeks | Hours | Fees | Blended FTE |
+|---|---|---:|---:|---:|---:|
+| P0 Foundation | Mo 0–3 | 13 | 1,530 | $392,040 | 2.9 |
+| P1 Pilot | Mo 3–6 | 13 | 2,170 | $606,440 | 4.2 |
+| P2 Orchestration | Mo 6–9 | 13 | 2,410 | $669,040 | 4.6 |
+| P3 Federation | Mo 9–11 | 9 | 1,950 | $503,820 | 5.4 |
+| P4 Scale | Mo 11–15 | 17 | 3,130 | $751,360 | 4.6 |
+| | **Total** | **65** | **11,190** | **$2,922,700** | **5.4 peak** |
+
+**Notes & grounding**
+- Effort is weighted to **Agentic AI Discovery (57%)** — the 5-agent pipeline, model strategy and evaluation framework are the heart of UC1 (Solution Design §4–6).
+- Delivery is **onshore-led with heavy offshore leverage** (Global Delivery at list) to hold the blended rate at ≈ $261/hr.
+- Build-up uses template defaults of **7% risk reserve + 3% reimbursable**; both are tunable inputs in the workbook.
+- Hours are a **bottom-up planning estimate to be validated, sequenced and co-funded with the customer** (deck slide 6). They **exclude** Azure consumption, partner-model usage and Merck-side effort.
+
+---
+
+## 8. Governance & human-in-the-loop gates
 
 | Gate | When | Owner | Criterion |
 |---|---|---|---|
@@ -118,7 +172,7 @@ gantt
 
 ---
 
-## 8. Success metrics / KPIs
+## 9. Success metrics / KPIs
 
 | KPI | Baseline | Target |
 |---|---|---|
@@ -131,8 +185,9 @@ gantt
 
 ---
 
-## 9. Cost & licensing considerations
+## 10. Cost & licensing considerations
 
+- **Professional-services delivery: ≈ $3.21M** total investment (11,190 hrs; 7% risk reserve + 3% reimbursable; blended ≈ $261/hr) — see Section 7 and `UC1-WBS-Estimates-Staffing.xlsx`. The items below are **Azure / partner consumption**, billed separately.
 - **Consumption-based** Azure HPC/Batch with burst — opex, not capex; governed by the HPC cost steward.
 - **Foundry Agent Service + Azure ML** endpoint costs scale with usage.
 - **Partner models** billed under existing Merck agreements (Gemini, Protillion, Variational) — federated, not re-licensed.
@@ -140,7 +195,7 @@ gantt
 
 ---
 
-## 10. Risks & mitigations
+## 11. Risks & mitigations
 
 | # | Risk | Likelihood | Impact | Mitigation |
 |---|---|---|---|---|
@@ -153,13 +208,13 @@ gantt
 
 ---
 
-## 11. Dependencies & assumptions
+## 12. Dependencies & assumptions
 
 - **Dependencies:** Entra Agent ID, Foundry Agent Service capacity, HPC GPU quota, OneLake shortcut GA, partner endpoints, Quality/Regulatory availability for gates.
 - **Assumptions:** partner agreements permit federated invocation; reference datasets accessible; sponsor commitment to the new operating roles.
 
 ---
 
-## 12. Summary
+## 13. Summary
 
-UC1 lands in five phases over ~15 months: **govern → pilot → orchestrate → federate → scale.** Value is proven on one target class with a human gate and an Annex 22 baseline before any portfolio-scale rollout — accelerating discovery while keeping a human owner on every regulated decision and protecting Merck's existing multicloud AI investments.
+UC1 lands in five phases over ~15 months: **govern → pilot → orchestrate → federate → scale.** Value is proven on one target class with a human gate and an Annex 22 baseline before any portfolio-scale rollout — accelerating discovery while keeping a human owner on every regulated decision and protecting Merck's existing multicloud AI investments. The engagement is sized at **≈ 11,190 hours / ≈ $3.21M total investment** with a peak team of **≈ 5.4 FTE**, detailed in the companion workbook `UC1-WBS-Estimates-Staffing.xlsx` (Section 7) and to be validated with the customer.
