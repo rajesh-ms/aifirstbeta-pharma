@@ -104,8 +104,9 @@ body{
 .archgrid{display:grid;grid-template-columns:1fr 252px;gap:14px;margin-top:14px;}
 .bands{display:flex;flex-direction:column;gap:11px;}
 .band{display:grid;grid-template-columns:152px 1fr;gap:11px;align-items:stretch;}
-.band__l{background:var(--green-700);color:#fff;border-radius:10px;display:grid;place-items:center;text-align:center;
+.band__l{background:var(--green-700);color:#fff;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;text-align:center;
   font:600 13px/1.12 var(--font-display);padding:6px 8px;}
+.plicon{width:23px;height:23px;display:block;color:#fff;opacity:.95;}
 .band__cards{display:grid;grid-template-columns:repeat(3,1fr);gap:11px;}
 .bcard{background:#fff;border:1px solid var(--line);border-radius:10px;padding:9px 12px;
   box-shadow:0 12px 26px -24px rgba(11,53,38,.5);}
@@ -210,6 +211,28 @@ kbd{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);borde
   font-size:12.5px;letter-spacing:.04em;background:rgba(8,32,24,.5);padding:7px 14px;border-radius:999px;
   border:1px solid rgba(255,255,255,.14);transition:opacity .6s ease;}
 
+/* ===================== brand lockup + imagery ===================== */
+.brandlock{display:flex;align-items:center;gap:12px;font-family:var(--font-sans);white-space:nowrap;}
+.brandlock .ms{display:flex;align-items:center;gap:8px;}
+.brandlock .ms-logo{display:block;flex:none;}
+.brandlock .msw{font-weight:600;font-size:17px;letter-spacing:.1px;}
+.brandlock .bdiv{width:1px;height:21px;display:inline-block;}
+.brandlock .merckw{display:flex;align-items:baseline;gap:7px;}
+.brandlock .msd{font-weight:800;font-size:20px;letter-spacing:1.5px;}
+.brandlock .msd-sub{font-weight:600;font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;}
+.title-brand{position:absolute;right:90px;top:46px;z-index:2;}
+.title-brand .msw{color:#fff;}
+.title-brand .bdiv{background:rgba(255,255,255,.38);}
+.title-brand .msd{color:#fff;}
+.title-brand .msd-sub{color:var(--gold-l);}
+.slide--title .title-wrap{z-index:1;}
+.cobrand{position:absolute;right:54px;top:22px;z-index:3;transform:scale(.8);transform-origin:top right;}
+.cobrand .msw{color:#4c5752;}
+.cobrand .bdiv{background:#cbd6d1;}
+.cobrand .msd{color:var(--green-600);}
+.cobrand .msd-sub{color:var(--muted);}
+.hero-art{position:absolute;right:-26px;top:50%;transform:translateY(-50%);width:560px;height:560px;opacity:.18;z-index:0;pointer-events:none;}
+
 /* print → clean PDF, one slide per page */
 @page{size:1280px 720px;margin:0;}
 @media print{
@@ -234,6 +257,42 @@ kbd{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);borde
     <section class="slide slide--title active" aria-label="Title">
       <div class="slide-inner">
         <div class="goldbar"></div>
+        <svg class="hero-art" viewBox="0 0 560 560" fill="none" stroke="#27bdb1" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polygon points="430,152 398,206 334,206 302,152 334,98 398,98"/>
+          <polygon points="405,152 387,182 351,182 333,152 351,122 387,122" stroke-width="2"/>
+          <circle cx="430" cy="152" r="6.5" fill="#3ccfc2" stroke="none"/>
+          <circle cx="398" cy="206" r="6.5" fill="#3ccfc2" stroke="none"/>
+          <circle cx="334" cy="206" r="6.5" fill="#3ccfc2" stroke="none"/>
+          <circle cx="302" cy="152" r="6.5" fill="#3ccfc2" stroke="none"/>
+          <circle cx="334" cy="98" r="6.5" fill="#3ccfc2" stroke="none"/>
+          <circle cx="398" cy="98" r="6.5" fill="#3ccfc2" stroke="none"/>
+          <line x1="430" y1="152" x2="486" y2="152"/>
+          <circle cx="496" cy="152" r="7.5" fill="#3ccfc2" stroke="none"/>
+          <line x1="302" y1="152" x2="260" y2="122"/>
+          <circle cx="251" cy="116" r="6.5" fill="#3ccfc2" stroke="none"/>
+          <g stroke="#1bb3a6" stroke-width="9">
+            <line x1="330" y1="502" x2="330" y2="410"/>
+            <line x1="330" y1="410" x2="254" y2="334"/>
+            <line x1="330" y1="410" x2="406" y2="334"/>
+          </g>
+          <circle cx="254" cy="334" r="15" stroke="#1bb3a6" stroke-width="9"/>
+          <circle cx="406" cy="334" r="15" stroke="#1bb3a6" stroke-width="9"/>
+          <circle cx="330" cy="410" r="7" fill="#1bb3a6" stroke="none"/>
+          <g stroke="#27bdb1">
+            <line x1="120" y1="250" x2="176" y2="286"/>
+            <line x1="176" y1="286" x2="150" y2="346"/>
+            <line x1="176" y1="286" x2="236" y2="286"/>
+          </g>
+          <circle cx="120" cy="250" r="6.5" fill="#3ccfc2" stroke="none"/>
+          <circle cx="176" cy="286" r="7.5" fill="#3ccfc2" stroke="none"/>
+          <circle cx="150" cy="346" r="6.5" fill="#3ccfc2" stroke="none"/>
+          <circle cx="236" cy="286" r="6" fill="#3ccfc2" stroke="none"/>
+        </svg>
+        <div class="brandlock title-brand">
+          <span class="ms"><svg class="ms-logo" width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><rect width="9" height="9" x="0" y="0" fill="#F25022"/><rect width="9" height="9" x="10.5" y="0" fill="#7FBA00"/><rect width="9" height="9" x="0" y="10.5" fill="#00A4EF"/><rect width="9" height="9" x="10.5" y="10.5" fill="#FFB900"/></svg><span class="msw">Microsoft</span></span>
+          <span class="bdiv"></span>
+          <span class="merckw"><span class="msd">MSD</span><span class="msd-sub">Merck</span></span>
+        </div>
         <div class="title-wrap">
           <div class="eyebrow title-eyebrow">Architect Transformation &nbsp;&middot;&nbsp; Phase B &nbsp;&middot;&nbsp; Deliverables</div>
           <h1 class="title-h1">Multi-Step Discovery Orchestration</h1>
@@ -254,6 +313,11 @@ kbd{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);borde
     <!-- ===================== SLIDE 2 — ARCHITECTURE CONCEPT ===================== -->
     <section class="slide slide--light slide--arch" aria-label="Architecture Concept Diagram">
       <div class="slide-inner"><div class="pad">
+        <div class="brandlock cobrand">
+          <span class="ms"><svg class="ms-logo" width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><rect width="9" height="9" x="0" y="0" fill="#F25022"/><rect width="9" height="9" x="10.5" y="0" fill="#7FBA00"/><rect width="9" height="9" x="0" y="10.5" fill="#00A4EF"/><rect width="9" height="9" x="10.5" y="10.5" fill="#FFB900"/></svg><span class="msw">Microsoft</span></span>
+          <span class="bdiv"></span>
+          <span class="merckw"><span class="msd">MSD</span><span class="msd-sub">Merck</span></span>
+        </div>
         <div class="eyebrow">Deliverable 1 &nbsp;&middot;&nbsp; Architecture Concept Diagram</div>
         <h1 class="h1">Cloud-Centric Platform &mdash; Governed Agentic Discovery</h1>
         <div class="rule"></div>
@@ -274,7 +338,7 @@ kbd{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);borde
         <div class="archgrid">
           <div class="bands">
             <div class="band">
-              <div class="band__l">Orchestration<br>plane</div>
+              <div class="band__l"><svg class="plicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="2.4"/><circle cx="5" cy="5" r="1.7"/><circle cx="19" cy="5" r="1.7"/><circle cx="5" cy="19" r="1.7"/><circle cx="19" cy="19" r="1.7"/><path d="M10.3 10.3 6.4 6.4M13.7 10.3 17.6 6.4M10.3 13.7 6.4 17.6M13.7 13.7 17.6 17.6"/></svg><span>Orchestration<br>plane</span></div>
               <div class="band__cards">
                 <div class="bcard"><b>Azure AI Foundry Agent Service</b><span>multi-agent: Target&middot;Design&middot;Structure&middot;Triage&middot;Rank</span></div>
                 <div class="bcard"><b>A2A interoperability</b><span>calls Gemini &middot; Protillion &middot; Variational agents</span></div>
@@ -282,7 +346,7 @@ kbd{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);borde
               </div>
             </div>
             <div class="band">
-              <div class="band__l">Foundation<br>models</div>
+              <div class="band__l"><svg class="plicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 3 7.5l9 4.5 9-4.5L12 3Z"/><path d="M3 12l9 4.5L21 12"/><path d="M3 16.5 12 21l9-4.5"/></svg><span>Foundation<br>models</span></div>
               <div class="band__cards">
                 <div class="bcard"><b>Foundry catalog + Azure ML</b><span>ESM &middot; AlphaFold3 &middot; Boltz-2 &middot; IgLM &middot; RFdiffusion</span></div>
                 <div class="bcard"><b>Azure Quantum Elements</b><span>generative chemistry + tox &middot; accel. DFT ~20&times;</span></div>
@@ -290,7 +354,7 @@ kbd{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);borde
               </div>
             </div>
             <div class="band">
-              <div class="band__l">Compute<br>plane</div>
+              <div class="band__l"><svg class="plicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="7" y="7" width="10" height="10" rx="1.5"/><path d="M10 7V4M14 7V4M10 20v-3M14 20v-3M7 10H4M7 14H4M20 10h-3M20 14h-3"/></svg><span>Compute<br>plane</span></div>
               <div class="band__cards">
                 <div class="bcard"><b>Azure HPC &mdash; ND-series GPU</b><span>structure prediction &amp; molecular dynamics</span></div>
                 <div class="bcard"><b>CycleCloud / Azure Batch</b><span>docking &amp; screening at scale</span></div>
@@ -298,7 +362,7 @@ kbd{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);borde
               </div>
             </div>
             <div class="band">
-              <div class="band__l">Data<br>foundation</div>
+              <div class="band__l"><svg class="plicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v12c0 1.66 3.13 3 7 3s7-1.34 7-3V6"/><path d="M5 12c0 1.66 3.13 3 7 3s7-1.34 7-3"/></svg><span>Data<br>foundation</span></div>
               <div class="band__cards">
                 <div class="bcard"><b>Microsoft Fabric / OneLake</b><span>shortcuts read S3 + GCS in place (GA)</span></div>
                 <div class="bcard"><b>Azure Health Data Services</b><span>FHIR/DICOM/genomics &middot; Mayo multimodal</span></div>
@@ -335,6 +399,11 @@ kbd{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);borde
     <!-- ===================== SLIDE 3 — PERSONAS ===================== -->
     <section class="slide slide--light slide--persona" aria-label="Persona-Driven Scenarios">
       <div class="slide-inner"><div class="pad">
+        <div class="brandlock cobrand">
+          <span class="ms"><svg class="ms-logo" width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><rect width="9" height="9" x="0" y="0" fill="#F25022"/><rect width="9" height="9" x="10.5" y="0" fill="#7FBA00"/><rect width="9" height="9" x="0" y="10.5" fill="#00A4EF"/><rect width="9" height="9" x="10.5" y="10.5" fill="#FFB900"/></svg><span class="msw">Microsoft</span></span>
+          <span class="bdiv"></span>
+          <span class="merckw"><span class="msd">MSD</span><span class="msd-sub">Merck</span></span>
+        </div>
         <div class="eyebrow">Deliverable 2 &nbsp;&middot;&nbsp; Persona-Driven Scenarios</div>
         <h1 class="h1">Human + AI Collaboration &mdash; Discovery Personas</h1>
         <div class="rule"></div>
@@ -384,6 +453,11 @@ kbd{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);borde
     <!-- ===================== SLIDE 4 — C-SUITE RELEVANCE ===================== -->
     <section class="slide slide--light slide--csuite" aria-label="C-Suite Relevance">
       <div class="slide-inner"><div class="pad">
+        <div class="brandlock cobrand">
+          <span class="ms"><svg class="ms-logo" width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><rect width="9" height="9" x="0" y="0" fill="#F25022"/><rect width="9" height="9" x="10.5" y="0" fill="#7FBA00"/><rect width="9" height="9" x="0" y="10.5" fill="#00A4EF"/><rect width="9" height="9" x="10.5" y="10.5" fill="#FFB900"/></svg><span class="msw">Microsoft</span></span>
+          <span class="bdiv"></span>
+          <span class="merckw"><span class="msd">MSD</span><span class="msd-sub">Merck</span></span>
+        </div>
         <div class="eyebrow">Deliverable 3 &nbsp;&middot;&nbsp; C-Suite Relevance &mdash; &ldquo;So What?&rdquo;</div>
         <h1 class="h1">The value in each executive&rsquo;s language</h1>
         <div class="rule"></div>
