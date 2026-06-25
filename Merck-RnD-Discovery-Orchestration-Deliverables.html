@@ -233,6 +233,30 @@ kbd{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);borde
 .cobrand .msd-sub{color:var(--muted);}
 .hero-art{position:absolute;right:-26px;top:50%;transform:translateY(-50%);width:560px;height:560px;opacity:.18;z-index:0;pointer-events:none;}
 
+/* presenter / speaker notes drawer (press S) */
+#notes{position:fixed;top:0;right:0;bottom:0;width:400px;max-width:88vw;z-index:45;
+  background:linear-gradient(180deg,#013b33 0%, #00251f 100%);color:#eaf6f3;
+  border-left:3px solid var(--gold-500);box-shadow:-26px 0 70px -28px rgba(0,0,0,.7);
+  transform:translateX(102%);transition:transform .3s ease;display:flex;flex-direction:column;
+  font-family:var(--font-sans);}
+body.notes-open #notes{transform:none;}
+#notes .nhead{padding:18px 22px 13px;border-bottom:1px solid rgba(255,255,255,.12);flex:none;}
+#notes .nlbl{color:var(--gold-500);font:700 11px/1 var(--font-sans);letter-spacing:.16em;text-transform:uppercase;}
+#notes .ntitle{margin:7px 0 0;font-family:var(--font-display);font-weight:600;font-size:18.5px;color:#fff;line-height:1.12;}
+#notes .nclose{position:absolute;top:15px;right:15px;width:30px;height:30px;border-radius:50%;border:1px solid rgba(255,255,255,.25);
+  background:rgba(255,255,255,.06);color:#cfeeea;cursor:pointer;font:600 15px/1 var(--font-sans);display:grid;place-items:center;}
+#notes .nclose:hover{background:rgba(255,255,255,.14);color:#fff;}
+#notes .nbody{padding:15px 22px 26px;overflow:auto;}
+#notes h4{color:var(--gold-l);font:700 11px/1.2 var(--font-sans);letter-spacing:.09em;text-transform:uppercase;margin:15px 0 7px;}
+#notes h4:first-child{margin-top:0;}
+#notes p{margin:0 0 9px;font-size:13px;line-height:1.5;color:#dceee9;}
+#notes ul{margin:0 0 9px;padding-left:17px;}
+#notes li{font-size:12.5px;line-height:1.46;margin:6px 0;color:#dceee9;}
+#notes b{color:#fff;font-weight:700;}
+#notes .qa{color:#bfe6df;font-style:italic;}
+#notes .ntime{display:inline-block;margin-top:6px;color:#0a251f;background:var(--gold-500);font:700 11px/1 var(--font-sans);
+  letter-spacing:.02em;padding:5px 10px;border-radius:999px;}
+
 /* print → clean PDF, one slide per page */
 @page{size:1280px 720px;margin:0;}
 @media print{
@@ -241,7 +265,7 @@ kbd{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);borde
   #stage{width:1280px;height:auto;box-shadow:none;}
   .slide{position:relative;opacity:1!important;transform:none!important;page-break-after:always;height:720px;}
   .slide-inner{transform:none!important;}
-  #progress,.nav-arrow,.dock,#hint,#toc{display:none!important;}
+  #progress,.nav-arrow,.dock,#hint,#toc,#notes{display:none!important;}
 }
 </style>
 </head>
@@ -519,13 +543,23 @@ kbd{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);borde
   <button class="nav-arrow right" aria-label="Next" onclick="next()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button>
 </div>
 
-<div id="hint">Use <kbd>&larr;</kbd> <kbd>&rarr;</kbd> to navigate &middot; <kbd>O</kbd> overview &middot; <kbd>F</kbd> fullscreen</div>
+<div id="notes" aria-label="Speaker notes">
+  <div class="nhead">
+    <button class="nclose" aria-label="Close notes" onclick="toggleNotes()">&times;</button>
+    <div class="nlbl">Speaker Notes</div>
+    <div class="ntitle" id="notesTitle">01 &middot; Title</div>
+  </div>
+  <div class="nbody" id="notesBody"></div>
+</div>
+
+<div id="hint">Use <kbd>&larr;</kbd> <kbd>&rarr;</kbd> to navigate &middot; <kbd>S</kbd> notes &middot; <kbd>O</kbd> overview &middot; <kbd>F</kbd> fullscreen</div>
 
 <div class="dock">
   <button aria-label="Previous slide" onclick="prev()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
   <span class="count" id="counter">01 / 04</span>
   <button aria-label="Next slide" onclick="next()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button>
   <span class="sep"></span>
+  <button aria-label="Speaker notes" title="Speaker notes (S)" onclick="toggleNotes()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16M4 10h16M4 15h10M4 20h7"/></svg></button>
   <button aria-label="Overview" title="Overview (O)" onclick="toggleToc()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></button>
   <button aria-label="Fullscreen" title="Fullscreen (F)" onclick="toggleFs()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3m13-5v3a2 2 0 0 1-2 2h-3"/></svg></button>
 </div>
@@ -543,6 +577,12 @@ kbd{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);borde
 (function(){
   var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
   var titles = ['Title','Architecture Concept Diagram','Persona-Driven Scenarios','C-Suite Relevance'];
+  var notes = [
+    "<h4>Open &mdash; the hook</h4><p>Merck&rsquo;s single biggest value lever is <b>R&amp;D speed</b> &mdash; and the clock is running. The <b>2028 Keytruda cliff</b> puts ~<b>$29.5B (about 46% of revenue)</b> in play. The question isn&rsquo;t <i>whether</i> to use AI in discovery &mdash; it&rsquo;s how to do it fast, at scale, <b>without abandoning the Google Cloud &amp; AWS investments you&rsquo;ve already made</b>.</p><h4>Say</h4><ul><li>This is <b>Phase B</b> &mdash; three deliverables: architecture, the human+AI personas, and the C-suite &ldquo;so what.&rdquo;</li><li>North star (bottom-right of every slide): <b>federate, don&rsquo;t migrate</b> &mdash; Azure orchestrates &amp; governs your multi-cloud estate.</li><li>This is a <b>Microsoft &times; MSD</b> co-engineering conversation, not a product pitch.</li></ul><h4>Transition</h4><p>&ldquo;Let&rsquo;s start with what the platform actually looks like.&rdquo;</p><h4>If asked &mdash; why Azure if we signed Google Cloud?</h4><p class='qa'>We don&rsquo;t displace Gemini &mdash; we orchestrate across it. The architecture literally calls Gemini as a federated agent.</p><span class='ntime'>~60&ndash;90 sec</span>",
+    "<h4>Open</h4><p>&ldquo;This one screen says: compress <b>4&ndash;6 years to 12&ndash;18 months to clinic</b> &mdash; and keep every regulator happy.&rdquo;</p><h4>Pipeline (top)</h4><p>Target ID &rarr; Generative design &rarr; Structure &amp; docking &rarr; In-silico triage &rarr; Rank. <b>An agent runs the whole chain; a human owns the gate.</b></p><h4>Four planes</h4><ul><li><b>Orchestration</b> &mdash; Foundry Agent Service; <b>A2A</b> calls Gemini/Protillion/Variational (federation in action); human-in-the-loop = Annex 22.</li><li><b>Foundation models</b> &mdash; ESM, AlphaFold3, Boltz-2, IgLM, RFdiffusion; Quantum Elements (~20&times; DFT).</li><li><b>Compute</b> &mdash; ND-series GPU HPC, CycleCloud/Batch, burst on-demand &mdash; no on-prem rebuild.</li><li><b>Data</b> &mdash; OneLake reads <b>S3 + GCS in place</b>; Health Data Services (Mayo); AI Search RAG.</li></ul><h4>Land the governance rail (close)</h4><p>Entra Agent ID &middot; Purview &middot; Defender &middot; Arc &middot; <b>Part 11 / ALCOA+</b>. &ldquo;Inspection-ready, and cross-cutting &mdash; not bolted on.&rdquo;</p><h4>Proof point &mdash; say it</h4><p>&ldquo;Bottom-left: OneLake reads your AWS &amp; Google data <b>where it lives</b>. That is federate, don&rsquo;t migrate.&rdquo;</p><h4>If asked &mdash; isn&rsquo;t this lock-in?</h4><p class='qa'>Opposite &mdash; Arc, OneLake shortcuts &amp; A2A are explicitly multicloud. You keep optionality.</p><span class='ntime'>~3&ndash;4 min (anchor slide)</span>",
+    "<h4>Open</h4><p>&ldquo;AI doesn&rsquo;t replace your scientists &mdash; it changes what they spend their day <b>deciding</b>.&rdquo;</p><h4>Read the framing template once</h4><p>&ldquo;&hellip;while the human <b>retains accountability</b>.&rdquo; That last clause is the whole control model in a sentence.</p><h4>DS &mdash; discovery scientist</h4><p>Agent runs target&rarr;design&rarr;dock&rarr;triage, returns a <b>ranked shortlist with lineage</b>; scientist decides what advances (four-eyes). New roles: in-silico triage scientist, HPC cost steward.</p><h4>AE &mdash; antibody engineer</h4><p>Agent orchestrates antibody LMs + generative design + developability/immunogenicity screens; engineer judges <b>manufacturability</b>. New roles: model-catalog curator, biologics agent-ops.</p><h4>Key message</h4><p><b>AI proposes at portfolio scale; the human disposes on the regulated call.</b> That consistency makes it trainable and auditable.</p><h4>Transition</h4><p>&ldquo;So why should the C-suite fund it? Let&rsquo;s translate.&rdquo;</p><h4>If asked &mdash; does this cut headcount?</h4><p class='qa'>It redeploys judgment, not people &mdash; and creates new agent-ops roles.</p><span class='ntime'>~2&ndash;3 min</span>",
+    "<h4>Open</h4><p>&ldquo;One platform, <b>three different conversations</b> &mdash; each executive buys a different outcome.&rdquo;</p><h4>CEO &mdash; Rob Davis</h4><p>Federated platform = <b>durable speed as a strategic moat</b>; protects ~46% of revenue; AI scaled responsibly = a board-grade story. &ldquo;No choosing between speed and the Google bet.&rdquo;</p><h4>Business/Ops &mdash; Dean Li</h4><p>More validated candidates/cycle, <b>12&ndash;18 mo vs 4&ndash;6 yr</b>; scientists shift from running tools to deciding; on-demand HPC, no capex.</p><h4>Risk/Compliance &mdash; Stelios Tsinontides</h4><p>Purview + <b>Part 11 / ALCOA+</b> provenance on every candidate; <b>Annex 22</b> &mdash; GenAI never makes the critical call; Entra Agent ID least-privilege + full audit.</p><h4>Close + the ask</h4><p>Speed for the business, defensibility for Quality, a moat for the CEO. <b>Phase C: one program, a 90-day proof</b>, governance on from day one.</p><h4>If asked &mdash; how do we know it&rsquo;s working?</h4><p class='qa'>Watchlist: Google Cloud realized gains &middot; Phase 3 V940 readouts &middot; measurable manufacturing gains.</p><span class='ntime'>~2&ndash;3 min + close</span>"
+  ];
   var i = 0;
   var stage = document.getElementById('stage');
   var prog = document.getElementById('progress');
@@ -557,6 +597,8 @@ kbd{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);borde
     slides.forEach(function(s,k){ s.classList.toggle('active', k===i); });
     prog.style.width = ((i+1)/slides.length*100) + '%';
     counter.textContent = pad2(i+1) + ' / ' + pad2(slides.length);
+    var nt = document.getElementById('notesTitle'); if(nt){ nt.innerHTML = pad2(i+1) + ' &middot; ' + titles[i]; }
+    var nb = document.getElementById('notesBody'); if(nb){ nb.innerHTML = notes[i] || ''; nb.scrollTop = 0; }
     try{ history.replaceState(null,'','#'+(i+1)); }catch(e){}
   }
   window.next = function(){ go(i+1); };
@@ -564,6 +606,7 @@ kbd{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);borde
   window.goTo = go;
   window.toggleFs = function(){ if(!document.fullscreenElement){ (document.documentElement.requestFullscreen||function(){})(); } else { (document.exitFullscreen||function(){})(); } };
   window.toggleToc = function(){ document.body.classList.toggle('toc-open'); };
+  window.toggleNotes = function(){ document.body.classList.toggle('notes-open'); };
 
   // build TOC
   var tl = document.getElementById('tocList');
@@ -580,8 +623,9 @@ kbd{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);borde
     else if(k==='ArrowLeft'||k==='PageUp'){ e.preventDefault(); prev(); }
     else if(k==='Home'){ e.preventDefault(); go(0); }
     else if(k==='End'){ e.preventDefault(); go(slides.length-1); }
-    else if(k==='Escape'){ document.body.classList.remove('toc-open'); }
+    else if(k==='Escape'){ document.body.classList.remove('toc-open'); document.body.classList.remove('notes-open'); }
     else if(k && k.toLowerCase()==='o'){ toggleToc(); }
+    else if(k && k.toLowerCase()==='s'){ toggleNotes(); }
     else if(k && k.toLowerCase()==='f'){ toggleFs(); }
   });
 
