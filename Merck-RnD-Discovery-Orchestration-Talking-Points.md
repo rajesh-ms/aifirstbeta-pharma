@@ -53,6 +53,8 @@
 
 **At a glance:** **12–18 mo to clinic** vs 4–6 yr · **more candidates validated per cycle** · **~46% of revenue protected.**
 
+**$ Dollar impact (illustrative `[design]`):** at the public keystone of **~$1–3M per day earlier to market**, pulling a program forward even **6–12 months** on the discovery leg ≈ **~$180M–$1.1B per successful asset.** Reducing effort/risk: pre-lab in-silico triage avoids **late-stage failures (~$100–300M sunk trial cost each)**, and **burst HPC replaces a multi-$10M on-prem GPU build.**
+
 **Models/partners — make the federation point, don't read the list:** "Multi-vendor by design — ESM, AlphaFold3, Boltz-2, IgLM, RFdiffusion alongside **Protillion, Variational, Gemini** and **Azure Quantum Elements.** We orchestrate across them."
 
 **Transition:** "Here's what that platform looks like."
@@ -106,7 +108,7 @@
 
 **Open:** "One platform, three conversations — each executive buys a **different outcome**."
 - **CEO — Rob Davis** *(lens: "Refill the pipeline before the 2028 cliff — without abandoning our Google & AWS bets.")*: federated platform = **durable speed as a strategic moat**; **protects ~46% of revenue**; AI scaled responsibly = a **board-grade governance** story.
-- **Business/Ops — Dean Li (Pres MRL)** *(lens: "More validated candidates per cycle — with scientists deciding, not running tools.")*: **12–18 mo vs 4–6 yr** · scientists shift from running tools to deciding · fewer late-stage failures · **on-demand HPC without capex.**
+- **Business/Ops — Dean Li (Pres MRL)** *(lens: "More validated candidates per cycle — with scientists deciding, not running tools.")*: **12–18 mo vs 4–6 yr** · scientists shift from running tools to deciding · fewer late-stage failures · **on-demand HPC without capex.** **$:** ~**$180M–$1.1B accelerated revenue per asset** (6–12 mo earlier × $1–3M/day) + avoided **~$100–300M** late-stage failures.
 - **Risk/Compliance — Stelios Tsinontides (VP Global Quality · ex-FDA/CDER)** *(lens: "Inspection-ready from research onward.")*: **Purview + Part 11 / ALCOA+** provenance on every candidate · **Annex 22 — GenAI never makes the critical call** · **Entra Agent ID** least-privilege + full audit.
 
 **Transition:** "Same governance spine, next point on the value chain — filing."
@@ -127,6 +129,8 @@
 - **The principle** — "**AI never signs. Humans never start from a blank page.** Backend model is interchangeable — **GPTeal / Gemini / Bedrock.**"
 
 **At a glance:** **days saved** on the submission critical path · **~$1–3M per day** value of each day earlier to market · **~20 launches** in the window · 30+ oncology studies.
+
+**$ Dollar impact (illustrative):** removing **~10–30 days** from the submission critical path ≈ **$10–90M per product** (at $1–3M/day); across **~20 launches + 30+ studies** that compounds to **several hundred $M** of accelerated revenue. Reducing effort: CSR drafting **180 → 80 hrs (~100 hrs / ~55% saved) + ~50% fewer errors** ≈ **low-single-digit $M/yr** in writer labor plus avoided rework.
 
 **Trust layer (where it runs):** **M365 Copilot · Word · Teams · Copilot Studio** (four-eyes + Part 11 e-sign) · **Entra Agent ID · Purview.**
 
@@ -168,7 +172,7 @@
 ## Slide 10 — UC2 · Authoring · *C-Suite Relevance* — "Three executive lenses"
 **Goal:** Tie days-saved economics to defensibility. *(~2 min)*
 - **CEO — Rob Davis** *(co-sponsor Dave Williams, CIDO)* *(lens: "Governed multicloud scale before the Keytruda LOE — with no disruptive migration.")*: **Keytruda LOE Dec 2028** · refill the pipeline (~$3B savings target) · scale GenAI value pilots leave stranded — **only ~24% of firms capture it** · **no rip-and-replace.**
-- **Business/Ops — Dean Li (Pres MRL)** *(lens: "Days off the submission critical path — defensibly, at launch scale.")*: days saved across **Draft → Review → QC → Lock → Submit** · each day ≈ **$1–3M per product** · **~20 launches** · 30+ registrational oncology studies.
+- **Business/Ops — Dean Li (Pres MRL)** *(lens: "Days off the submission critical path — defensibly, at launch scale.")*: days saved across **Draft → Review → QC → Lock → Submit** · each day ≈ **$1–3M per product** · **~20 launches** · 30+ registrational oncology studies. **$:** ~**$10–90M per product** (10–30 days earlier) → **several hundred $M** across the launch window; + **low-single-digit $M/yr** writer-labor savings.
 - **Risk/Compliance — Jennifer Zachary (EVP & General Counsel) + Stelios Tsinontides (VP Global Quality)** *(lens: "Black box → glass box.")*: evidence **source-linked, signed, immutable, audited**, identity-bound across clouds · **Annex 22 + Part 11 / ALCOA+** built in · a defensible **credibility framework for FDA / EMA.**
 
 **Transition:** "Now the gate that unblocks everything — Quality."
@@ -189,6 +193,8 @@
 - **The principle** — "**Federate, don't migrate** — read **AWS S3 + eschbach + GCS in place** via OneLake. The human owns every regulated call."
 
 **At a glance:** **~30–50% faster** closure (pilot-gated) · **~70% fewer** batch-record errors · ~50% fewer CSR errors · **$10M–$100M+** tail-risk actively managed.
+
+**$ Dollar impact (illustrative):** **~30–50% faster** closure across **thousands of deviations/yr** ≈ **~$1–5M/yr** investigator labor + faster batch release (working-capital benefit). Reducing quality cost/risk: **~70% fewer batch-record errors** avoids scrapped/rejected batches (**$1–10M+ each** for biologics), and **$10M–$100M+** regulatory tail-risk (483 / consent decree / recall) is actively managed.
 
 **Azure components:** AI Search · Azure OpenAI · Content Safety · Purview · Entra Agent ID · Azure Monitor · OneLake.
 
@@ -229,7 +235,7 @@
 ## Slide 14 — UC3 · Deviation · *C-Suite Relevance* — "Same architecture (C1–C8), three value stories"
 **Goal:** Make the Quality gate the strategic unlock. *(~2–3 min + lead to the ask)*
 - **CEO — Rob Davis** *(lens: "A credible, defensible way to scale AI fast enough to matter before 2028.")*: removing the audit gate (**BB-2**) is what lets **every** AI use case scale — R&D, trials, quality · protects **~$1–3M/day** earlier revenue per product (sibling trials use case) · **auditability is the enabler tax** that keeps AI value from being clawed back.
-- **Business/Ops — Dave Maraldo (EVP Manufacturing · owns deviation-closure P&L)** *(lens: "Faster closure and more predictable release — with zero added audit risk.")*: **~30–50% faster** closure · **~70% fewer** batch-record errors · **speed and compliance are the same path.**
+- **Business/Ops — Dave Maraldo (EVP Manufacturing · owns deviation-closure P&L)** *(lens: "Faster closure and more predictable release — with zero added audit risk.")*: **~30–50% faster** closure · **~70% fewer** batch-record errors · **speed and compliance are the same path.** **$:** ~**$1–5M/yr** investigator labor + **$1–10M+** per avoided scrapped batch + **$10M–$100M+** tail-risk managed.
 - **Risk/Compliance — Stelios Tsinontides (VP Global Quality · compliance veto)** *(lens: "Inspection-ready by construction — I can defend it to FDA / EMA.")*: **grounded-only** output (C1+C3) · **four-eyes** enforced as a release precondition (C2), Annex 22 + agent identity (C5) · **Part 11 / ALCOA+** evidence + cross-cloud lineage (C4/C6).
 
 **Also in the room:** CIO/CDO **Dave Williams** (one governed platform; federate, don't migrate) · CFO **Caroline Litchfield** (V5 migration avoided ✓ · tail-risk managed). **Win the Quality gate first — it unblocks every other conversation.**
@@ -243,6 +249,20 @@
 - **The ask `[design]`:** "Pick **one lighthouse program per block** (or just the Quality gate) and stand up the spine as a **90-day proof**, governance on from day one."
 
 ---
+
+## 💲 Dollar-savings model (illustrative — show the anchor + assumption, then re-price with Merck's numbers)
+**Keystone (public anchor):** *each day a drug reaches market earlier ≈ **$1–3M** in accelerated revenue per product* (Lilly CIO, Yseop 2026). Timeline savings scale from this; effort/quality savings use figures Merck has already disclosed.
+
+| Lever | Mechanism | Illustrative $ |
+| --- | --- | --- |
+| **UC1 · Timeline** | discovery 4–6 yr → 12–18 mo; attribute **6–12 mo** net earlier-to-clinic that survives to launch | **~$180M–$1.1B / successful asset** |
+| **UC1 · Risk + effort** | pre-lab in-silico triage avoids late-stage failures; burst HPC vs on-prem build | **~$100–300M / avoided Phase 3 failure** · ~$10M+ capex avoided |
+| **UC2 · Timeline** | governed authoring removes **~10–30 days/submission** × $1–3M/day | **~$10–90M / product** → several hundred $M across ~20 launches + 30+ studies |
+| **UC2 · Effort** | CSR drafting **180→80 hrs (~55% less)** + ~50% fewer errors | **low-single-digit $M/yr** writer labor + rework |
+| **UC3 · Effort** | **~30–50% faster** closure across thousands of deviations/yr + faster release | **~$1–5M/yr** labor + working-capital benefit |
+| **UC3 · Quality + risk** | **~70% fewer** batch-record errors; regulatory tail-risk managed | **$1–10M+** / avoided scrapped batch · **$10M–$100M+** tail-risk |
+
+> **How to use live:** open with the **keystone ($1–3M/day)** + one block's range, then ask the customer for **their** per-day asset value, deviation volume, and submission count — the model re-prices on the spot. Numbers are **order-of-magnitude, illustrative**, derived from public anchors; **not a Merck forecast** — validate against their portfolio economics.
 
 ## Quick-reference facts
 | Fact | Use it for |
