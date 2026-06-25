@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Governed Authoring &amp; Review Copilot — Merck × Microsoft (Demo)</title>
+<style>
+  :root{
+    --ms-blue:#0078D4; --ms-blue-dk:#005A9E; --navy:#1B3A5B;
+    --teal:#0F7B8A; --teal-dk:#0B6673;
+    --red:#F25022; --green:#7FBA00; --cyan:#00A4EF; --yellow:#FFB900;
+    --ink:#201F1E; --ink-2:#3B3A39; --muted:#605E5C; --faint:#8A8886;
+    --line:#E1DFDD; --line-2:#EDEBE9;
+    --bg:#EAF1F8; --surface:#FFFFFF; --surface-2:#F6FAFD;
+    --amber:#9A5B00; --amber-bg:#FFF3E0; --amber-bd:#F2C786;
+    --teal-bg:#E6F4F6; --teal-bd:#A9D7DD;
+    --green-bg:#EAF4D9; --green-ink:#3E6B00;
+    --radius:14px; --radius-sm:10px; --radius-xs:7px;
+    --shadow:0 1px 2px rgba(16,24,40,.06), 0 8px 22px rgba(16,24,40,.10);
+    --shadow-lg:0 6px 14px rgba(16,24,40,.10), 0 22px 60px rgba(16,24,40,.18);
+    --font:"Segoe UI Variable","Segoe UI",system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;
+    --mono:"Cascadia Code","Consolas",ui-monospace,SFMono-Regular,Menlo,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    font-family:var(--font); color:var(--ink);
+    background:
+      radial-gradient(1200px 600px at 12% -10%, #DCEAFB 0%, rgba(220,234,251,0) 60%),
+      radial-gradient(1000px 700px at 110% 120%, #E2F1F3 0%, rgba(226,241,243,0) 55%),
+      var(--bg);
+    display:flex; flex-direction:column; height:100vh; overflow:hidden;
+    -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+  }
+
+  /* ============ App bar ============ */
+  .appbar{
+    height:56px; flex:0 0 auto; display:flex; align-items:center; gap:14px;
+    padding:0 20px; background:rgba(255,255,255,.86); backdrop-filter:saturate(140%) blur(10px);
+    border-bottom:1px solid var(--line); z-index:30;
+  }
+  .ms-logo{display:inline-block;vertical-align:middle}
+  .product{display:flex;align-items:center;gap:10px;font-weight:600;letter-spacing:.2px}
+  .product .pname{font-weight:600}
+  .product .ppill{font-size:11px;font-weight:700;color:var(--teal-dk);background:var(--teal-bg);
+    border:1px solid var(--teal-bd);border-radius:999px;padding:2px 9px;letter-spacing:.3px}
+  .ctxbar{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:12.5px;font-weight:500;
+    background:var(--surface-2);border:1px solid var(--line);border-radius:999px;padding:5px 12px}
+  .ctxbar b{color:var(--ink-2)}
+  .spacer{flex:1}
+  .cobrand{display:flex;align-items:center;gap:11px;white-space:nowrap}
+  .cobrand .msw{color:#4c5752;font-weight:600;font-size:14px}
+  .cobrand .bdiv{width:1px;height:20px;background:#cbd6d1;display:inline-block}
+  .cobrand .msd{color:var(--teal-dk);font-weight:800;font-size:15px;letter-spacing:.4px}
+  .cobrand .msd-sub{color:var(--muted);font-weight:600;font-size:11px;margin-left:5px;text-transform:uppercase;letter-spacing:.6px}
+  .who{display:flex;align-items:center;gap:9px;padding-left:6px}
+  .who .av{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--teal),var(--ms-blue));
+    color:#fff;display:grid;place-items:center;font-weight:700;font-size:12px}
+  .who .wn{font-size:12px;line-height:1.15}
+  .who .wn b{display:block;color:var(--ink)} .who .wn span{color:var(--faint);font-size:10.5px}
+  .who .entra{font-size:9px;font-weight:700;color:var(--ms-blue-dk);background:#EAF2FB;border:1px solid #BFD9F2;
+    border-radius:5px;padding:2px 5px;letter-spacing:.3px}
+
+  /* ============ App grid ============ */
+  .app{flex:1; min-height:0; display:grid; grid-template-columns:248px 1fr 354px; gap:14px; padding:14px 18px}
+  .pane{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
+    box-shadow:var(--shadow); display:flex; flex-direction:column; min-height:0; overflow:hidden}
+  .pane-h{flex:0 0 auto;padding:13px 16px 11px;border-bottom:1px solid var(--line-2);display:flex;align-items:center;gap:8px}
+  .pane-h .ttl{font-size:12px;font-weight:700;color:var(--ink-2);text-transform:uppercase;letter-spacing:.5px}
+  .pane-h .ic{width:16px;height:16px;color:var(--teal)}
+  .pane-b{flex:1;min-height:0;overflow:auto;padding:14px 16px}
+  .pane-b::-webkit-scrollbar{width:9px} .pane-b::-webkit-scrollbar-thumb{background:#D9DDE3;border-radius:9px;border:2px solid #fff}
+
+  /* ============ Left rail — pipeline ============ */
+  .principle{margin:0 0 14px;padding:11px 13px;border-radius:var(--radius-sm);
+    background:linear-gradient(135deg,#0B6673,#0F7B8A);color:#fff;font-weight:600;font-size:12.5px;line-height:1.35}
+  .principle b{color:#BdEEF3}
+  .steps{display:flex;flex-direction:column;gap:3px}
+  .step{display:flex;align-items:center;gap:11px;padding:10px 11px;border-radius:var(--radius-sm);
+    position:relative;transition:.25s;border:1px solid transparent}
+  .step .dot{width:30px;height:30px;border-radius:50%;flex:0 0 auto;display:grid;place-items:center;
+    background:#EEF1F4;color:var(--faint);border:1.5px solid var(--line);transition:.25s}
+  .step .dot svg{width:15px;height:15px}
+  .step .slabel{display:flex;flex-direction:column;line-height:1.2;min-width:0}
+  .step .slabel b{font-size:12.5px;color:var(--ink-2);font-weight:600}
+  .step .slabel i{font-size:10.5px;color:var(--faint);font-style:normal}
+  .step .chk{margin-left:auto;font-size:13px;color:var(--green-ink);opacity:0;transition:.25s}
+  .step.done .dot{background:var(--green-bg);color:var(--green-ink);border-color:#BcdC84}
+  .step.done .chk{opacity:1}
+  .step.active{background:var(--teal-bg);border-color:var(--teal-bd)}
+  .step.active .dot{background:linear-gradient(135deg,var(--teal),var(--ms-blue));color:#fff;border-color:transparent;
+    box-shadow:0 0 0 4px rgba(15,123,138,.14)}
+  .step.active .slabel b{color:var(--teal-dk)}
+  .step.locked{opacity:.5}
+  .agentid{margin-top:14px;padding:10px 12px;border:1px dashed var(--line);border-radius:var(--radius-sm);background:var(--surface-2)}
+  .agentid .al{font-size:10px;font-weight:700;color:var(--faint);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
+  .agentid .ar{display:flex;align-items:flex-start;gap:7px;font-size:11px;color:var(--ink-2);margin:4px 0;line-height:1.4}
+  .agentid .ar .d{width:7px;height:7px;border-radius:50%;flex:0 0 auto;margin-top:5px}
+  .agentid code{font-family:var(--mono);font-size:10px;color:var(--ms-blue-dk)}
+
+  /* ============ Center — document ============ */
+  .center{position:relative}
+  .ribbon{flex:0 0 auto;display:flex;align-items:center;gap:3px;padding:7px 14px;border-bottom:1px solid var(--line-2);
+    background:var(--surface-2);font-size:11.5px;color:var(--muted)}
+  .ribbon .tab{padding:4px 9px;border-radius:6px}
+  .ribbon .tab.on{background:#fff;border:1px solid var(--line);color:var(--ink-2);font-weight:600}
+  .ribbon .cop{margin-left:auto;display:flex;align-items:center;gap:6px;font-weight:700;color:var(--teal-dk);
+    background:var(--teal-bg);border:1px solid var(--teal-bd);border-radius:999px;padding:3px 10px}
+  .ribbon .cop svg{width:13px;height:13px}
+  .docwrap{flex:1;min-height:0;overflow:auto;padding:26px clamp(20px,5%,60px);background:
+    repeating-linear-gradient(180deg,#fff,#fff 39px,#FBFCFE 39px,#FBFCFE 40px)}
+  .docwrap::-webkit-scrollbar{width:11px} .docwrap::-webkit-scrollbar-thumb{background:#D9DDE3;border-radius:9px;border:3px solid #fff}
+  .paper{max-width:760px;margin:0 auto;background:#fff;border:1px solid var(--line);border-radius:10px;
+    box-shadow:var(--shadow);padding:38px 46px 46px;position:relative;min-height:100%}
+
+  /* blank state */
+  .blank{display:grid;place-items:center;min-height:440px;text-align:center}
+  .blank .card{max-width:430px}
+  .blank .spark{width:64px;height:64px;margin:0 auto 16px;border-radius:18px;display:grid;place-items:center;
+    background:linear-gradient(135deg,var(--teal),var(--ms-blue));color:#fff;box-shadow:var(--shadow-lg)}
+  .blank .spark svg{width:32px;height:32px}
+  .blank h3{font-size:21px;color:var(--ink);margin-bottom:9px;font-weight:700}
+  .blank p{color:var(--muted);font-size:14px;line-height:1.55;margin-bottom:20px}
+  .blank .foot{margin-top:22px;font-size:12px;color:var(--teal-dk);font-weight:700}
+
+  /* drafted document */
+  .doc-h{border-bottom:2px solid var(--teal);padding-bottom:13px;margin-bottom:6px}
+  .doc-h .dt{font-size:20px;font-weight:700;color:var(--navy);letter-spacing:.1px}
+  .doc-h .ds{font-size:12px;color:var(--muted);margin-top:4px}
+  .doc-h .badges{display:flex;gap:7px;margin-top:11px;flex-wrap:wrap}
+  .dbadge{font-size:10.5px;font-weight:700;border-radius:999px;padding:3px 9px;display:inline-flex;align-items:center;gap:5px}
+  .dbadge.ai{color:var(--teal-dk);background:var(--teal-bg);border:1px solid var(--teal-bd)}
+  .dbadge.cite{color:var(--ms-blue-dk);background:#EAF2FB;border:1px solid #BFD9F2}
+  .dbadge.qa{color:var(--amber);background:var(--amber-bg);border:1px solid var(--amber-bd)}
+  .dbadge.qa.ok{color:var(--green-ink);background:var(--green-bg);border:1px solid #BcdC84}
+  h4.sec{font-size:15px;color:var(--navy);margin:20px 0 9px;font-weight:700}
+  .doc-body p{font-size:13.5px;line-height:1.85;color:var(--ink-2);margin:0 0 13px;text-align:justify}
+  cite{font-style:normal;cursor:pointer;font-size:9.5px;font-weight:800;color:#fff;background:var(--ms-blue);
+    border-radius:4px;padding:1px 4px;margin:0 1px;vertical-align:super;line-height:1;transition:.18s;position:relative;top:-2px}
+  cite:hover{background:var(--ms-blue-dk);transform:translateY(-1px)}
+  cite.flag{background:var(--yellow);color:#5b3d00}
+  .flagable{transition:.3s;border-radius:3px;padding:0 2px}
+  .flagable.flag{background:var(--amber-bg);box-shadow:inset 0 -2px 0 var(--amber);color:var(--amber);font-weight:700}
+  .flagable.fixed{background:var(--green-bg);box-shadow:inset 0 -2px 0 var(--green-ink);color:var(--green-ink);font-weight:700}
+  .flagable .old{text-decoration:line-through;color:var(--faint);font-weight:400;margin-right:4px}
+  .hint{display:inline-flex;align-items:center;gap:6px;margin-top:10px;font-size:11px;color:var(--ms-blue-dk);
+    background:#EAF2FB;border:1px solid #BFD9F2;border-radius:999px;padding:4px 11px;white-space:nowrap;animation:pulse 2.2s infinite}
+  .hint svg{width:13px;height:13px;flex:0 0 auto}
+  .hint b{margin:0 2px}
+  @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,120,212,.18)}50%{box-shadow:0 0 0 5px rgba(0,120,212,0)}}
+  .stamp{position:absolute;right:28px;top:30px;display:flex;flex-direction:column;gap:7px;align-items:flex-end}
+  .seal{font-size:11px;font-weight:800;border-radius:8px;padding:7px 12px;display:flex;align-items:center;gap:7px;
+    transform:rotate(-3deg);box-shadow:var(--shadow)}
+  .seal.signed{color:#fff;background:var(--teal-dk);border:1px solid var(--teal)}
+  .seal.ready{color:#fff;background:var(--green-ink);border:1px solid #6fa000}
+  .seal svg{width:14px;height:14px}
+  .fade-in{animation:fadein .5s both}
+  @keyframes fadein{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+  /* ============ Right rail — context ============ */
+  .src{display:flex;gap:10px;padding:10px;border:1px solid var(--line);border-radius:var(--radius-sm);margin-bottom:8px;background:var(--surface-2)}
+  .src .fi{width:30px;height:30px;border-radius:7px;flex:0 0 auto;display:grid;place-items:center;background:#fff;border:1px solid var(--line);color:var(--ms-blue)}
+  .src .fi svg{width:16px;height:16px}
+  .src .sx{min-width:0}
+  .src .sx b{font-size:12.5px;color:var(--ink);display:block}
+  .src .sx span{font-size:11px;color:var(--muted)}
+  .src .ix{margin-left:auto;font-size:9.5px;font-weight:700;color:var(--green-ink);background:var(--green-bg);
+    border:1px solid #BcdC84;border-radius:5px;padding:2px 6px;align-self:center;white-space:nowrap}
+  .panel-note{font-size:11.5px;color:var(--muted);line-height:1.5;margin:4px 0 12px}
+  .panel-note.lead{color:var(--ink-2);font-weight:600;font-size:12.5px}
+
+  .agentcard{border:1px solid var(--teal-bd);background:var(--teal-bg);border-radius:var(--radius-sm);padding:13px;margin-bottom:12px}
+  .agentcard .ah{display:flex;align-items:center;gap:9px;margin-bottom:9px}
+  .agentcard .ai-ic{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--teal),var(--ms-blue));
+    color:#fff;display:grid;place-items:center} .agentcard .ai-ic svg{width:17px;height:17px}
+  .agentcard .ah b{font-size:13px;color:var(--teal-dk);display:block} .agentcard .ah span{font-size:10.5px;color:var(--teal-dk);opacity:.8}
+  .agentcard .arow{display:flex;justify-content:space-between;font-size:11.5px;padding:5px 0;border-top:1px solid rgba(15,123,138,.18)}
+  .agentcard .arow b{color:var(--teal-dk)}
+  .model{display:inline-flex;gap:6px;align-items:center;font-size:10.5px;font-weight:700;color:var(--teal-dk);
+    background:#fff;border:1px solid var(--teal-bd);border-radius:999px;padding:3px 9px;margin-top:9px}
+
+  .qa-row{display:flex;align-items:center;gap:11px;padding:11px 12px;border:1px solid var(--line);border-radius:var(--radius-sm);margin-bottom:8px;background:#fff}
+  .qa-row .qi{width:26px;height:26px;border-radius:50%;flex:0 0 auto;display:grid;place-items:center;font-weight:800;font-size:13px}
+  .qa-row .qi.ok{background:var(--green-bg);color:var(--green-ink)} .qa-row .qi.warn{background:var(--amber-bg);color:var(--amber)}
+  .qa-row .qi.run{background:#EAF2FB;color:var(--ms-blue)}
+  .qa-row .qx b{font-size:12.5px;color:var(--ink-2);display:block} .qa-row .qx span{font-size:11px;color:var(--muted)}
+  .qa-row .qv{margin-left:auto;font-weight:800;font-size:13px;font-variant-numeric:tabular-nums}
+  .qa-row .qv.ok{color:var(--green-ink)} .qa-row .qv.warn{color:var(--amber)}
+  .gatebox{margin-top:6px;padding:11px 12px;border-radius:var(--radius-sm);font-size:12px;line-height:1.45;
+    background:var(--amber-bg);border:1px solid var(--amber-bd);color:var(--amber);font-weight:600}
+  .gatebox.ok{background:var(--green-bg);border-color:#BcdC84;color:var(--green-ink)}
+
+  .issue{border:1px solid var(--amber-bd);background:var(--amber-bg);border-radius:var(--radius-sm);padding:13px;margin-bottom:12px}
+  .issue .ih{font-size:12px;font-weight:800;color:var(--amber);margin-bottom:9px;display:flex;align-items:center;gap:7px}
+  .cmp{display:flex;gap:8px;margin:8px 0}
+  .cmp .c{flex:1;background:#fff;border:1px solid var(--line);border-radius:8px;padding:8px 10px;text-align:center}
+  .cmp .c .cl{font-size:9.5px;font-weight:700;color:var(--faint);text-transform:uppercase;letter-spacing:.4px}
+  .cmp .c .cv{font-size:17px;font-weight:800;margin-top:2px}
+  .cmp .c.draft .cv{color:var(--amber)} .cmp .c.truth .cv{color:var(--green-ink)}
+  .cmp .arr{align-self:center;color:var(--faint)}
+
+  .reviewer{display:flex;align-items:center;gap:9px;padding:10px;border:1px solid var(--line);border-radius:var(--radius-sm);margin-bottom:12px;background:var(--surface-2)}
+  .reviewer .av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#5B6CB0,#8a5fb0);color:#fff;display:grid;place-items:center;font-weight:700;font-size:12px}
+  .reviewer .rn b{font-size:12.5px;display:block;color:var(--ink)} .reviewer .rn span{font-size:10.5px;color:var(--muted)}
+
+  .signpanel{border:1px solid var(--line);border-radius:var(--radius-sm);padding:14px;margin-bottom:12px}
+  .signpanel .row{display:flex;justify-content:space-between;font-size:12px;padding:6px 0;border-bottom:1px dashed var(--line-2)}
+  .signpanel .row:last-child{border:0} .signpanel .row b{color:var(--ink-2)}
+
+  .audit{display:flex;flex-direction:column;gap:0}
+  .au{display:flex;gap:11px;padding:11px 0;position:relative}
+  .au:not(:last-child){border-bottom:1px solid var(--line-2)}
+  .au .amk{width:30px;height:30px;border-radius:50%;flex:0 0 auto;display:grid;place-items:center;color:#fff}
+  .au .amk svg{width:15px;height:15px}
+  .au.agent .amk{background:linear-gradient(135deg,var(--teal),var(--ms-blue))}
+  .au.human .amk{background:linear-gradient(135deg,#5B6CB0,#8a5fb0)}
+  .au.system .amk{background:#6a7280}
+  .au .ax{min-width:0;flex:1}
+  .au .ax .at{font-size:12.5px;color:var(--ink-2);line-height:1.4}
+  .au .ax .at b{color:var(--ink)}
+  .au .ax .am{display:flex;flex-wrap:wrap;gap:8px;margin-top:5px;align-items:center}
+  .au .ax .am span{font-size:10px;color:var(--faint)}
+  .au .ax .am code{font-family:var(--mono);font-size:9.5px;color:var(--ms-blue-dk);background:#EAF2FB;border-radius:4px;padding:1px 5px}
+  .worm{font-size:9px;font-weight:800;color:var(--green-ink);background:var(--green-bg);border:1px solid #BcdC84;border-radius:4px;padding:1px 5px;letter-spacing:.3px}
+  .closing{margin-top:10px;padding:12px;border-radius:var(--radius-sm);background:linear-gradient(135deg,#0B3A52,#10314F);color:#fff;text-align:center}
+  .closing b{color:#9FE0EA;font-size:14px} .closing span{display:block;font-size:11px;opacity:.85;margin-top:3px}
+
+  /* buttons */
+  .btn{font-family:inherit;font-size:13px;font-weight:700;border-radius:9px;padding:10px 16px;border:1px solid var(--line);
+    background:#fff;color:var(--ink-2);cursor:pointer;transition:.18s;display:inline-flex;align-items:center;gap:8px;justify-content:center}
+  .btn:hover{border-color:#c9cdd2;background:var(--surface-2)}
+  .btn:disabled{opacity:.45;cursor:not-allowed}
+  .btn.primary{background:linear-gradient(135deg,var(--teal),var(--ms-blue));color:#fff;border-color:transparent;box-shadow:0 4px 12px rgba(15,123,138,.28)}
+  .btn.primary:hover{filter:brightness(1.06)}
+  .btn.full{width:100%;margin-top:4px}
+  .btn.sm{padding:7px 12px;font-size:12px}
+  .btn svg{width:15px;height:15px}
+
+  /* bottom bar */
+  .bottom{flex:0 0 auto;height:62px;display:flex;align-items:center;gap:14px;padding:0 20px;
+    background:rgba(255,255,255,.86);backdrop-filter:blur(10px);border-top:1px solid var(--line)}
+  .bottom .ctrls{display:flex;gap:9px}
+  .bottom .stage-lbl{font-size:12.5px;color:var(--muted);font-weight:600}
+  .bottom .stage-lbl b{color:var(--teal-dk)}
+  .roi{margin-left:auto;display:flex;gap:8px;align-items:center}
+  .roi .rk{font-size:11px;font-weight:700;color:var(--ink-2);background:var(--surface-2);border:1px solid var(--line);
+    border-radius:999px;padding:5px 11px;opacity:.32;transition:.4s;display:flex;align-items:baseline;gap:5px}
+  .roi .rk.on{opacity:1;border-color:var(--teal-bd);background:var(--teal-bg);color:var(--teal-dk)}
+  .roi .rk b{font-size:12.5px;color:var(--teal-dk)}
+
+  /* source overlay */
+  .srccard{position:fixed;right:22px;bottom:80px;width:340px;background:#fff;border:1px solid var(--line);
+    border-radius:var(--radius);box-shadow:var(--shadow-lg);z-index:60;transform:translateX(390px);transition:.3s cubic-bezier(.2,.7,.2,1);overflow:hidden}
+  .srccard.show{transform:none}
+  .srccard .sh{display:flex;align-items:center;gap:9px;padding:12px 14px;border-bottom:1px solid var(--line-2);background:var(--surface-2)}
+  .srccard .sh .si{width:28px;height:28px;border-radius:7px;background:#EAF2FB;color:var(--ms-blue);display:grid;place-items:center} .srccard .sh .si svg{width:15px;height:15px}
+  .srccard .sh b{font-size:12.5px} .srccard .sh span{font-size:10.5px;color:var(--muted);display:block}
+  .srccard .sh .x{margin-left:auto;cursor:pointer;color:var(--faint);font-size:18px;line-height:1;padding:2px 6px;border-radius:6px}
+  .srccard .sh .x:hover{background:#eee}
+  .srccard .sb{padding:13px 14px}
+  .srccard .quote{font-size:12.5px;line-height:1.6;color:var(--ink-2);border-left:3px solid var(--teal);padding-left:11px;margin-bottom:10px}
+  .srccard .verdict{font-size:11.5px;font-weight:700;border-radius:8px;padding:8px 10px;display:flex;align-items:center;gap:7px}
+  .srccard .verdict.ok{color:var(--green-ink);background:var(--green-bg)} .srccard .verdict.bad{color:var(--amber);background:var(--amber-bg)}
+
+  /* modal */
+  .modal-bg{position:fixed;inset:0;background:rgba(16,24,40,.42);backdrop-filter:blur(2px);z-index:70;display:none;place-items:center}
+  .modal-bg.show{display:grid}
+  .modal{width:420px;background:#fff;border-radius:var(--radius);box-shadow:var(--shadow-lg);overflow:hidden;animation:fadein .3s both}
+  .modal .mh{padding:16px 20px;border-bottom:1px solid var(--line-2);display:flex;align-items:center;gap:11px}
+  .modal .mh .mi{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--teal),var(--ms-blue));color:#fff;display:grid;place-items:center} .modal .mh .mi svg{width:18px;height:18px}
+  .modal .mh b{font-size:15px} .modal .mh span{font-size:11px;color:var(--muted);display:block}
+  .modal .mb{padding:18px 20px}
+  .modal .field{margin-bottom:13px}
+  .modal .field label{font-size:11px;font-weight:700;color:var(--faint);text-transform:uppercase;letter-spacing:.4px;display:block;margin-bottom:5px}
+  .modal .field .val{font-size:13.5px;color:var(--ink);font-weight:600;padding:9px 11px;background:var(--surface-2);border:1px solid var(--line);border-radius:8px}
+  .modal .mfa{display:flex;align-items:center;gap:10px;padding:11px;border:1px solid #BFD9F2;background:#EAF2FB;border-radius:9px;font-size:12px;color:var(--ms-blue-dk);font-weight:600}
+  .modal .mfa svg{width:18px;height:18px;flex:0 0 auto}
+  .modal .mf{padding:14px 20px;border-top:1px solid var(--line-2);display:flex;gap:9px;justify-content:flex-end;background:var(--surface-2)}
+  .note-tiny{font-size:10.5px;color:var(--faint);text-align:center;margin-top:9px}
+
+  @media (max-width:1180px){ .app{grid-template-columns:210px 1fr 320px} }
+</style>
+</head>
+<body>
+
+  <!-- ============ App bar ============ -->
+  <div class="appbar">
+    <svg class="ms-logo" width="22" height="22" viewBox="0 0 20 20" aria-hidden="true"><rect width="9" height="9" x="0" y="0" fill="#F25022"/><rect width="9" height="9" x="10.5" y="0" fill="#7FBA00"/><rect width="9" height="9" x="0" y="10.5" fill="#00A4EF"/><rect width="9" height="9" x="10.5" y="10.5" fill="#FFB900"/></svg>
+    <div class="product"><span class="pname">Governed Authoring &amp; Review Copilot</span><span class="ppill">DEMO</span></div>
+    <div class="ctxbar">CSR · <b>MK-1234-001</b> · Phase 3 Oncology · <b>§11.4.1 Efficacy</b></div>
+    <div class="spacer"></div>
+    <div class="cobrand">
+      <span class="msw">Microsoft</span><span class="bdiv"></span>
+      <span><span class="msd">MSD</span><span class="msd-sub">Merck</span></span>
+    </div>
+    <div class="who">
+      <div class="av">LV</div>
+      <div class="wn"><b>Lena Vargas</b><span>Lead Medical Writer</span></div>
+      <span class="entra">ENTRA ID</span>
+    </div>
+  </div>
+
+  <!-- ============ App grid ============ -->
+  <div class="app">
+
+    <!-- LEFT: pipeline -->
+    <aside class="pane">
+      <div class="pane-h">
+        <svg class="ic" viewBox="0 0 24 24" fill="currentColor"><path d="M4 5h16v2H4zm0 6h16v2H4zm0 6h10v2H4z"/></svg>
+        <span class="ttl">Governance pipeline</span>
+      </div>
+      <div class="pane-b">
+        <div class="principle"><b>AI never signs.</b> Humans never start from a blank page.</div>
+        <div class="steps" id="steps"></div>
+        <div class="agentid">
+          <div class="al">Identity &amp; trust</div>
+          <div class="ar"><span class="d" style="background:var(--ms-blue)"></span><span>People &amp; agents — <b>one Entra identity</b></span></div>
+          <div class="ar"><span class="d" style="background:var(--teal)"></span><span>Agent ID <code>a3f7·9c2e</code> · cross-cloud</span></div>
+          <div class="ar"><span class="d" style="background:#6a7280"></span><span>Purview · DLP · immutable audit</span></div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- CENTER: document -->
+    <main class="pane center">
+      <div class="ribbon">
+        <span class="tab">File</span><span class="tab on">Home</span><span class="tab">Insert</span><span class="tab">Review</span><span class="tab">References</span>
+        <span class="cop"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.4 5.6L20 10l-5.6 2.4L12 18l-2.4-5.6L4 10l5.6-2.4z"/></svg>Copilot</span>
+      </div>
+      <div class="docwrap">
+        <div class="paper" id="paper"><!-- rendered --></div>
+      </div>
+    </main>
+
+    <!-- RIGHT: context -->
+    <aside class="pane">
+      <div class="pane-h" id="rightHead">
+        <svg class="ic" viewBox="0 0 24 24" fill="currentColor"><path d="M4 4h16v12H7l-3 3z"/></svg>
+        <span class="ttl" id="rightTitle">Evidence pack</span>
+      </div>
+      <div class="pane-b" id="rightBody"><!-- rendered --></div>
+    </aside>
+  </div>
+
+  <!-- ============ Bottom bar ============ -->
+  <div class="bottom">
+    <div class="ctrls">
+      <button class="btn sm" id="backBtn">◀ Back</button>
+      <button class="btn sm primary" id="nextBtn">Next ▶</button>
+      <button class="btn sm" id="runBtn">▶ Auto-run</button>
+      <button class="btn sm" id="resetBtn">↺ Reset</button>
+    </div>
+    <div class="stage-lbl">Step <b id="stepNo">1</b> / 6 · <span id="stepName">Evidence pack</span></div>
+    <div class="roi" id="roi">
+      <span class="rk" data-r="0"><b>180→80</b>hrs / CSR</span>
+      <span class="rk" data-r="1"><b>~50%</b>fewer errors</span>
+      <span class="rk" data-r="2"><b>2–3 wks→3–4 days</b></span>
+      <span class="rk" data-r="3"><b>$1–3M</b>/ day to market</span>
+    </div>
+  </div>
+
+  <!-- source overlay -->
+  <div class="srccard" id="srcCard">
+    <div class="sh">
+      <span class="si"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 2h9l5 5v15H6z" opacity=".25"/><path d="M6 2h9l5 5v15H6zm9 1.5V8h4.5z"/></svg></span>
+      <div><b id="srcTitle">Source</b><span id="srcLoc">—</span></div>
+      <span class="x" id="srcClose">×</span>
+    </div>
+    <div class="sb">
+      <div class="quote" id="srcQuote">—</div>
+      <div class="verdict ok" id="srcVerdict">✓ Matches the drafted claim</div>
+    </div>
+  </div>
+
+  <!-- Part 11 sign modal -->
+  <div class="modal-bg" id="signModal">
+    <div class="modal">
+      <div class="mh">
+        <span class="mi"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 17l6-6 3 3 7-7v4h2V4h-7v2h4l-6 6-3-3-7 7z"/><path d="M3 19h18v2H3z"/></svg></span>
+        <div><b>21 CFR Part 11 · Electronic Signature</b><span>Annex 22 / ALCOA+ · identity-bound</span></div>
+      </div>
+      <div class="mb">
+        <div class="field"><label>Signatory</label><div class="val">Dr. Elena Brandt · QPPV / Regulatory Affairs</div></div>
+        <div class="field"><label>Meaning of signature</label><div class="val">Approved — content reviewed, accurate &amp; defensible</div></div>
+        <div class="mfa"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 1l9 4v6c0 5-3.8 9.4-9 11-5.2-1.6-9-6-9-11V5z"/></svg>Identity verified via Microsoft Entra MFA — authenticator approved</div>
+        <div class="note-tiny">No AI agent can hold or apply this signature. A human is accountable.</div>
+      </div>
+      <div class="mf">
+        <button class="btn sm" id="signCancel">Cancel</button>
+        <button class="btn sm primary" id="signConfirm">🖊 Apply signature</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------- icons ---------- */
+  var IC = {
+    folder:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 6a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>',
+    pen:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 17.25V21h3.75L17.8 9.94l-3.75-3.75zM20.7 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75z"/></svg>',
+    gear:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8m9 4-2.1 1.6.3 2.6-2.5.6-1.3 2.3L13 20l-2.4-1-2.5-.6.3-2.6L6.3 14l-2.1-1.6L6.3 10 6 7.4l2.5-.6L9.8 4.5 12 5.5l2.4-1 1.3 2.3 2.5.6-.3 2.6z"/></svg>',
+    people:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6m-8 0a3 3 0 1 0 0-6 3 3 0 0 0 0 6m0 2c-2.7 0-8 1.3-8 4v3h9v-3c0-1 .4-1.9 1.1-2.6C9.3 13.2 8.5 13 8 13m8 0c-.4 0-.9 0-1.4.1 1.4 1 2.4 2.3 2.4 3.9v3h7v-3c0-2.7-5.3-4-8-4"/></svg>',
+    sign:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 17l6-6 3 3 7-7v4h2V4h-7v2h4l-6 6-3-3-7 7z"/><path d="M3 19h18v2H3z"/></svg>',
+    shield:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 1 3 5v6c0 5 3.8 9.4 9 11 5.2-1.6 9-6 9-11V5z"/></svg>',
+    spark:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.4 5.6L20 10l-5.6 2.4L12 18l-2.4-5.6L4 10l5.6-2.4z"/></svg>',
+    robot:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2v3M7 8h10a3 3 0 0 1 3 3v6a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3v-6a3 3 0 0 1 3-3m2 5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3m6 0a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3"/></svg>',
+    sys:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 4h16v12H4zm2 16h12v2H6z"/></svg>'
+  };
+
+  var STEPS = [
+    {k:'Evidence pack', s:'Protocol · SAP · TLF', ic:IC.folder},
+    {k:'Grounded draft', s:'in Word', ic:IC.pen},
+    {k:'Deterministic QA', s:'citations · consistency', ic:IC.gear},
+    {k:'Four-eyes review', s:'human', ic:IC.people},
+    {k:'Part 11 sign-off', s:'human', ic:IC.sign},
+    {k:'Purview audit', s:'immutable', ic:IC.shield}
+  ];
+
+  var SOURCES = {
+    1:{src:'Protocol MK-1234-001 v3.0', loc:'§6.1 Analysis populations', q:'The intent-to-treat (ITT) population comprises all randomized subjects (N = 842).', match:true},
+    2:{src:'TLF — Table 14.2.3', loc:'PFS Kaplan–Meier summary', q:'Median PFS — MK-1234: 11.2 mo (9.8–12.9); Control: 7.4 mo (6.5–8.3).', match:true},
+    3:{src:'SAP v2.1', loc:'§9.2 Primary PFS analysis', q:'Stratified Cox model — HR 0.62 (0.51–0.75), p < 0.001.', match:true},
+    4:{src:'TLF — Table 14.2.1', loc:'Objective response (confirmed)', q:'Confirmed ORR — MK-1234: 43.0% (38.1–47.8); Control: 28.6%.', match:false, draft:'42.9%', truth:'43.0%'},
+    5:{src:'SAP v2.1', loc:'§9.4 Secondary endpoints', q:'ORR assessed by blinded independent central review (BICR).', match:true},
+    6:{src:'TLF — Table 14.2.7', loc:'OS interim (immature)', q:'OS events = 42% of target; data immature at this cutoff.', match:true},
+    7:{src:'TLF — Table 14.2.8', loc:'OS hazard ratio (interim)', q:'Interim OS HR 0.78 — favorable trend, not yet significant.', match:true},
+    8:{src:'Prior CSR safety template', loc:'§12.2 Safety overview', q:'No new safety signals; AEs consistent with the known class profile.', match:true}
+  };
+
+  /* ---------- state ---------- */
+  var step = 0, accepted = false, signed = false, running = false;
+  var audit = [];
+  var paper = document.getElementById('paper');
+  var rightBody = document.getElementById('rightBody');
+  var rightTitle = document.getElementById('rightTitle');
+
+  /* ---------- document markup ---------- */
+  function docHTML(){
+    var stamp = '';
+    if(signed){ stamp += '<div class="seal signed">'+IC.sign+' Part 11 SIGNED · E. Brandt</div>'; }
+    if(step>=5){ stamp += '<div class="seal ready">'+IC.shield+' SUBMISSION-READY</div>'; }
+    var orr = accepted
+      ? '<span id="orrVal" class="flagable fixed"><span class="old">42.9%</span>43.0%</span>'
+      : '<span id="orrVal" class="flagable'+(step>=2?' flag':'')+'">42.9%</span>';
+    var cite4cls = (step>=2 && !accepted) ? ' class="flag"' : '';
+    return ''+
+    '<div class="stamp">'+stamp+'</div>'+
+    '<div class="doc-h">'+
+      '<div class="dt">Clinical Study Report — MK-1234-001</div>'+
+      '<div class="ds">Section 11.4.1 · Primary Efficacy Analysis · Phase 3, metastatic NSCLC</div>'+
+      '<div class="badges">'+
+        '<span class="dbadge ai">'+IC.spark+' AI-drafted · GPTeal</span>'+
+        '<span class="dbadge cite">8 / 8 citations linked</span>'+
+        (step>=2 ? (accepted
+            ? '<span class="dbadge qa ok">✓ QA passed</span>'
+            : '<span class="dbadge qa">⚠ 1 consistency exception</span>') : '')+
+      '</div>'+
+    '</div>'+
+    '<div class="doc-body">'+
+      '<h4 class="sec">11.4.1&nbsp;&nbsp;Primary Efficacy Analysis</h4>'+
+      '<p>In the intent-to-treat population (N = 842)<cite data-n="1">1</cite>, MK-1234 demonstrated a statistically significant improvement in progression-free survival (PFS) versus standard of care. Median PFS was 11.2 months (95% CI 9.8–12.9) in the MK-1234 arm versus 7.4 months (95% CI 6.5–8.3) for control<cite data-n="2">2</cite>, corresponding to a hazard ratio of 0.62 (95% CI 0.51–0.75; p&lt;0.001)<cite data-n="3">3</cite>.</p>'+
+      '<p>The confirmed objective response rate (ORR) was '+orr+' (95% CI 38.1–47.8) in the MK-1234 arm versus 28.6% for control<cite data-n="4"'+cite4cls+'>4</cite>, consistent with the secondary-endpoint analysis pre-specified in the SAP<cite data-n="5">5</cite>.</p>'+
+      '<p>Overall survival remained immature at this analysis (42% of target events)<cite data-n="6">6</cite>; the interim analysis showed a favorable trend (HR 0.78)<cite data-n="7">7</cite>. The safety profile was consistent with the known class effect, with no new safety signals identified<cite data-n="8">8</cite>.</p>'+
+      (step>=1 && step<=3 ? '<div class="hint">'+IC.spark+' Tip: click any <b>[n]</b> citation to trace its source</div>' : '')+
+    '</div>';
+  }
+
+  function blankHTML(){
+    return '<div class="blank"><div class="card">'+
+      '<div class="spark">'+IC.spark+'</div>'+
+      '<h3>Start from evidence — not a blank page</h3>'+
+      '<p>Copilot assembles the evidence pack (Protocol · SAP · TLF), drafts a grounded, fully-cited efficacy section, and runs deterministic QA <i>before a human ever sees it</i>.</p>'+
+      '<button class="btn primary" id="draftBtn">'+IC.spark+' Draft with Copilot</button>'+
+      '<div class="foot">AI never signs. Humans never start from a blank page.</div>'+
+    '</div></div>';
+  }
+
+  /* ---------- right panel per step ---------- */
+  function rightHTML(){
+    if(step===0){
+      rightTitle.textContent = 'Evidence pack';
+      var rows = Object.keys(SOURCES).slice(0,5).map(function(n){
+        var s = SOURCES[n];
+        return '<div class="src"><span class="fi">'+IC.folder+'</span><div class="sx"><b>'+s.src+'</b><span>'+s.loc+'</span></div><span class="ix">indexed</span></div>';
+      }).join('');
+      return '<div class="panel-note lead">Assembled &amp; indexed by the AI Validation &amp; Evidence Steward.</div>'+
+        '<div class="panel-note">Protocol, Statistical Analysis Plan, and Tables/Listings/Figures are grounded sources — every drafted claim must resolve to one of them.</div>'+
+        rows +
+        '<div class="src"><span class="fi">'+IC.folder+'</span><div class="sx"><b>+ 3 more sources</b><span>TLF 14.2.7–8 · Prior CSR template</span></div><span class="ix">indexed</span></div>';
+    }
+    if(step===1){
+      rightTitle.textContent = 'Grounded draft';
+      return '<div class="agentcard">'+
+          '<div class="ah"><span class="ai-ic">'+IC.robot+'</span><div><b>Medical-Writing AI Editor</b><span>Agent · Entra Agent ID a3f7·9c2e</span></div></div>'+
+          '<div class="arow"><span>Claims grounded</span><b>8 / 8</b></div>'+
+          '<div class="arow"><span>Citations attached</span><b>8</b></div>'+
+          '<div class="arow"><span>Draft time</span><b>~90 sec</b></div>'+
+          '<div class="model">'+IC.spark+' GPTeal · interchangeable: Gemini · Bedrock</div>'+
+        '</div>'+
+        '<div class="panel-note">A grounded draft now sits in Word — every sentence traces to the evidence pack. Generation is solved; the value is what comes next.</div>'+
+        '<button class="btn primary full" id="advBtn">Run deterministic QA ▶</button>';
+    }
+    if(step===2){
+      rightTitle.textContent = 'Deterministic QA';
+      return '<div class="panel-note lead">Automated checks run before a human ever sees the draft.</div>'+
+        '<div class="qa-row"><span class="qi ok">✓</span><div class="qx"><b>Citations linked &amp; resolved</b><span>every claim maps to a source</span></div><span class="qv ok">8 / 8</span></div>'+
+        '<div class="qa-row"><span class="qi ok">✓</span><div class="qx"><b>Required subsections present</b><span>primary · secondary · OS · safety</span></div><span class="qv ok">4 / 4</span></div>'+
+        '<div class="qa-row"><span class="qi warn">!</span><div class="qx"><b>Numerical consistency vs TLF</b><span>ORR text 42.9% ≠ Table 14.2.1 43.0%</span></div><span class="qv warn">1</span></div>'+
+        '<div class="gatebox">⚠ 1 exception surfaced for human review. The draft cannot advance silently — governance gates it.</div>'+
+        '<button class="btn primary full" id="advBtn" style="margin-top:12px">Send to four-eyes review ▶</button>';
+    }
+    if(step===3){
+      rightTitle.textContent = 'Four-eyes review';
+      var rv = '<div class="reviewer"><span class="av">MR</span><div class="rn"><b>Marcus Reed</b><span>QA / Regulatory Reviewer · second pair of eyes</span></div></div>';
+      if(!accepted){
+        return rv +
+          '<div class="issue"><div class="ih">⚠ Consistency exception · ORR</div>'+
+            '<div class="cmp"><div class="c draft"><div class="cl">Draft text</div><div class="cv">42.9%</div></div><div class="arr">→</div><div class="c truth"><div class="cl">TLF 14.2.1</div><div class="cv">43.0%</div></div></div>'+
+            '<button class="btn sm full" id="viewSrcBtn" style="margin:6px 0">View source · TLF 14.2.1</button>'+
+            '<button class="btn sm primary full" id="acceptBtn">✓ Accept correction (43.0%)</button>'+
+          '</div>'+
+          '<div class="panel-note">The human decides — the copilot only surfaces the discrepancy and the evidence. Nothing is changed without sign-off.</div>';
+      }
+      return rv +
+        '<div class="gatebox ok">✓ ORR corrected 42.9% → 43.0% per TLF 14.2.1. Four-eyes review complete — claim now defensible.</div>'+
+        '<div class="panel-note">All 8 claims reviewed &amp; source-consistent. Ready to route to the accountable signatory.</div>'+
+        '<button class="btn primary full" id="advBtn">Approve &amp; route to sign-off ▶</button>';
+    }
+    if(step===4){
+      rightTitle.textContent = 'Part 11 sign-off';
+      return '<div class="reviewer"><span class="av">EB</span><div class="rn"><b>Dr. Elena Brandt</b><span>Accountable Signatory · QPPV / Reg Affairs</span></div></div>'+
+        '<div class="signpanel">'+
+          '<div class="row"><span>Document</span><b>CSR §11.4.1</b></div>'+
+          '<div class="row"><span>QA status</span><b style="color:var(--green-ink)">Passed</b></div>'+
+          '<div class="row"><span>Four-eyes review</span><b style="color:var(--green-ink)">Complete</b></div>'+
+          '<div class="row"><span>Standard</span><b>21 CFR Part 11 · Annex 22</b></div>'+
+        '</div>'+
+        (signed
+          ? '<div class="gatebox ok">✓ Electronically signed by E. Brandt — identity-bound, timestamped, immutable.</div>'
+          : '<div class="panel-note">Only a human can apply this signature. The AI prepared everything; it cannot sign.</div>'+
+            '<button class="btn primary full" id="signBtn">'+IC.sign+' Apply Part 11 signature</button>');
+    }
+    // step 5 — audit
+    rightTitle.textContent = 'Purview audit trail';
+    var items = audit.map(function(a){
+      return '<div class="au '+a.kind+'"><span class="amk">'+(a.kind==='agent'?IC.robot:a.kind==='human'?IC.people:IC.sys)+'</span>'+
+        '<div class="ax"><div class="at"><b>'+a.who+'</b> — '+a.act+'</div>'+
+        '<div class="am"><span>'+a.t+'</span><code>'+a.hash+'</code><span class="worm">WORM</span></div></div></div>';
+    }).join('');
+    return '<div class="panel-note lead">Immutable, identity-bound record — inspection-ready by construction.</div>'+
+      '<div class="audit">'+items+'</div>'+
+      '<button class="btn sm full" style="margin-top:12px">⤓ Export audit package (FDA / EMA)</button>'+
+      '<div class="closing"><b>Black box → glass box</b><span>source-linked · signed · immutable · audited</span></div>';
+  }
+
+  /* ---------- audit builder ---------- */
+  function baseTime(i){ var m=2+i; return '2026-06-25 14:'+(m<10?'0'+m:m)+':'+ (11+i*7); }
+  function hash(seed){ var h='9f2c'; var s='0123456789abcdef'; for(var i=0;i<4;i++){h+=s[(seed*7+i*3)%16];} return 'sha256:'+h+'…d41'; }
+  function logAudit(kind,who,act){ audit.push({kind:kind,who:who,act:act,t:baseTime(audit.length),hash:hash(audit.length+1)}); }
+
+  function syncAuditToStep(){
+    // rebuild audit deterministically from state so back/reset stay consistent
+    audit = [];
+    if(step>=1) logAudit('agent','Medical-Writing AI Editor','generated grounded draft (8 sourced claims) from the evidence pack');
+    if(step>=2) logAudit('system','Deterministic QA Service','ran citation · consistency · completeness checks — 1 exception raised');
+    if(accepted) logAudit('human','Marcus Reed (QA/Reg)','corrected ORR 42.9% → 43.0% per TLF 14.2.1; four-eyes review complete');
+    if(signed) logAudit('human','Dr. Elena Brandt (QPPV)','applied 21 CFR Part 11 e-signature — meaning: Approved');
+    if(step>=5) logAudit('system','Microsoft Purview','sealed immutable WORM record; package marked submission-ready');
+  }
+
+  /* ---------- steppers / roi ---------- */
+  function renderSteps(){
+    document.getElementById('steps').innerHTML = STEPS.map(function(s,i){
+      var cls = i<step ? 'done' : (i===step ? 'active' : 'locked');
+      return '<div class="step '+cls+'"><span class="dot">'+s.ic+'</span>'+
+        '<span class="slabel"><b>'+s.k+'</b><i>'+s.s+'</i></span><span class="chk">✓</span></div>';
+    }).join('');
+    document.getElementById('stepNo').textContent = step+1;
+    document.getElementById('stepName').textContent = STEPS[step].k;
+  }
+  function renderRoi(){
+    var on = [step>=1, step>=2, step>=3, step>=4]; // reveal progressively
+    document.querySelectorAll('#roi .rk').forEach(function(el,i){ el.classList.toggle('on', !!on[i]); });
+  }
+
+  /* ---------- master render ---------- */
+  function render(){
+    syncAuditToStep();
+    paper.innerHTML = (step===0) ? blankHTML() : docHTML();
+    paper.classList.remove('fade-in'); void paper.offsetWidth; paper.classList.add('fade-in');
+    rightBody.innerHTML = rightHTML();
+    renderSteps(); renderRoi(); wire();
+    // gating
+    document.getElementById('nextBtn').disabled =
+      (step===3 && !accepted) || (step===4 && !signed) || step===5;
+    document.getElementById('backBtn').disabled = step===0;
+  }
+
+  /* ---------- actions ---------- */
+  function go(n){ step = Math.max(0, Math.min(5, n)); if(step<3) accepted=false; if(step<4) signed=false; closeSrc(); render(); }
+  function next(){ if(document.getElementById('nextBtn').disabled) return; go(step+1); }
+  function back(){ go(step-1); }
+  function draft(){ go(1); }
+  function accept(){ accepted = true; render(); }
+  function openSign(){ document.getElementById('signModal').classList.add('show'); }
+  function doSign(){ signed = true; document.getElementById('signModal').classList.remove('show'); render(); }
+  function reset(){ step=0; accepted=false; signed=false; running=false; closeSrc(); render(); }
+
+  /* ---------- source overlay ---------- */
+  function showSrc(n){
+    var s = SOURCES[n]; if(!s) return;
+    document.getElementById('srcTitle').textContent = s.src;
+    document.getElementById('srcLoc').textContent = s.loc;
+    document.getElementById('srcQuote').textContent = s.q;
+    var v = document.getElementById('srcVerdict');
+    if(s.match || (n===4 && accepted)){ v.className='verdict ok'; v.textContent='✓ Matches the drafted claim'; }
+    else { v.className='verdict bad'; v.textContent='⚠ Draft shows '+s.draft+' — source says '+s.truth; }
+    document.getElementById('srcCard').classList.add('show');
+  }
+  function closeSrc(){ document.getElementById('srcCard').classList.remove('show'); }
+
+  /* ---------- wiring (re-bound each render) ---------- */
+  function wire(){
+    var d = document.getElementById('draftBtn'); if(d) d.onclick = draft;
+    var a = document.getElementById('advBtn');   if(a) a.onclick = next;
+    var ac= document.getElementById('acceptBtn');if(ac) ac.onclick = accept;
+    var vs= document.getElementById('viewSrcBtn');if(vs) vs.onclick = function(){ showSrc(4); };
+    var sb= document.getElementById('signBtn');  if(sb) sb.onclick = openSign;
+    paper.querySelectorAll('cite').forEach(function(c){
+      c.onclick = function(){ showSrc(parseInt(c.getAttribute('data-n'),10)); };
+    });
+  }
+
+  /* ---------- auto-run ---------- */
+  function wait(ms){ return new Promise(function(r){ setTimeout(r,ms); }); }
+  async function run(){
+    if(running) return; running = true;
+    var ctrls = document.querySelectorAll('.bottom .ctrls .btn'); ctrls.forEach(function(b){b.disabled=true;});
+    reset(); await wait(700);
+    draft(); await wait(1500);
+    go(2); await wait(1700);
+    go(3); await wait(1100);
+    showSrc(4); await wait(1500); closeSrc();
+    accept(); await wait(1500);
+    go(4); await wait(1100);
+    openSign(); await wait(1400);
+    doSign(); await wait(1500);
+    go(5);
+    running = false; ctrls.forEach(function(b){b.disabled=false;});
+    document.getElementById('nextBtn').disabled = true;
+    document.getElementById('backBtn').disabled = false;
+  }
+
+  /* ---------- static wiring ---------- */
+  document.getElementById('nextBtn').onclick = next;
+  document.getElementById('backBtn').onclick = back;
+  document.getElementById('runBtn').onclick = run;
+  document.getElementById('resetBtn').onclick = reset;
+  document.getElementById('srcClose').onclick = closeSrc;
+  document.getElementById('signCancel').onclick = function(){ document.getElementById('signModal').classList.remove('show'); };
+  document.getElementById('signConfirm').onclick = doSign;
+  document.addEventListener('keydown', function(e){
+    if(e.key==='ArrowRight') next();
+    else if(e.key==='ArrowLeft') back();
+    else if(e.key==='r'||e.key==='R') reset();
+    else if(e.key==='Escape'){ closeSrc(); document.getElementById('signModal').classList.remove('show'); }
+  });
+
+  /* optional deep-link for presenters / QA: #s=3a , #s=4ag , #s=5 */
+  (function(){
+    var h = (location.hash||'').replace('#','');
+    if(!h) return;
+    var m = h.match(/s=(\d)/); if(m){ step = Math.max(0, Math.min(5, parseInt(m[1],10))); }
+    if(/a/.test(h)) accepted = true;
+    if(/g/.test(h)) signed = true;
+    if(step>=5){ accepted = true; signed = true; }
+    if(step<3) accepted=false; if(step<4) signed=false;
+  })();
+
+  render();
+})();
+</script>
+</body>
+</html>
