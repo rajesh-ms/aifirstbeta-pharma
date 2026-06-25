@@ -1,0 +1,644 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Multi-Step Discovery Orchestration — Merck (MSD): Phase B Deliverables</title>
+<meta name="description" content="Phase B deliverables for the Merck (MSD) R&D-speed use case: Architecture Concept Diagram (Cloud-Centric Platform), Persona-Driven Scenarios, and C-Suite Relevance — protein/antibody + foundation models orchestrated on Azure, federated across Google & AWS." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+:root{
+  /* Merck (MSD) brand palette — teal-forward (Merck Teal #009CA6 / Pantone 320C) */
+  --green-900:#00332c; --green-800:#013c33; --green-700:#00675b; --green-600:#00857c;
+  --green-mid:#00786e;
+  --teal-700:#00857c; --teal-600:#009ca6; --olive-600:#6eb43f;
+  --gold-500:#009ca6; --gold-600:#0a766e; --gold-l:#cfeeea; --gold-bg:#e6f5f3;
+  --lime:#6eb43f; --lime-l:#a6dd7a;
+  --ink:#14302a; --muted:#5c6b66; --line:#dfe7e4;
+  --surface:#f1f6f5; --sage-50:#e9f2ef; --card:#ffffff;
+  --font-display:"Fraunces","Georgia",serif;
+  --font-sans:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{
+  background:#062420;
+  color:var(--ink);
+  font-family:var(--font-sans);
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+  overflow:hidden;
+}
+#viewport{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(120% 120% at 50% -10%, #053a32 0%, #062722 60%, #04201c 100%);}
+#stage{position:relative;width:min(100vw,177.78vh);aspect-ratio:16/9;
+  box-shadow:0 40px 120px -40px rgba(0,0,0,.75);overflow:hidden;background:var(--surface);}
+
+/* ---- slide scaffold (fixed 1280x720 design space, scaled) ---- */
+.slide{position:absolute;inset:0;opacity:0;pointer-events:none;
+  transition:opacity .5s ease, transform .5s ease;transform:translateX(24px);}
+.slide.active{opacity:1;pointer-events:auto;transform:none;}
+.slide-inner{position:absolute;top:0;left:0;width:1280px;height:720px;
+  transform:scale(var(--s,1));transform-origin:top left;}
+.pad{position:absolute;inset:0;padding:56px 68px;}
+
+/* light slide texture */
+.slide--light .slide-inner{background:
+  radial-gradient(60% 70% at 100% 0%, rgba(0,156,166,.08), transparent 60%),
+  radial-gradient(50% 60% at 0% 100%, rgba(0,133,124,.06), transparent 55%),
+  var(--surface);}
+
+/* ---- shared header ---- */
+.eyebrow{font:600 13px/1 var(--font-sans);letter-spacing:.2em;text-transform:uppercase;color:var(--gold-600);}
+.h1{font-family:var(--font-display);font-weight:600;color:var(--green-900);
+  font-size:50px;line-height:1.02;letter-spacing:-.01em;margin:8px 0 0;}
+.rule{width:74px;height:5px;border-radius:3px;background:var(--gold-500);margin:12px 0 0;}
+.subtitle{color:var(--muted);font-size:14px;margin:12px 0 0;line-height:1.4;}
+
+/* ---- footer ---- */
+.sfoot{position:absolute;left:68px;right:68px;bottom:24px;display:flex;justify-content:space-between;
+  align-items:center;font:500 11.5px/1.3 var(--font-sans);color:#9aa79f;letter-spacing:.01em;gap:18px;}
+.sfoot .num{font-variant-numeric:tabular-nums;color:var(--green-700);font-weight:600;letter-spacing:.1em;white-space:nowrap;}
+.sfoot .prov{color:var(--gold-600);font-weight:600;white-space:nowrap;}
+.sfoot .footr{display:flex;gap:16px;align-items:center;white-space:nowrap;}
+
+/* ---- title slide ---- */
+.slide--title .slide-inner{background:
+  radial-gradient(80% 90% at 88% -10%, rgba(0,156,166,.20), transparent 55%),
+  radial-gradient(70% 80% at 0% 110%, rgba(0,133,124,.26), transparent 55%),
+  linear-gradient(135deg,#024a40 0%, #00332c 55%, #04201c 100%);}
+.slide--title .goldbar{position:absolute;left:0;top:0;right:0;height:14px;background:var(--gold-500);}
+.title-wrap{position:absolute;left:96px;right:96px;top:50%;transform:translateY(-50%);}
+.title-eyebrow{color:var(--gold-500);letter-spacing:.22em;}
+.title-h1{font-family:var(--font-display);font-weight:600;color:#fff;font-size:74px;line-height:1.0;
+  letter-spacing:-.015em;margin:20px 0 0;}
+.title-sub{color:#c4e6e1;font-size:21px;margin:22px 0 0;max-width:900px;line-height:1.45;}
+.title-sub b{color:var(--gold-l);font-weight:600;}
+.dchips{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin:42px 0 0;max-width:1040px;}
+.dchip{position:relative;background:rgba(255,255,255,.05);border:1.5px solid rgba(0,156,166,.85);
+  border-radius:14px;padding:18px 20px 18px 70px;min-height:108px;}
+.dchip .dn{position:absolute;left:18px;top:18px;width:38px;height:38px;border-radius:50%;
+  background:var(--gold-500);color:var(--green-900);display:grid;place-items:center;
+  font:700 19px/1 var(--font-sans);}
+.dchip h3{font-family:var(--font-display);font-weight:600;color:#fff;font-size:18px;margin:1px 0 7px;line-height:1.12;}
+.dchip p{margin:0;color:#c4e6e1;font-size:12.5px;line-height:1.36;}
+.title-byline{position:absolute;left:96px;right:96px;bottom:40px;display:flex;justify-content:space-between;
+  color:#83a39c;font-size:13.5px;letter-spacing:.03em;}
+.title-byline .prov{color:var(--gold-500);font-weight:600;}
+
+/* =====================  SLIDE 2 — ARCHITECTURE  ===================== */
+.slide--arch .pad{padding:30px 56px 22px;}
+.slide--arch .h1{font-size:33px;}
+.slide--arch .rule{margin-top:8px;height:4px;}
+.slide--arch .subtitle{margin-top:10px;}
+
+.pipe{display:flex;align-items:stretch;gap:0;margin-top:16px;}
+.pstep{flex:1;display:flex;align-items:center;gap:9px;background:#fff;border:1.5px solid var(--gold-500);
+  border-radius:12px;padding:8px 12px;box-shadow:0 10px 22px -18px rgba(11,53,38,.6);}
+.pstep .pn{flex:none;width:26px;height:26px;border-radius:50%;background:var(--gold-500);color:var(--green-900);
+  display:grid;place-items:center;font:700 13px/1 var(--font-sans);}
+.pstep span{font:700 12px/1.12 var(--font-sans);color:var(--ink);}
+.parrow{flex:none;display:grid;place-items:center;width:24px;color:var(--gold-500);font-size:18px;font-weight:700;}
+
+.archgrid{display:grid;grid-template-columns:1fr 252px;gap:14px;margin-top:14px;}
+.bands{display:flex;flex-direction:column;gap:11px;}
+.band{display:grid;grid-template-columns:152px 1fr;gap:11px;align-items:stretch;}
+.band__l{background:var(--green-700);color:#fff;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;text-align:center;
+  font:600 13px/1.12 var(--font-display);padding:6px 8px;}
+.plicon{width:23px;height:23px;display:block;color:#fff;opacity:.95;}
+.band__cards{display:grid;grid-template-columns:repeat(3,1fr);gap:11px;}
+.bcard{background:#fff;border:1px solid var(--line);border-radius:10px;padding:9px 12px;
+  box-shadow:0 12px 26px -24px rgba(11,53,38,.5);}
+.bcard b{display:block;color:var(--green-900);font:600 12px/1.2 var(--font-sans);margin-bottom:3px;}
+.bcard span{color:var(--muted);font:500 10.5px/1.28 var(--font-sans);}
+
+.gov{background:var(--green-900);border:1.5px solid var(--gold-500);border-radius:12px;padding:14px 16px;
+  display:flex;flex-direction:column;justify-content:center;box-shadow:0 22px 44px -28px rgba(11,53,38,.7);}
+.gov h4{font-family:var(--font-display);color:var(--gold-500);font-size:16px;margin:0 0 2px;text-align:center;font-weight:600;}
+.gov .gsub{color:#c4e6e1;font-size:10.5px;text-align:center;margin-bottom:13px;letter-spacing:.02em;}
+.gov ul{margin:0;padding:0;}
+.gov li{color:#fff;font:500 12.5px/1.3 var(--font-sans);list-style:none;margin:8px 0;padding-left:17px;position:relative;}
+.gov li::before{content:"\25AA";position:absolute;left:0;color:var(--gold-500);}
+.gov li.hl{color:var(--lime);font-weight:700;}
+
+.outcome{margin-top:13px;background:var(--green-mid);border-radius:10px;padding:11px 20px;display:flex;
+  justify-content:space-between;align-items:center;gap:18px;}
+.outcome .ot{color:#fff;font:500 13px/1.32 var(--font-sans);}
+.outcome .ot b{color:var(--gold-l);font-weight:700;}
+.outcome .obadge{color:var(--lime);font:700 13px/1 var(--font-sans);white-space:nowrap;}
+
+/* =====================  SLIDE 3 — PERSONAS  ===================== */
+.slide--persona .pad{padding:30px 56px 22px;}
+.framing{margin-top:16px;background:var(--gold-bg);border:1.5px solid var(--gold-500);border-radius:12px;padding:13px 20px;}
+.framing .flbl{color:var(--gold-600);font:700 11px/1 var(--font-sans);letter-spacing:.13em;text-transform:uppercase;}
+.framing p{margin:7px 0 0;font-family:var(--font-display);font-style:italic;font-size:17px;color:var(--ink);line-height:1.4;}
+.framing .ph{color:var(--green-700);font-weight:700;font-style:italic;}
+
+.pcards{display:grid;grid-template-columns:1fr 1fr;gap:26px;margin-top:20px;}
+.pcard{background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden;
+  box-shadow:0 26px 50px -34px rgba(11,53,38,.55);}
+.pcard__h{background:var(--green-900);padding:14px 22px;display:flex;align-items:center;gap:15px;}
+.pcard__h .pav{flex:none;width:46px;height:46px;border-radius:50%;background:var(--gold-500);color:var(--green-900);
+  display:grid;place-items:center;font:700 17px/1 var(--font-display);}
+.pcard__h .pname{font-family:var(--font-display);font-weight:600;color:#fff;font-size:18.5px;line-height:1.08;}
+.pcard__h .prole{color:var(--gold-l);font-size:12px;margin-top:3px;}
+.pcard__b{padding:15px 22px 19px;}
+.pone{font-family:var(--font-display);font-style:italic;color:var(--ink);font-size:14px;line-height:1.42;margin:0 0 13px;}
+.prow{margin:10px 0;font:500 13px/1.4 var(--font-sans);color:var(--ink);}
+.prow b{color:var(--gold-600);font-weight:700;}
+
+/* =====================  SLIDE 4 — C-SUITE  ===================== */
+.slide--csuite .pad{padding:30px 56px 22px;}
+.cscols{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:20px;}
+.cscol{background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden;
+  box-shadow:0 26px 50px -34px rgba(11,53,38,.55);display:flex;flex-direction:column;}
+.cscol__h{background:var(--green-900);padding:14px 18px;display:flex;align-items:center;gap:13px;}
+.cscol__h .csn{flex:none;width:42px;height:42px;border-radius:50%;background:var(--gold-500);color:var(--green-900);
+  display:grid;place-items:center;font:700 18px/1 var(--font-sans);}
+.cscol__h .cslens{font-family:var(--font-display);font-weight:600;color:#fff;font-size:17px;line-height:1.08;}
+.cscol__h .csexe{color:var(--gold-l);font-size:11.5px;margin-top:3px;font-weight:600;}
+.cscol__b{padding:14px 18px 18px;flex:1;}
+.csfocus{color:var(--teal-700);font:700 12px/1.2 var(--font-sans);margin-bottom:9px;letter-spacing:.01em;}
+.csstmt{font-family:var(--font-display);font-weight:600;color:var(--ink);font-size:15.5px;line-height:1.34;margin:0 0 15px;}
+.csb{margin:0;padding:0;list-style:none;}
+.csb li{position:relative;padding-left:18px;margin:10px 0;font:500 12.5px/1.38 var(--font-sans);color:var(--ink);}
+.csb li::before{content:"\2022";position:absolute;left:2px;color:var(--gold-500);font-weight:700;}
+.csfoot{margin-top:18px;background:var(--green-mid);border-radius:10px;padding:12px 22px;display:flex;
+  justify-content:space-between;align-items:center;gap:20px;}
+.csfoot .l{color:#fff;font:500 13px/1.3 var(--font-sans);}
+.csfoot .l b{color:var(--gold-l);font-weight:700;}
+.csfoot .r{color:#fff;font:500 13px/1.3 var(--font-sans);text-align:right;}
+
+/* ===== chrome (outside scaled stage) ===== */
+#progress{position:fixed;top:0;left:0;height:3px;background:var(--gold-500);width:0;z-index:40;
+  transition:width .45s ease;box-shadow:0 0 12px rgba(0,156,166,.6);}
+.nav-arrow{position:fixed;top:50%;transform:translateY(-50%);width:54px;height:54px;border-radius:50%;
+  border:1px solid rgba(255,255,255,.22);background:rgba(8,32,24,.45);color:#fff;cursor:pointer;
+  display:grid;place-items:center;z-index:35;opacity:0;transition:opacity .25s, background .2s;backdrop-filter:blur(6px);}
+#viewport:hover .nav-arrow{opacity:.55;}
+.nav-arrow:hover{opacity:1;background:rgba(0,133,124,.78);}
+.nav-arrow.left{left:22px;} .nav-arrow.right{right:22px;}
+.nav-arrow svg{width:22px;height:22px;}
+.dock{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:35;display:flex;align-items:center;
+  gap:6px;padding:7px 9px;border-radius:999px;background:rgba(8,32,24,.55);border:1px solid rgba(255,255,255,.16);
+  backdrop-filter:blur(10px);box-shadow:0 16px 40px -16px rgba(0,0,0,.6);}
+.dock button{appearance:none;border:0;background:transparent;color:#dfeae3;cursor:pointer;border-radius:999px;
+  height:34px;min-width:34px;padding:0 10px;display:grid;place-items:center;font:600 13px/1 var(--font-sans);}
+.dock button:hover{background:rgba(255,255,255,.12);color:#fff;}
+.dock .count{font-variant-numeric:tabular-nums;letter-spacing:.12em;color:#c4e6e1;padding:0 8px;}
+.dock .sep{width:1px;height:20px;background:rgba(255,255,255,.16);margin:0 2px;}
+.dock svg{width:18px;height:18px;}
+
+/* TOC overlay */
+#toc{position:fixed;inset:0;z-index:50;background:rgba(3,28,24,.84);backdrop-filter:blur(8px);
+  display:none;align-items:center;justify-content:center;}
+body.toc-open #toc{display:flex;}
+.toc-card{width:min(720px,90vw);background:#013b33;border:1px solid rgba(255,255,255,.12);border-radius:18px;
+  padding:30px 34px;box-shadow:0 40px 100px -30px rgba(0,0,0,.7);}
+.toc-card h2{font-family:var(--font-display);color:#fff;margin:0 0 4px;font-size:26px;font-weight:600;}
+.toc-card p{color:#83a39c;margin:0 0 18px;font-size:13px;}
+.toc-list{display:grid;gap:8px;}
+.toc-list button{display:flex;gap:16px;align-items:baseline;text-align:left;width:100%;cursor:pointer;
+  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:13px 16px;color:#eaf2ec;
+  font:500 16px/1.3 var(--font-sans);transition:background .15s,border-color .15s;}
+.toc-list button:hover{background:rgba(0,133,124,.38);border-color:rgba(0,156,166,.5);}
+.toc-list button .n{color:var(--gold-500);font-weight:700;font-variant-numeric:tabular-nums;min-width:26px;}
+.toc-hint{margin-top:18px;color:#7f9388;font-size:12px;text-align:center;}
+kbd{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);border-radius:5px;padding:1px 6px;font:600 11px/1.4 var(--font-sans);color:#dfeae3;}
+
+#hint{position:fixed;bottom:74px;left:50%;transform:translateX(-50%);z-index:34;color:#c4e6e1;
+  font-size:12.5px;letter-spacing:.04em;background:rgba(8,32,24,.5);padding:7px 14px;border-radius:999px;
+  border:1px solid rgba(255,255,255,.14);transition:opacity .6s ease;}
+
+/* ===================== brand lockup + imagery ===================== */
+.brandlock{display:flex;align-items:center;gap:12px;font-family:var(--font-sans);white-space:nowrap;}
+.brandlock .ms{display:flex;align-items:center;gap:8px;}
+.brandlock .ms-logo{display:block;flex:none;}
+.brandlock .msw{font-weight:600;font-size:17px;letter-spacing:.1px;}
+.brandlock .bdiv{width:1px;height:21px;display:inline-block;}
+.brandlock .merckw{display:flex;align-items:baseline;gap:7px;}
+.brandlock .msd{font-weight:800;font-size:20px;letter-spacing:1.5px;}
+.brandlock .msd-sub{font-weight:600;font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;}
+.title-brand{position:absolute;right:90px;top:46px;z-index:2;}
+.title-brand .msw{color:#fff;}
+.title-brand .bdiv{background:rgba(255,255,255,.38);}
+.title-brand .msd{color:#fff;}
+.title-brand .msd-sub{color:var(--gold-l);}
+.slide--title .title-wrap{z-index:1;}
+.cobrand{position:absolute;right:54px;top:22px;z-index:3;transform:scale(.8);transform-origin:top right;}
+.cobrand .msw{color:#4c5752;}
+.cobrand .bdiv{background:#cbd6d1;}
+.cobrand .msd{color:var(--green-600);}
+.cobrand .msd-sub{color:var(--muted);}
+.hero-art{position:absolute;right:-26px;top:50%;transform:translateY(-50%);width:560px;height:560px;opacity:.18;z-index:0;pointer-events:none;}
+
+/* presenter / speaker notes drawer (press S) */
+#notes{position:fixed;top:0;right:0;bottom:0;width:400px;max-width:88vw;z-index:45;
+  background:linear-gradient(180deg,#013b33 0%, #00251f 100%);color:#eaf6f3;
+  border-left:3px solid var(--gold-500);box-shadow:-26px 0 70px -28px rgba(0,0,0,.7);
+  transform:translateX(102%);transition:transform .3s ease;display:flex;flex-direction:column;
+  font-family:var(--font-sans);}
+body.notes-open #notes{transform:none;}
+#notes .nhead{padding:18px 22px 13px;border-bottom:1px solid rgba(255,255,255,.12);flex:none;}
+#notes .nlbl{color:var(--gold-500);font:700 11px/1 var(--font-sans);letter-spacing:.16em;text-transform:uppercase;}
+#notes .ntitle{margin:7px 0 0;font-family:var(--font-display);font-weight:600;font-size:18.5px;color:#fff;line-height:1.12;}
+#notes .nclose{position:absolute;top:15px;right:15px;width:30px;height:30px;border-radius:50%;border:1px solid rgba(255,255,255,.25);
+  background:rgba(255,255,255,.06);color:#cfeeea;cursor:pointer;font:600 15px/1 var(--font-sans);display:grid;place-items:center;}
+#notes .nclose:hover{background:rgba(255,255,255,.14);color:#fff;}
+#notes .nbody{padding:15px 22px 26px;overflow:auto;}
+#notes h4{color:var(--gold-l);font:700 11px/1.2 var(--font-sans);letter-spacing:.09em;text-transform:uppercase;margin:15px 0 7px;}
+#notes h4:first-child{margin-top:0;}
+#notes p{margin:0 0 9px;font-size:13px;line-height:1.5;color:#dceee9;}
+#notes ul{margin:0 0 9px;padding-left:17px;}
+#notes li{font-size:12.5px;line-height:1.46;margin:6px 0;color:#dceee9;}
+#notes b{color:#fff;font-weight:700;}
+#notes .qa{color:#bfe6df;font-style:italic;}
+#notes .ntime{display:inline-block;margin-top:6px;color:#0a251f;background:var(--gold-500);font:700 11px/1 var(--font-sans);
+  letter-spacing:.02em;padding:5px 10px;border-radius:999px;}
+
+/* print → clean PDF, one slide per page */
+@page{size:1280px 720px;margin:0;}
+@media print{
+  body{overflow:visible;background:#fff;}
+  #viewport{position:static;display:block;}
+  #stage{width:1280px;height:auto;box-shadow:none;}
+  .slide{position:relative;opacity:1!important;transform:none!important;page-break-after:always;height:720px;}
+  .slide-inner{transform:none!important;}
+  #progress,.nav-arrow,.dock,#hint,#toc,#notes{display:none!important;}
+}
+</style>
+</head>
+<body>
+<div id="progress"></div>
+
+<div id="viewport">
+  <button class="nav-arrow left" aria-label="Previous" onclick="prev()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+
+  <div id="stage">
+
+    <!-- ===================== SLIDE 1 — TITLE ===================== -->
+    <section class="slide slide--title active" aria-label="Title">
+      <div class="slide-inner">
+        <div class="goldbar"></div>
+        <svg class="hero-art" viewBox="0 0 560 560" fill="none" stroke="#27bdb1" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polygon points="430,152 398,206 334,206 302,152 334,98 398,98"/>
+          <polygon points="405,152 387,182 351,182 333,152 351,122 387,122" stroke-width="2"/>
+          <circle cx="430" cy="152" r="6.5" fill="#3ccfc2" stroke="none"/>
+          <circle cx="398" cy="206" r="6.5" fill="#3ccfc2" stroke="none"/>
+          <circle cx="334" cy="206" r="6.5" fill="#3ccfc2" stroke="none"/>
+          <circle cx="302" cy="152" r="6.5" fill="#3ccfc2" stroke="none"/>
+          <circle cx="334" cy="98" r="6.5" fill="#3ccfc2" stroke="none"/>
+          <circle cx="398" cy="98" r="6.5" fill="#3ccfc2" stroke="none"/>
+          <line x1="430" y1="152" x2="486" y2="152"/>
+          <circle cx="496" cy="152" r="7.5" fill="#3ccfc2" stroke="none"/>
+          <line x1="302" y1="152" x2="260" y2="122"/>
+          <circle cx="251" cy="116" r="6.5" fill="#3ccfc2" stroke="none"/>
+          <g stroke="#1bb3a6" stroke-width="9">
+            <line x1="330" y1="502" x2="330" y2="410"/>
+            <line x1="330" y1="410" x2="254" y2="334"/>
+            <line x1="330" y1="410" x2="406" y2="334"/>
+          </g>
+          <circle cx="254" cy="334" r="15" stroke="#1bb3a6" stroke-width="9"/>
+          <circle cx="406" cy="334" r="15" stroke="#1bb3a6" stroke-width="9"/>
+          <circle cx="330" cy="410" r="7" fill="#1bb3a6" stroke="none"/>
+          <g stroke="#27bdb1">
+            <line x1="120" y1="250" x2="176" y2="286"/>
+            <line x1="176" y1="286" x2="150" y2="346"/>
+            <line x1="176" y1="286" x2="236" y2="286"/>
+          </g>
+          <circle cx="120" cy="250" r="6.5" fill="#3ccfc2" stroke="none"/>
+          <circle cx="176" cy="286" r="7.5" fill="#3ccfc2" stroke="none"/>
+          <circle cx="150" cy="346" r="6.5" fill="#3ccfc2" stroke="none"/>
+          <circle cx="236" cy="286" r="6" fill="#3ccfc2" stroke="none"/>
+        </svg>
+        <div class="brandlock title-brand">
+          <span class="ms"><svg class="ms-logo" width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><rect width="9" height="9" x="0" y="0" fill="#F25022"/><rect width="9" height="9" x="10.5" y="0" fill="#7FBA00"/><rect width="9" height="9" x="0" y="10.5" fill="#00A4EF"/><rect width="9" height="9" x="10.5" y="10.5" fill="#FFB900"/></svg><span class="msw">Microsoft</span></span>
+          <span class="bdiv"></span>
+          <span class="merckw"><span class="msd">MSD</span><span class="msd-sub">Merck</span></span>
+        </div>
+        <div class="title-wrap">
+          <div class="eyebrow title-eyebrow">Architect Transformation &nbsp;&middot;&nbsp; Phase B &nbsp;&middot;&nbsp; Deliverables</div>
+          <h1 class="title-h1">Multi-Step Discovery Orchestration</h1>
+          <p class="title-sub"><b>R&amp;D Speed &middot; Cloud-Centric Platform</b> &mdash; protein / antibody design over foundation models, orchestrated on Azure and federated across Google &amp; AWS.</p>
+          <div class="dchips">
+            <div class="dchip"><div class="dn">1</div><h3>Architecture Concept Diagram</h3><p>Cloud-Centric Platform for governed agentic discovery.</p></div>
+            <div class="dchip"><div class="dn">2</div><h3>Persona-Driven Scenarios</h3><p>How human + AI collaborate; new hybrid roles.</p></div>
+            <div class="dchip"><div class="dn">3</div><h3>C-Suite Relevance</h3><p>CEO &middot; Business/Ops &middot; Risk &mdash; the &ldquo;So What?&rdquo;</p></div>
+          </div>
+        </div>
+        <div class="title-byline">
+          <span>Merck (MSD) &nbsp;&middot;&nbsp; Pharmaceuticals &nbsp;&middot;&nbsp; <i>Federate, don&rsquo;t migrate</i></span>
+          <span class="prov">[brief] &middot; [deck] &middot; [H/design]</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== SLIDE 2 — ARCHITECTURE CONCEPT ===================== -->
+    <section class="slide slide--light slide--arch" aria-label="Architecture Concept Diagram">
+      <div class="slide-inner"><div class="pad">
+        <div class="brandlock cobrand">
+          <span class="ms"><svg class="ms-logo" width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><rect width="9" height="9" x="0" y="0" fill="#F25022"/><rect width="9" height="9" x="10.5" y="0" fill="#7FBA00"/><rect width="9" height="9" x="0" y="10.5" fill="#00A4EF"/><rect width="9" height="9" x="10.5" y="10.5" fill="#FFB900"/></svg><span class="msw">Microsoft</span></span>
+          <span class="bdiv"></span>
+          <span class="merckw"><span class="msd">MSD</span><span class="msd-sub">Merck</span></span>
+        </div>
+        <div class="eyebrow">Deliverable 1 &nbsp;&middot;&nbsp; Architecture Concept Diagram</div>
+        <h1 class="h1">Cloud-Centric Platform &mdash; Governed Agentic Discovery</h1>
+        <div class="rule"></div>
+        <p class="subtitle">Multi-step discovery orchestration over protein/antibody + foundation models &middot; federated across Azure, Google &amp; AWS.</p>
+
+        <div class="pipe">
+          <div class="pstep"><span class="pn">1</span><span>Target ID &amp; validation</span></div>
+          <div class="parrow">&rarr;</div>
+          <div class="pstep"><span class="pn">2</span><span>Generative design</span></div>
+          <div class="parrow">&rarr;</div>
+          <div class="pstep"><span class="pn">3</span><span>Structure &amp; docking</span></div>
+          <div class="parrow">&rarr;</div>
+          <div class="pstep"><span class="pn">4</span><span>In-silico triage</span></div>
+          <div class="parrow">&rarr;</div>
+          <div class="pstep"><span class="pn">5</span><span>Rank &rarr; human gate</span></div>
+        </div>
+
+        <div class="archgrid">
+          <div class="bands">
+            <div class="band">
+              <div class="band__l"><svg class="plicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="2.4"/><circle cx="5" cy="5" r="1.7"/><circle cx="19" cy="5" r="1.7"/><circle cx="5" cy="19" r="1.7"/><circle cx="19" cy="19" r="1.7"/><path d="M10.3 10.3 6.4 6.4M13.7 10.3 17.6 6.4M10.3 13.7 6.4 17.6M13.7 13.7 17.6 17.6"/></svg><span>Orchestration<br>plane</span></div>
+              <div class="band__cards">
+                <div class="bcard"><b>Azure AI Foundry Agent Service</b><span>multi-agent: Target&middot;Design&middot;Structure&middot;Triage&middot;Rank</span></div>
+                <div class="bcard"><b>A2A interoperability</b><span>calls Gemini &middot; Protillion &middot; Variational agents</span></div>
+                <div class="bcard"><b>Human-in-the-loop gate</b><span>four-eyes before wet-lab (Annex 22)</span></div>
+              </div>
+            </div>
+            <div class="band">
+              <div class="band__l"><svg class="plicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 3 7.5l9 4.5 9-4.5L12 3Z"/><path d="M3 12l9 4.5L21 12"/><path d="M3 16.5 12 21l9-4.5"/></svg><span>Foundation<br>models</span></div>
+              <div class="band__cards">
+                <div class="bcard"><b>Foundry catalog + Azure ML</b><span>ESM &middot; AlphaFold3 &middot; Boltz-2 &middot; IgLM &middot; RFdiffusion</span></div>
+                <div class="bcard"><b>Azure Quantum Elements</b><span>generative chemistry + tox &middot; accel. DFT ~20&times;</span></div>
+                <div class="bcard"><b>Federated partner models</b><span>Protillion (Ab) &middot; Variational &middot; Gemini (R&amp;D)</span></div>
+              </div>
+            </div>
+            <div class="band">
+              <div class="band__l"><svg class="plicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="7" y="7" width="10" height="10" rx="1.5"/><path d="M10 7V4M14 7V4M10 20v-3M14 20v-3M7 10H4M7 14H4M20 10h-3M20 14h-3"/></svg><span>Compute<br>plane</span></div>
+              <div class="band__cards">
+                <div class="bcard"><b>Azure HPC &mdash; ND-series GPU</b><span>structure prediction &amp; molecular dynamics</span></div>
+                <div class="bcard"><b>CycleCloud / Azure Batch</b><span>docking &amp; screening at scale</span></div>
+                <div class="bcard"><b>Burst &amp; on-demand</b><span>capacity without on-prem rebuild</span></div>
+              </div>
+            </div>
+            <div class="band">
+              <div class="band__l"><svg class="plicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v12c0 1.66 3.13 3 7 3s7-1.34 7-3V6"/><path d="M5 12c0 1.66 3.13 3 7 3s7-1.34 7-3"/></svg><span>Data<br>foundation</span></div>
+              <div class="band__cards">
+                <div class="bcard"><b>Microsoft Fabric / OneLake</b><span>shortcuts read S3 + GCS in place (GA)</span></div>
+                <div class="bcard"><b>Azure Health Data Services</b><span>FHIR/DICOM/genomics &middot; Mayo multimodal</span></div>
+                <div class="bcard"><b>Azure AI Search</b><span>hybrid RAG over assay &amp; precedent data</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="gov">
+            <h4>Governance &amp; Identity</h4>
+            <div class="gsub">cross-cutting plane</div>
+            <ul>
+              <li>Entra Agent ID</li>
+              <li>Purview lineage</li>
+              <li>Microsoft Defender</li>
+              <li>Azure Arc (multicloud/edge)</li>
+              <li class="hl">Part 11 / ALCOA+ ready</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="outcome">
+          <div class="ot">Outcome: more validated candidates / cycle &middot; <b>12&ndash;18 mo to clinic vs 4&ndash;6 yr norm</b> &middot; human owns the wet-lab call.</div>
+          <div class="obadge">Federate, don&rsquo;t migrate</div>
+        </div>
+
+        <div class="sfoot">
+          <span>Concept A of three &mdash; Cloud-Centric Platform</span>
+          <span class="footr"><span class="prov">[brief] [deck] [H/design]</span><span class="num">02 / 04</span></span>
+        </div>
+      </div></div>
+    </section>
+
+    <!-- ===================== SLIDE 3 — PERSONAS ===================== -->
+    <section class="slide slide--light slide--persona" aria-label="Persona-Driven Scenarios">
+      <div class="slide-inner"><div class="pad">
+        <div class="brandlock cobrand">
+          <span class="ms"><svg class="ms-logo" width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><rect width="9" height="9" x="0" y="0" fill="#F25022"/><rect width="9" height="9" x="10.5" y="0" fill="#7FBA00"/><rect width="9" height="9" x="0" y="10.5" fill="#00A4EF"/><rect width="9" height="9" x="10.5" y="10.5" fill="#FFB900"/></svg><span class="msw">Microsoft</span></span>
+          <span class="bdiv"></span>
+          <span class="merckw"><span class="msd">MSD</span><span class="msd-sub">Merck</span></span>
+        </div>
+        <div class="eyebrow">Deliverable 2 &nbsp;&middot;&nbsp; Persona-Driven Scenarios</div>
+        <h1 class="h1">Human + AI Collaboration &mdash; Discovery Personas</h1>
+        <div class="rule"></div>
+        <p class="subtitle">Decisions the copilot supports &mdash; not replaces &mdash; across the discovery pipeline.</p>
+
+        <div class="framing">
+          <div class="flbl">Framing template</div>
+          <p>&ldquo;An AI copilot that assists <span class="ph">&lt;persona&gt;</span> by synthesizing <span class="ph">&lt;data&gt;</span>, flagging <span class="ph">&lt;risks&gt;</span>, and recommending <span class="ph">&lt;actions&gt;</span> &mdash; while the human retains accountability.&rdquo;</p>
+        </div>
+
+        <div class="pcards">
+          <div class="pcard">
+            <div class="pcard__h">
+              <div class="pav">DS</div>
+              <div><div class="pname">Discovery scientist / computational chemist</div><div class="prole">R&amp;D &middot; small-molecule + target</div></div>
+            </div>
+            <div class="pcard__b">
+              <p class="pone">Synthesizes target + Mayo multimodal data, flags non-synthesizable or toxic candidates pre-lab, and recommends a ranked shortlist &mdash; human retains scientific accountability.</p>
+              <div class="prow"><b>Agent does:</b> Runs target &rarr; design &rarr; dock &rarr; triage; returns ranked candidates with evidence &amp; lineage.</div>
+              <div class="prow"><b>Supports (not replaces):</b> Which candidates advance to wet-lab; target go / no-go.</div>
+              <div class="prow"><b>Human + AI:</b> AI triages at portfolio scale; scientist validates biology and approves the shortlist (four-eyes).</div>
+              <div class="prow"><b>New roles / interfaces:</b> In-silico triage scientist &middot; agent workbench over Foundry &middot; HPC cost steward.</div>
+            </div>
+          </div>
+          <div class="pcard">
+            <div class="pcard__h">
+              <div class="pav">AE</div>
+              <div><div class="pname">Antibody / protein-design engineer</div><div class="prole">R&amp;D &middot; biologics (Protillion)</div></div>
+            </div>
+            <div class="pcard__b">
+              <p class="pone">Synthesizes sequence + structure + developability data, flags immunogenicity &amp; liability risks, and recommends optimized binders &mdash; human retains design accountability.</p>
+              <div class="prow"><b>Agent does:</b> Orchestrates antibody LMs + generative design + ABodyBuilder structure + developability/immunogenicity screens.</div>
+              <div class="prow"><b>Supports (not replaces):</b> Which scaffolds / sequences to synthesize; potency-vs-developability trade-offs.</div>
+              <div class="prow"><b>Human + AI:</b> AI proposes &amp; optimizes; engineer judges manufacturability and approves designs.</div>
+              <div class="prow"><b>New roles / interfaces:</b> Model-catalog curator &middot; biologics agent-ops engineer.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="sfoot">
+          <span>Personas map to the discovery workflow, not titles</span>
+          <span class="footr"><span class="prov">[brief] [H/design]</span><span class="num">03 / 04</span></span>
+        </div>
+      </div></div>
+    </section>
+
+    <!-- ===================== SLIDE 4 — C-SUITE RELEVANCE ===================== -->
+    <section class="slide slide--light slide--csuite" aria-label="C-Suite Relevance">
+      <div class="slide-inner"><div class="pad">
+        <div class="brandlock cobrand">
+          <span class="ms"><svg class="ms-logo" width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><rect width="9" height="9" x="0" y="0" fill="#F25022"/><rect width="9" height="9" x="10.5" y="0" fill="#7FBA00"/><rect width="9" height="9" x="0" y="10.5" fill="#00A4EF"/><rect width="9" height="9" x="10.5" y="10.5" fill="#FFB900"/></svg><span class="msw">Microsoft</span></span>
+          <span class="bdiv"></span>
+          <span class="merckw"><span class="msd">MSD</span><span class="msd-sub">Merck</span></span>
+        </div>
+        <div class="eyebrow">Deliverable 3 &nbsp;&middot;&nbsp; C-Suite Relevance &mdash; &ldquo;So What?&rdquo;</div>
+        <h1 class="h1">The value in each executive&rsquo;s language</h1>
+        <div class="rule"></div>
+        <p class="subtitle">Multi-step discovery orchestration &middot; mapped to three executive lenses.</p>
+
+        <div class="cscols">
+          <div class="cscol">
+            <div class="cscol__h"><div class="csn">1</div><div><div class="cslens">CEO</div><div class="csexe">Rob Davis</div></div></div>
+            <div class="cscol__b">
+              <div class="csfocus">Modernization &middot; scale &middot; governance</div>
+              <p class="csstmt">Refill the pipeline before the 2028 Keytruda cliff &mdash; without abandoning our Google &amp; AWS bets.</p>
+              <ul class="csb">
+                <li>Federated platform = durable speed as a strategic moat (data + platforms + partnerships).</li>
+                <li>Protects ~46% of revenue exposed at the cliff.</li>
+                <li>AI scaled responsibly &mdash; a board-grade governance story.</li>
+              </ul>
+            </div>
+          </div>
+          <div class="cscol">
+            <div class="cscol__h"><div class="csn">2</div><div><div class="cslens">Business / Operations</div><div class="csexe">Dean Li &middot; Pres MRL</div></div></div>
+            <div class="cscol__b">
+              <div class="csfocus">Speed &middot; throughput &middot; reliability</div>
+              <p class="csstmt">More validated candidates per cycle, at portfolio scale &mdash; 12&ndash;18 mo to clinic vs 4&ndash;6 yr norm.</p>
+              <ul class="csb">
+                <li>Scientists shift from running tools to deciding.</li>
+                <li>Fewer costly late-stage failures (pre-lab triage).</li>
+                <li>On-demand HPC &mdash; capacity without capex.</li>
+              </ul>
+            </div>
+          </div>
+          <div class="cscol">
+            <div class="cscol__h"><div class="csn">3</div><div><div class="cslens">Risk / Compliance</div><div class="csexe">Stelios Tsinontides &middot; Quality</div></div></div>
+            <div class="cscol__b">
+              <div class="csfocus">Safety &middot; trust &middot; regulatory</div>
+              <p class="csstmt">Inspection-ready from research onward &mdash; AI triages, a human owns every regulated call.</p>
+              <ul class="csb">
+                <li>Purview lineage + Part 11 / ALCOA+-ready provenance on every candidate.</li>
+                <li>Annex 22 honored: GenAI never makes the critical decision.</li>
+                <li>Agents governed by Entra Agent ID &mdash; least privilege, full audit.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="csfoot">
+          <div class="l">Translate architecture &rarr; <b>operational outcomes the business cares about.</b></div>
+          <div class="r">Strengthen controls, transparency &amp; defensibility.</div>
+        </div>
+
+        <div class="sfoot">
+          <span>Multi-Step Discovery Orchestration &middot; Phase B Deliverable &middot; Merck (MSD)</span>
+          <span class="footr"><span class="prov">[brief] [deck] [H/design]</span><span class="num">04 / 04</span></span>
+        </div>
+      </div></div>
+    </section>
+
+  </div><!-- /#stage -->
+
+  <button class="nav-arrow right" aria-label="Next" onclick="next()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button>
+</div>
+
+<div id="notes" aria-label="Speaker notes">
+  <div class="nhead">
+    <button class="nclose" aria-label="Close notes" onclick="toggleNotes()">&times;</button>
+    <div class="nlbl">Speaker Notes</div>
+    <div class="ntitle" id="notesTitle">01 &middot; Title</div>
+  </div>
+  <div class="nbody" id="notesBody"></div>
+</div>
+
+<div id="hint">Use <kbd>&larr;</kbd> <kbd>&rarr;</kbd> to navigate &middot; <kbd>S</kbd> notes &middot; <kbd>O</kbd> overview &middot; <kbd>F</kbd> fullscreen</div>
+
+<div class="dock">
+  <button aria-label="Previous slide" onclick="prev()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+  <span class="count" id="counter">01 / 04</span>
+  <button aria-label="Next slide" onclick="next()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button>
+  <span class="sep"></span>
+  <button aria-label="Speaker notes" title="Speaker notes (S)" onclick="toggleNotes()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16M4 10h16M4 15h10M4 20h7"/></svg></button>
+  <button aria-label="Overview" title="Overview (O)" onclick="toggleToc()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></button>
+  <button aria-label="Fullscreen" title="Fullscreen (F)" onclick="toggleFs()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3m13-5v3a2 2 0 0 1-2 2h-3"/></svg></button>
+</div>
+
+<div id="toc" onclick="if(event.target.id==='toc')toggleToc()">
+  <div class="toc-card">
+    <h2>Multi-Step Discovery Orchestration</h2>
+    <p>Merck (MSD) &middot; Phase B Deliverables &mdash; jump to a slide</p>
+    <div class="toc-list" id="tocList"></div>
+    <div class="toc-hint">Press <kbd>O</kbd> or <kbd>Esc</kbd> to close</div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var titles = ['Title','Architecture Concept Diagram','Persona-Driven Scenarios','C-Suite Relevance'];
+  var notes = [
+    "<h4>Open &mdash; the hook</h4><p>Merck&rsquo;s single biggest value lever is <b>R&amp;D speed</b> &mdash; and the clock is running. The <b>2028 Keytruda cliff</b> puts ~<b>$29.5B (about 46% of revenue)</b> in play. The question isn&rsquo;t <i>whether</i> to use AI in discovery &mdash; it&rsquo;s how to do it fast, at scale, <b>without abandoning the Google Cloud &amp; AWS investments you&rsquo;ve already made</b>.</p><h4>Say</h4><ul><li>This is <b>Phase B</b> &mdash; three deliverables: architecture, the human+AI personas, and the C-suite &ldquo;so what.&rdquo;</li><li>North star (bottom-right of every slide): <b>federate, don&rsquo;t migrate</b> &mdash; Azure orchestrates &amp; governs your multi-cloud estate.</li><li>This is a <b>Microsoft &times; MSD</b> co-engineering conversation, not a product pitch.</li></ul><h4>Transition</h4><p>&ldquo;Let&rsquo;s start with what the platform actually looks like.&rdquo;</p><h4>If asked &mdash; why Azure if we signed Google Cloud?</h4><p class='qa'>We don&rsquo;t displace Gemini &mdash; we orchestrate across it. The architecture literally calls Gemini as a federated agent.</p><span class='ntime'>~60&ndash;90 sec</span>",
+    "<h4>Open</h4><p>&ldquo;This one screen says: compress <b>4&ndash;6 years to 12&ndash;18 months to clinic</b> &mdash; and keep every regulator happy.&rdquo;</p><h4>Pipeline (top)</h4><p>Target ID &rarr; Generative design &rarr; Structure &amp; docking &rarr; In-silico triage &rarr; Rank. <b>An agent runs the whole chain; a human owns the gate.</b></p><h4>Four planes</h4><ul><li><b>Orchestration</b> &mdash; Foundry Agent Service; <b>A2A</b> calls Gemini/Protillion/Variational (federation in action); human-in-the-loop = Annex 22.</li><li><b>Foundation models</b> &mdash; ESM, AlphaFold3, Boltz-2, IgLM, RFdiffusion; Quantum Elements (~20&times; DFT).</li><li><b>Compute</b> &mdash; ND-series GPU HPC, CycleCloud/Batch, burst on-demand &mdash; no on-prem rebuild.</li><li><b>Data</b> &mdash; OneLake reads <b>S3 + GCS in place</b>; Health Data Services (Mayo); AI Search RAG.</li></ul><h4>Land the governance rail (close)</h4><p>Entra Agent ID &middot; Purview &middot; Defender &middot; Arc &middot; <b>Part 11 / ALCOA+</b>. &ldquo;Inspection-ready, and cross-cutting &mdash; not bolted on.&rdquo;</p><h4>Proof point &mdash; say it</h4><p>&ldquo;Bottom-left: OneLake reads your AWS &amp; Google data <b>where it lives</b>. That is federate, don&rsquo;t migrate.&rdquo;</p><h4>If asked &mdash; isn&rsquo;t this lock-in?</h4><p class='qa'>Opposite &mdash; Arc, OneLake shortcuts &amp; A2A are explicitly multicloud. You keep optionality.</p><span class='ntime'>~3&ndash;4 min (anchor slide)</span>",
+    "<h4>Open</h4><p>&ldquo;AI doesn&rsquo;t replace your scientists &mdash; it changes what they spend their day <b>deciding</b>.&rdquo;</p><h4>Read the framing line once</h4><p>&ldquo;An AI copilot that assists the <b>discovery scientist &amp; protein-design engineer</b> by synthesizing <b>target + multimodal data</b>, flagging <b>non-synthesizable or toxic candidates</b>, and recommending <b>a ranked shortlist</b> &mdash; the human retains scientific accountability.&rdquo; That last clause is the whole control model.</p><h4>Walk the swim-lane</h4><p>Target ID &rarr; Generative design &rarr; Structure &amp; docking (<b>AlphaFold3 &middot; ABodyBuilder</b>) &rarr; In-silico triage &rarr; <b>Human gate</b> (four-eyes &middot; Annex 22) &rarr; <b>Wet-lab call</b> (scientist owns). Everything is traced.</p><h4>Two columns &mdash; the heart of the slide</h4><ul><li><b>Decisions a human owns:</b> which candidates advance; target go/no-go; which scaffolds/sequences to synthesize; approve the ranked shortlist (four-eyes).</li><li><b>New roles:</b> in-silico triage scientist; model-catalog curator &amp; biologics agent-ops engineer; HPC cost steward.</li></ul><h4>Key message</h4><p><b>AI proposes at portfolio scale; the human disposes on the regulated call.</b> Consistent, trainable, auditable &mdash; and it creates new roles, it doesn&rsquo;t erase scientists.</p><h4>Transition</h4><p>&ldquo;So why should the C-suite fund it? Let&rsquo;s translate.&rdquo;</p><h4>If asked &mdash; does this cut headcount?</h4><p class='qa'>It redeploys judgment, not people &mdash; and stands up new agent-ops roles.</p><span class='ntime'>~2&ndash;3 min</span>",
+    "<h4>Open</h4><p>&ldquo;One platform, <b>three different conversations</b> &mdash; each executive buys a different outcome.&rdquo;</p><h4>CEO &mdash; Rob Davis</h4><p>Federated platform = <b>durable speed as a strategic moat</b>; protects ~46% of revenue; AI scaled responsibly = a board-grade story. &ldquo;No choosing between speed and the Google bet.&rdquo;</p><h4>Business/Ops &mdash; Dean Li</h4><p>More validated candidates/cycle, <b>12&ndash;18 mo vs 4&ndash;6 yr</b>; scientists shift from running tools to deciding; on-demand HPC, no capex.</p><h4>Risk/Compliance &mdash; Stelios Tsinontides</h4><p>Purview + <b>Part 11 / ALCOA+</b> provenance on every candidate; <b>Annex 22</b> &mdash; GenAI never makes the critical call; Entra Agent ID least-privilege + full audit.</p><h4>Close + the ask</h4><p>Speed for the business, defensibility for Quality, a moat for the CEO. <b>Phase C: one program, a 90-day proof</b>, governance on from day one.</p><h4>If asked &mdash; how do we know it&rsquo;s working?</h4><p class='qa'>Watchlist: Google Cloud realized gains &middot; Phase 3 V940 readouts &middot; measurable manufacturing gains.</p><span class='ntime'>~2&ndash;3 min + close</span>"
+  ];
+  var i = 0;
+  var stage = document.getElementById('stage');
+  var prog = document.getElementById('progress');
+  var counter = document.getElementById('counter');
+  var hint = document.getElementById('hint');
+  var pad2 = function(n){return (n<10?'0':'')+n;};
+
+  function fit(){ var s = stage.clientWidth/1280; stage.style.setProperty('--s', s); }
+
+  function go(n){
+    i = Math.max(0, Math.min(slides.length-1, n));
+    slides.forEach(function(s,k){ s.classList.toggle('active', k===i); });
+    prog.style.width = ((i+1)/slides.length*100) + '%';
+    counter.textContent = pad2(i+1) + ' / ' + pad2(slides.length);
+    var nt = document.getElementById('notesTitle'); if(nt){ nt.innerHTML = pad2(i+1) + ' &middot; ' + titles[i]; }
+    var nb = document.getElementById('notesBody'); if(nb){ nb.innerHTML = notes[i] || ''; nb.scrollTop = 0; }
+    try{ history.replaceState(null,'','#'+(i+1)); }catch(e){}
+  }
+  window.next = function(){ go(i+1); };
+  window.prev = function(){ go(i-1); };
+  window.goTo = go;
+  window.toggleFs = function(){ if(!document.fullscreenElement){ (document.documentElement.requestFullscreen||function(){})(); } else { (document.exitFullscreen||function(){})(); } };
+  window.toggleToc = function(){ document.body.classList.toggle('toc-open'); };
+  window.toggleNotes = function(){ document.body.classList.toggle('notes-open'); };
+
+  // build TOC
+  var tl = document.getElementById('tocList');
+  titles.forEach(function(t,k){
+    var b = document.createElement('button');
+    b.innerHTML = '<span class="n">'+pad2(k+1)+'</span><span>'+t+'</span>';
+    b.onclick = function(){ go(k); document.body.classList.remove('toc-open'); };
+    tl.appendChild(b);
+  });
+
+  document.addEventListener('keydown', function(e){
+    var k = e.key;
+    if(k==='ArrowRight'||k==='PageDown'||k===' '){ e.preventDefault(); next(); }
+    else if(k==='ArrowLeft'||k==='PageUp'){ e.preventDefault(); prev(); }
+    else if(k==='Home'){ e.preventDefault(); go(0); }
+    else if(k==='End'){ e.preventDefault(); go(slides.length-1); }
+    else if(k==='Escape'){ document.body.classList.remove('toc-open'); document.body.classList.remove('notes-open'); }
+    else if(k && k.toLowerCase()==='o'){ toggleToc(); }
+    else if(k && k.toLowerCase()==='s'){ toggleNotes(); }
+    else if(k && k.toLowerCase()==='f'){ toggleFs(); }
+  });
+
+  window.addEventListener('resize', fit);
+  window.addEventListener('hashchange', function(){
+    var h = parseInt((location.hash||'').replace('#',''),10);
+    if(!isNaN(h) && h-1 !== i){ go(h-1); }
+  });
+  fit();
+  var start = parseInt((location.hash||'').replace('#',''),10);
+  go(isNaN(start)?0:start-1);
+  setTimeout(function(){ if(hint){ hint.style.opacity='0'; } }, 4200);
+})();
+</script>
+</body>
+</html>
