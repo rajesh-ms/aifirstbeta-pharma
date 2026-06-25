@@ -1,132 +1,268 @@
-# Speaker Talking Points — Use Case 1: Multi-Step Discovery Orchestration
+# Speaker Talking Points — Merck AI-First: Three Use Cases
 
-**Deck:** `Merck-AI-First-Three-Use-Cases` — **Discovery / R&D block, slides 3–6** (Microsoft × MSD · Account Pursuit)
-**Audience:** Merck (MSD) R&D leadership + C-suite sponsors
-**Block runtime:** ~9–11 min · **Anchor slide:** Slide 4 (architecture)
-**Through-line carried in from slide 2:** *"Generation is solved. The gate is governance."*
-**Discovery thesis:** *Federate, don't migrate* — Azure becomes the orchestration + governance layer over Merck's existing Google/AWS estate to compress discovery from **4–6 years → 12–18 months to clinic**, inspection-ready from day one.
+**Deck:** `Merck-AI-First-Three-Use-Cases` — 15 slides (Microsoft × MSD · Account Pursuit · Confidential)
+**Audience:** Merck (MSD) R&D, Regulatory & Quality leadership + C-suite sponsors
+**Full runtime:** ~22–26 min — or present **any one use-case block in ~9–11 min** (each stands alone)
+**Spine thesis (slide 2):** *"Generation is solved. The gate is governance."* — one **Governed Human & Trust Layer** over the multicloud AI Merck already owns. **Integrate, don't displace.**
+**Operating principle, every slide:** AI accelerates; **a human owns every regulated decision.**
 
 > Provenance tags: `[slide]` = printed on the slide · `[brief]` = Company Intelligence Brief · `[design]` = architecture proposal.
-> Exec quotes on slide 6 are **persona-lens framing** (the outcome each leader buys), not verbatim public statements.
+> Exec quotes on the C-Suite slides are **persona-lens framing** (the outcome each leader buys), not verbatim public statements.
+
+## Deck map
+| # | Block | Slide |
+| --- | --- | --- |
+| 1 | — | Cover — *AI-First Architecture at Merck* |
+| 2 | — | The Through-Line — *Generation is solved. The gate is governance.* |
+| 3–6 | **UC1 · Discovery (R&D)** | What it is → Future State → Personas → C-Suite |
+| 7–10 | **UC2 · Regulatory Authoring** | What it is → Future State → Personas → C-Suite |
+| 11–14 | **UC3 · Manufacturing Quality (GxP)** | What it is → Future State → Personas → C-Suite |
+| 15 | — | The Ask — *Three copilots. One governance spine.* |
 
 ---
 
-## Slide 3 — Use Case 1 · Discovery · *What it is*
-### "Multi-Step Discovery Orchestration"
-**Goal:** Land the problem, the mechanism, and the operating principle — before any architecture. *(~90s–2 min)*
+## Slide 1 — Cover · "AI-First Architecture at Merck"
+**Goal:** Set the frame in two sentences. *(~30–45s)*
+- "One **Governed Human & Trust Layer** over the multicloud AI Merck already owns — applied across **three points of the value chain**: **Discovery, Authoring, Deviation.** **Integrate, don't displace.**"
+- "Three copilots, one governance spine — all in service of **refilling the pipeline before 2028**."
 
-**Open (the hook):**
-- "Merck's single biggest value lever is R&D speed — and the clock is running. The **2028 Keytruda cliff** puts **~46% of revenue** in play, and today discovery runs **4–6 years to clinic** with too few validated candidates per cycle." *(~$29.5B exposed — `[brief]`)*
+## Slide 2 — The Through-Line · "Generation is solved. The gate is governance."
+**Goal:** Pre-empt the "why not just use Gemini?" reflex and license adopting one, two, or all three. *(~1–1.5 min)*
 
-**Say — walk the three cards `[slide]`:**
-- **The problem** — refill the pipeline before 2028; discovery is too slow and too thin on validated candidates.
-- **What it does** — "A **cloud-centric platform for *governed agentic* drug discovery.** Agents run the chain — **Target ID → generative design → structure & docking → in-silico triage** — and hand a **ranked shortlist to a human gate** before any wet-lab work."
-- **The principle** — "**AI triages at portfolio scale; the scientist owns the wet-lab call** — four-eyes, Annex 22." This is the line to repeat all block.
+**Say `[slide]`:**
+- "Merck has already bet **~$1B+ on multicloud agentic AI** — Gemini, Bedrock, GPTeal. **The models work — we're not rebuilding them.**"
+- "Each of these three copilots closes a **different gap** today's AI leaves open in *regulated* work, and **each stands on its own.** What connects them is a shared **governance spine** — one connected story, **not a dependency.**"
+- Spine components to point at: **Azure AI Foundry · Entra Agent ID · Purview lineage · human-in-the-loop / four-eyes · Annex 22 · Part 11 / ALCOA+ · OneLake shortcuts (read S3 + GCS in place).**
 
-**Point to "At a glance":**
-- **12–18 months to clinic** vs the 4–6 year norm · **more validated candidates per cycle** · **~46% of revenue protected** at the cliff.
-
-**Name the models/partners — don't read them all; make the federation point:**
-- "The stack is **multi-vendor by design** — ESM, AlphaFold3, Boltz-2, IgLM, RFdiffusion alongside **Protillion, Variational, Gemini** and **Azure Quantum Elements.** We orchestrate across them; we don't replace them."
-
-**Transition:** "Here's what that platform actually looks like."
-
-**If asked — "We just signed a ~$1B Google Cloud deal; why Azure?"** `[brief]`
-- "We don't displace Gemini — the architecture literally *calls* it as a federated agent. Azure adds the orchestration spine and the audit trail. Next slide shows it."
+**Transition:** "Adopt one, two, or all three. Let's start with Discovery."
 
 ---
 
-## Slide 4 — Use Case 1 · Discovery · *Future State*
-### "Cloud-Centric Platform — governed agentic discovery"
-**Goal:** Prove "fast + governed + federated" is one coherent design. This is the slide to slow down on. *(~3–4 min — anchor)*
+# Part 1 · Use Case 1 — Discovery (R&D) · slides 3–6
+*Block thesis: federate, don't migrate — compress discovery from **4–6 years → 12–18 months to clinic**, inspection-ready from day one.*
 
-**Open:** "One screen: compress **4–6 years of discovery to 12–18 months to clinic** — and keep every regulator happy."
+## Slide 3 — UC1 · Discovery · *What it is* — "Multi-Step Discovery Orchestration"
+**Goal:** Land the problem, the mechanism, and the operating principle. *(~90s–2 min)*
 
-**Pipeline (top band):** Target ID & validation → Generative design → Structure & docking → In-silico triage → **Rank → human gate.** "An agent runs the whole chain; a human owns the gate."
+**Open (hook):** "Merck's biggest value lever is **R&D speed** — and the clock is running. The **2028 Keytruda cliff** puts **~46% of revenue** in play *(~$29.5B — `[brief]`)*, and discovery still runs **4–6 years to clinic** with too few validated candidates per cycle."
 
-**Walk the four planes (top to bottom) `[slide]`:**
-- **Orchestration** — **Azure AI Foundry Agent Service** runs the multi-agent chain (Target·Design·Structure·Triage·Rank); **A2A interoperability** *calls* **Gemini / Protillion / Variational** — federation in action; **human-in-the-loop gate** = four-eyes before wet-lab (Annex 22).
-- **Foundation models** — **Foundry catalog + Azure ML** (ESM · AlphaFold3 · Boltz-2 · IgLM · RFdiffusion); **Azure Quantum Elements** (generative chemistry + tox, **~20× accelerated DFT**); **federated partner models** (Protillion · Variational · Gemini).
-- **Compute** — **ND-series GPU HPC**, **CycleCloud / Azure Batch** for docking & screening at scale, **burst on-demand** — capacity **without an on-prem rebuild**.
-- **Data foundation** — **Fabric / OneLake shortcuts read S3 + GCS *in place* (GA)**; **Azure Health Data Services** (FHIR/DICOM/genomics) for the **Mayo** multimodal data; **AI Search** for hybrid RAG over assay & precedent data.
+**Say — the three cards `[slide]`:**
+- **The problem** — refill the pipeline before 2028; too slow, too thin on validated candidates.
+- **What it does** — "A **cloud-centric platform for *governed agentic* drug discovery.** Agents run **Target ID → generative design → structure & docking → in-silico triage** and hand a **ranked shortlist to a human gate** before any wet-lab work."
+- **The principle** — "**AI triages at portfolio scale; the scientist owns the wet-lab call** — four-eyes, Annex 22."
 
-**Land the governance rail (right column — the close):**
-- **Entra Agent ID · Purview lineage · Defender · Azure Arc (multicloud/edge) · Part 11 / ALCOA+ ready.** "**Cross-cutting across all planes — not bolted on.** That's what makes it inspection-ready."
+**At a glance:** **12–18 mo to clinic** vs 4–6 yr · **more candidates validated per cycle** · **~46% of revenue protected.**
 
-**The proof point (say it explicitly):** "In the data plane — **OneLake reads your AWS and Google data where it lives.** *That* is 'federate, don't migrate' — no data exodus, no re-platforming tax."
+**Models/partners — make the federation point, don't read the list:** "Multi-vendor by design — ESM, AlphaFold3, Boltz-2, IgLM, RFdiffusion alongside **Protillion, Variational, Gemini** and **Azure Quantum Elements.** We orchestrate across them."
 
-**Outcome bar:** more validated candidates/cycle · **12–18 mo vs 4–6 yr** · human owns the wet-lab call — and the badge: **"Federate, don't migrate."**
+**Transition:** "Here's what that platform looks like."
+
+**If asked — "We signed ~$1B with Google Cloud; why Azure?"** `[brief]` — "We don't displace Gemini; the architecture *calls* it as a federated agent. Azure adds the orchestration spine and the audit trail."
+
+## Slide 4 — UC1 · Discovery · *Future State* — "Cloud-Centric Platform — governed agentic discovery"
+**Goal:** Prove "fast + governed + federated" is one coherent design. Slow down here. *(~3–4 min — anchor)*
+
+**Open:** "One screen: compress **4–6 years to 12–18 months to clinic** — and keep every regulator happy."
+
+**Pipeline (top):** Target ID → Generative design → Structure & docking → In-silico triage → **Rank → human gate.** "An agent runs the chain; a human owns the gate."
+
+**Four planes `[slide]`:**
+- **Orchestration** — **Foundry Agent Service** runs the multi-agent chain; **A2A** *calls* Gemini / Protillion / Variational (federation in action); human-in-the-loop = four-eyes before wet-lab (Annex 22).
+- **Foundation models** — **Foundry catalog + Azure ML** (ESM · AlphaFold3 · Boltz-2 · IgLM · RFdiffusion); **Azure Quantum Elements** (gen-chem + tox, **~20× DFT**); **federated partner models.**
+- **Compute** — **ND-series GPU HPC**, **CycleCloud / Azure Batch**, **burst on-demand** — no on-prem rebuild.
+- **Data** — **Fabric / OneLake shortcuts read S3 + GCS *in place* (GA)**; **Azure Health Data Services** (Mayo multimodal); **AI Search** hybrid RAG.
+
+**Governance rail (close):** **Entra Agent ID · Purview lineage · Defender · Azure Arc · Part 11 / ALCOA+ ready.** "Cross-cutting across all planes — **not bolted on.**"
+
+**Proof point — say it:** "**OneLake reads your AWS & Google data where it lives.** *That's* federate, don't migrate — no data exodus, no re-platforming tax."
+
+**Outcome bar:** more validated candidates/cycle · **12–18 mo vs 4–6 yr** · human owns the wet-lab call.
 
 **Transition:** "Architecture only matters if people can run it — here's who."
 
-**If asked — "Isn't this Azure lock-in?"**
-- "The opposite — **Arc, OneLake shortcuts and A2A are explicitly multicloud.** You keep your contracts and your optionality; Azure adds the connective tissue and the audit trail."
+**If asked — "Isn't this Azure lock-in?"** — "Opposite — **Arc, OneLake shortcuts and A2A are explicitly multicloud.** You keep optionality and your contracts."
 
----
-
-## Slide 5 — Use Case 1 · Discovery · *Persona-Driven Scenarios*
-### "Decisions the copilot supports, not replaces"
+## Slide 5 — UC1 · Discovery · *Personas* — "Decisions the copilot supports, not replaces"
 **Goal:** Show AI changes *what scientists decide*, not whether they're needed. *(~2–3 min)*
 
-**Open:** "AI doesn't replace your scientists — it changes what they spend their day deciding."
+**Open:** "AI doesn't replace your scientists — it changes what they spend their day **deciding**."
 
-**Read the framing line once — it's the control model in a sentence `[slide]`:**
-- "*An AI copilot that assists the **discovery scientist & protein-design engineer** by synthesizing **target + multimodal data**, flagging **non-synthesizable or toxic candidates**, and recommending **a ranked shortlist** — the human retains scientific accountability.*"
+**Framing line `[slide]`:** "*An AI copilot that assists the **discovery scientist & protein-design engineer** by synthesizing **target + multimodal data**, flagging **non-synthesizable or toxic candidates**, and recommending **a ranked shortlist** — the human retains scientific accountability.*"
 
-**Walk the swim-lane:**
-- Target ID → Generative design (scaffolds · sequences) → Structure & docking (**AlphaFold3 · ABodyBuilder**) → In-silico triage (ranked shortlist) → **Human gate (four-eyes · Annex 22)** → **Wet-lab call (scientist owns).** "Everything up to the gate is AI accelerating; the last two nodes are human-owned — and **everything is traced.**"
+**Swim-lane:** Target ID → Generative design (scaffolds·sequences) → Structure & docking (**AlphaFold3 · ABodyBuilder**) → In-silico triage → **Human gate (four-eyes · Annex 22)** → **Wet-lab call (scientist owns).** "Everything is traced."
 
-**Contrast the two columns — the heart of the slide:**
-- **Decisions a human owns:** which candidates advance to wet-lab (Discovery Scientist) · target go/no-go · which scaffolds/sequences to synthesize (Protein-Design Engineer) · approve the ranked shortlist, four-eyes — validates the biology.
-- **New roles & interfaces:** **in-silico triage scientist** (agent workbench over Foundry) · **model-catalog curator** & **biologics agent-ops engineer** · **HPC cost steward** (burst compute, no capex).
+**Two columns (the heart):**
+- **Decisions a human owns:** which candidates advance to wet-lab (Discovery Scientist) · target go/no-go · which scaffolds/sequences to synthesize (Protein-Design Engineer) · approve the ranked shortlist (four-eyes).
+- **New roles:** in-silico triage scientist (agent workbench over Foundry) · model-catalog curator & biologics agent-ops engineer · HPC cost steward (no capex).
 
-**Key message:** "**AI proposes at portfolio scale; the human disposes on the regulated call.** That consistency is what makes it **trainable and auditable** — and it **creates new roles**, it doesn't erase scientists."
+**Key message:** "**AI proposes at portfolio scale; the human disposes on the regulated call** — trainable, auditable, and it **creates new roles.**"
 
-**Transition:** "So if that's how the work changes — why should the C-suite fund it?"
+**Transition:** "So why should the C-suite fund it?"
 
-**If asked — "Does this cut headcount?"**
-- "It **redeploys judgment, not people** — scientists move from running tools to deciding — and it stands up **new agent-ops roles.**"
+**If asked — "Does this cut headcount?"** — "It **redeploys judgment, not people**, and stands up new agent-ops roles."
 
----
+## Slide 6 — UC1 · Discovery · *C-Suite Relevance* — "Three executive lenses"
+**Goal:** Hand each executive their own outcome, then transition. *(~2–3 min)*
 
-## Slide 6 — Use Case 1 · Discovery · *C-Suite Relevance*
-### "Multi-step discovery orchestration — three executive lenses"
-**Goal:** Hand each executive their own outcome, then make the ask. *(~2–3 min + close)*
+**Open:** "One platform, three conversations — each executive buys a **different outcome**."
+- **CEO — Rob Davis** *(lens: "Refill the pipeline before the 2028 cliff — without abandoning our Google & AWS bets.")*: federated platform = **durable speed as a strategic moat**; **protects ~46% of revenue**; AI scaled responsibly = a **board-grade governance** story.
+- **Business/Ops — Dean Li (Pres MRL)** *(lens: "More validated candidates per cycle — with scientists deciding, not running tools.")*: **12–18 mo vs 4–6 yr** · scientists shift from running tools to deciding · fewer late-stage failures · **on-demand HPC without capex.**
+- **Risk/Compliance — Stelios Tsinontides (VP Global Quality · ex-FDA/CDER)** *(lens: "Inspection-ready from research onward.")*: **Purview + Part 11 / ALCOA+** provenance on every candidate · **Annex 22 — GenAI never makes the critical call** · **Entra Agent ID** least-privilege + full audit.
 
-**Open:** "One platform, three conversations — the CEO, the head of labs, and Quality each buy a **different outcome**."
-
-**CEO — Rob Davis (Chairman & CEO) · modernization / scale / governance `[slide]`:**
-- *Their lens:* "Refill the pipeline before the 2028 cliff — without abandoning our Google & AWS bets."
-- Federated platform = **durable speed as a strategic moat** (data + platforms + partnerships) · **protects ~46% of revenue** at the cliff · **AI scaled responsibly = a board-grade governance story.** "He doesn't have to choose between speed and his Google bet."
-
-**Business / Ops — Dean Li (President, Merck Research Labs) · speed / throughput:**
-- *Their lens:* "More validated candidates per cycle, at portfolio scale — with scientists deciding, not running tools."
-- **12–18 mo to clinic vs 4–6 yr** · scientists **shift from running tools to deciding** · **fewer costly late-stage failures** (pre-lab triage) · **on-demand HPC without capex.**
-
-**Risk / Compliance — Stelios Tsinontides (VP Global Quality · ex-FDA/CDER) · safety / trust:**
-- *Their lens:* "Inspection-ready from research onward — AI triages, a human owns every regulated call."
-- **Purview lineage + Part 11 / ALCOA+** provenance on **every candidate** · **Annex 22 honored — GenAI never makes the critical decision** · agents governed by **Entra Agent ID** — least privilege, full audit.
-
-**Close:** "Same architecture, three value stories — **speed** for the business, **defensibility** for Quality, a **durable moat** for the CEO."
-
-**The ask (next step) `[design]`:** "**Phase C** — pick **one discovery program** and stand up the orchestration spine as a **90-day proof**, with the governance rail on from day one."
-
-**If asked — "How will we know it's working?"** (tie to the brief watchlist) `[brief]`
-- "Three signals: **Google Cloud / Gemini realized productivity gains**, **Phase 3 V940 / mRNA-4157 readouts**, and **measurable manufacturing gains** — yield, deviation cycle time, scrap."
+**Transition:** "Same governance spine, next point on the value chain — filing."
 
 ---
 
-## Quick-reference facts (from the Company Intelligence Brief)
+# Part 2 · Use Case 2 — Regulatory Authoring (Development) · slides 7–10
+*Block thesis: the **governed last mile** for regulatory writing — keep every AI bet; add the layer where a human **reviews, signs and defends** AI output, on the tools already on every desk.*
+
+## Slide 7 — UC2 · Authoring · *What it is* — "Governed Authoring & Review Copilot"
+**Goal:** Reframe the problem from "can AI draft?" to "can the draft survive an audit?" *(~90s–2 min)*
+
+**Open (hook):** "Generation is already solved here — **over 80% of staff** draft CSRs with GPTeal + McKinsey today. **The problem is the audit wall:** pilots stall because the output **isn't defensible.**"
+
+**Say — the three cards `[slide]`:**
+- **The problem** — drafting is widespread; pilots stall at the **audit wall**.
+- **What it does** — "Assembles the **evidence pack**, surfaces a **grounded draft in Word**, and runs **deterministic QA** — citations, consistency, completeness — *before a human ever sees it.*"
+- **The principle** — "**AI never signs. Humans never start from a blank page.** Backend model is interchangeable — **GPTeal / Gemini / Bedrock.**"
+
+**At a glance:** **days saved** on the submission critical path · **~$1–3M per day** value of each day earlier to market · **~20 launches** in the window · 30+ oncology studies.
+
+**Trust layer (where it runs):** **M365 Copilot · Word · Teams · Copilot Studio** (four-eyes + Part 11 e-sign) · **Entra Agent ID · Purview.**
+
+**Transition:** "Here's the trust layer over the AI you already own."
+
+**If asked — "Isn't this just Copilot?"** — "Copilot drafts; **this is the governed review/sign/defend flow around it** — four-eyes, Part 11 e-sign, immutable audit. That's the part pilots are missing."
+
+## Slide 8 — UC2 · Authoring · *Future State* — "A trust layer over the AI Merck already owns"
+**Goal:** Show it's an additive governance layer, not a migration. *(~3 min)*
+
+**Open `[slide]`:** "Keep **every** AI bet you've made. We add the **one layer none of them gives you** — the place where a human **reviews, signs and defends** AI output, with an audit trail, on the tools already on every desk."
+
+**Walk the three bands (top → bottom):**
+- **Human owners** — Medical writer (grounded draft + evidence pane) · QA / Reg reviewer (four-eyes) · Accountable signatory (Part 11 sign-off). *Connector: REVIEW · SIGN · DEFEND.*
+- **Microsoft trust layer (already in the building)** — **M365 Copilot/Word/Teams** (review & approval surface) · **Copilot Studio** (four-eyes + Part 11 e-sign) · **Entra (+ Agent ID)** (one identity for people & agents, cross-cloud) · **Purview** (AI governance · DLP · immutable audit). *Connector: DRAFT FROM ANY MODEL.*
+- **AI you already own (untouched · generation = solved)** — Gemini Enterprise (~$1B) · AWS Bedrock · GPTeal + McKinsey (>80% staff) · Snowflake.
+
+**"Why these decisions" (be ready for each):** 1) **Why not rebuild?** Rivals already won generation. 2) **Why the trust layer?** Auditability is the wall most pilots fail. 3) **Why M365/Entra/Purview?** Already licensed & deployed. 4) **Why start here?** Low GxP risk, fast proof, then data gravity.
+
+**Land it:** "**Not a migration. Not a rip-and-replace.** A governance + accountability layer on software Merck already owns."
+
+**Transition:** "Here's who works inside it."
+
+## Slide 9 — UC2 · Authoring · *Personas* — "Supports the decision, never replaces it"
+**Goal:** Same control model, the writing/QA context. *(~2 min)*
+
+**Framing line `[slide]`:** "*An AI copilot that assists **medical writers & reviewers** by synthesizing **the evidence pack**, flagging **unsupported claims**, and recommending **a grounded draft & review route** — the human always retains accountability.*"
+
+**Swim-lane:** Evidence pack (Protocol · SAP · TLF) → Grounded draft (in Word) → Deterministic QA (citations · consistency) → **Four-eyes review (human)** → **Part 11 sign-off (human)** → Purview audit (immutable record).
+
+**Two columns:**
+- **Decisions a human owns:** ready for author review? (lead medical writer) · claims supported & consistent? (study author/reviewer) · package defensible? (Reg lead/QA) · sign & release? (accountable signatory — QPPV / Reg).
+- **New roles:** **Medical-Writing AI Editor** (curates grounded drafts) · **AI Validation & Evidence Steward** (owns the evidence pack & checks) · **Agent Security Administrator** (identity & access for agents).
+
+**Key message:** "**AI accelerates · humans decide · everything is traced.** The signer never starts from a blank page, and never rubber-stamps a black box."
+
+**Transition:** "Why each executive funds it."
+
+## Slide 10 — UC2 · Authoring · *C-Suite Relevance* — "Three executive lenses"
+**Goal:** Tie days-saved economics to defensibility. *(~2 min)*
+- **CEO — Rob Davis** *(co-sponsor Dave Williams, CIDO)* *(lens: "Governed multicloud scale before the Keytruda LOE — with no disruptive migration.")*: **Keytruda LOE Dec 2028** · refill the pipeline (~$3B savings target) · scale GenAI value pilots leave stranded — **only ~24% of firms capture it** · **no rip-and-replace.**
+- **Business/Ops — Dean Li (Pres MRL)** *(lens: "Days off the submission critical path — defensibly, at launch scale.")*: days saved across **Draft → Review → QC → Lock → Submit** · each day ≈ **$1–3M per product** · **~20 launches** · 30+ registrational oncology studies.
+- **Risk/Compliance — Jennifer Zachary (EVP & General Counsel) + Stelios Tsinontides (VP Global Quality)** *(lens: "Black box → glass box.")*: evidence **source-linked, signed, immutable, audited**, identity-bound across clouds · **Annex 22 + Part 11 / ALCOA+** built in · a defensible **credibility framework for FDA / EMA.**
+
+**Transition:** "Now the gate that unblocks everything — Quality."
+
+---
+
+# Part 3 · Use Case 3 — Manufacturing Quality / GxP · slides 11–14
+*Block thesis: **inspection-ready by construction** — faster GMP investigations on Azure, federated over the multicloud estate. Win this gate first; it unblocks every other AI conversation.*
+
+## Slide 11 — UC3 · Deviation · *What it is* — "Gen-AI Deviation / Investigation Copilot"
+**Goal:** Frame speed and compliance as the *same* path. *(~90s–2 min)*
+
+**Open (hook):** "GMP investigations take **2–8 hours of manual search**, and the **audit-credibility gate** keeps AI out of regulated work entirely — with **$10M–$100M+** of regulatory tail-risk behind it."
+
+**Say — the three cards `[slide]`:**
+- **The problem** — slow manual investigations · the audit gate blocks AI · large tail-risk.
+- **What it does** — "Grounds on **validated precedent (RAG)**, drafts the investigation, **blocks any ungrounded output**, routes **four-eyes sign-off**, writes an **immutable audit trail.**"
+- **The principle** — "**Federate, don't migrate** — read **AWS S3 + eschbach + GCS in place** via OneLake. The human owns every regulated call."
+
+**At a glance:** **~30–50% faster** closure (pilot-gated) · **~70% fewer** batch-record errors · ~50% fewer CSR errors · **$10M–$100M+** tail-risk actively managed.
+
+**Azure components:** AI Search · Azure OpenAI · Content Safety · Purview · Entra Agent ID · Azure Monitor · OneLake.
+
+**Transition:** "Here's the reference architecture — C1 through C8."
+
+**If asked — "Why will Quality trust an LLM?"** — "Because it's **grounded-only** — Content Safety + groundedness **block any output it can't source.** No confident, unsourced summary."
+
+## Slide 12 — UC3 · Deviation · *Future State* — "Inspection-ready by construction — over the multi-cloud estate"
+**Goal:** Show governance is *enforced by components*, not policy promises. *(~3 min)*
+
+**Open:** "Same UI your teams already use — **M365 Copilot (Word) · existing QMS · Teams.** Underneath, eight components, each doing one job."
+
+**Walk C1–C8 `[slide]`:** **C1** AI Search (RAG over validated GxP precedent, ACLs) · **C2** Azure OpenAI / Agent Service (drafting + four-eyes gate, pinned model/prompt/eval) · **C3** Content Safety + Groundedness (**block-on-ungrounded gate**) · **C4** Purview + Compliance Manager (Part 11 / ALCOA+ / GAMP 5 + cross-cloud lineage) · **C5** Entra ID + Agent ID (least privilege per action · Annex 22) · **C6** Azure Monitor / Log Analytics (immutable audit trail) · **C7** AI Vision on Arc / IoT Ops (Phase 2 · shop-floor CV) · **C8** Fabric / OneLake (**SSOT · shortcuts read S3 + eschbach + GCS in place**).
+
+**Cross-cutting:** **Agent 365** — register · identity-bind · Defender runtime · Purview DLP/audit · lifecycle.
+
+**Retained, not migrated:** AWS deviation management · eschbach Visual Factory (SSOT) · Google Cloud estate.
+
+**Outcome:** **BB-2** inspection-ready auditability · **BB-1** faster, lower-cost investigations · **BB-3** federation without migration.
+
+**Transition:** "Ten real roles run this loop every day."
+
+## Slide 13 — UC3 · Deviation · *Personas* — "Ten roles, one daily loop — the human owns every gate"
+**Goal:** Make it concrete and human — named roles, not abstractions. *(~2 min)*
+
+**Framing line `[slide]`:** "*An AI copilot that assists the **quality investigator** by synthesizing **prior deviations & SOPs**, flagging **ungrounded or unsupported root cause**, and recommending **a cited, four-eyes-ready investigation** — the human owns every gate.*"
+
+**Swim-lane (the daily loop):** Initiators (**Sofia**·Operator, **Lena**·QC Analyst) → Author (**Maria**·Quality Investigator) → SME input (**Raj**·MSAT) → **Approver (James·QA·four-eyes)** → **Release (Pierre·QP, EU)** → Assurance (**Aisha**·Auditor).
+
+**Two columns:**
+- **Decisions a human owns:** Phase I lab-error determination (Lena/QC) · investigation authorship & root cause (Maria) · four-eyes approval (James/QA) · batch certification & release (Pierre/QP).
+- **New roles keeping the validated state:** **Tom** — CSV / Validation Engineer (GAMP 5) · **Nadia** — Document Controller / RAG Curator · **Daniel** — AI Platform Engineer / GxP-MLOps.
+
+**Key message:** "**Initiate · Author · Approve · Release · Assure — AI drafts, humans decide.** Every gate has an accountable name on it."
+
+**Transition:** "And the value story, in each executive's language."
+
+## Slide 14 — UC3 · Deviation · *C-Suite Relevance* — "Same architecture (C1–C8), three value stories"
+**Goal:** Make the Quality gate the strategic unlock. *(~2–3 min + lead to the ask)*
+- **CEO — Rob Davis** *(lens: "A credible, defensible way to scale AI fast enough to matter before 2028.")*: removing the audit gate (**BB-2**) is what lets **every** AI use case scale — R&D, trials, quality · protects **~$1–3M/day** earlier revenue per product (sibling trials use case) · **auditability is the enabler tax** that keeps AI value from being clawed back.
+- **Business/Ops — Dave Maraldo (EVP Manufacturing · owns deviation-closure P&L)** *(lens: "Faster closure and more predictable release — with zero added audit risk.")*: **~30–50% faster** closure · **~70% fewer** batch-record errors · **speed and compliance are the same path.**
+- **Risk/Compliance — Stelios Tsinontides (VP Global Quality · compliance veto)** *(lens: "Inspection-ready by construction — I can defend it to FDA / EMA.")*: **grounded-only** output (C1+C3) · **four-eyes** enforced as a release precondition (C2), Annex 22 + agent identity (C5) · **Part 11 / ALCOA+** evidence + cross-cloud lineage (C4/C6).
+
+**Also in the room:** CIO/CDO **Dave Williams** (one governed platform; federate, don't migrate) · CFO **Caroline Litchfield** (V5 migration avoided ✓ · tail-risk managed). **Win the Quality gate first — it unblocks every other conversation.**
+
+---
+
+## Slide 15 — Closing · "Three copilots. One governance spine."
+**Goal:** Restate the win and make the ask. *(~1 min)*
+- **KEEP THE BETS `[slide]`:** "Keep every AI bet Merck has made — Google, AWS, GPTeal. We add the one layer none of them gives you: where a human **reviews, signs and defends** AI output, with an audit trail, identity-bound across clouds."
+- **WIN THE GATE — Land · Attach · Expand:** "**Land** narrow on one lighthouse workflow → **Attach** governance across clouds (**Agent 365: Entra Agent ID + Purview**) → **Expand** on proof. **Win the Quality gate first** — defensible by construction, not by retrofit."
+- **The ask `[design]`:** "Pick **one lighthouse program per block** (or just the Quality gate) and stand up the spine as a **90-day proof**, governance on from day one."
+
+---
+
+## Quick-reference facts
 | Fact | Use it for |
 | --- | --- |
-| **2028 Keytruda cliff** — ~$29.5B, ~46% of revenue | The urgency / "why now" |
-| **Google Cloud (Apr 2026)** — up to **$1B**, Gemini Enterprise | Federation, not displacement |
-| **Moderna V940 / mRNA-4157** — now **Phase 3** | AI-designed therapy proof; watchlist |
-| **Mayo Clinic (Feb 2026)** — multimodal + virtual-cell | Data foundation / target ID |
-| **Variational AI** (small molecules), **Protillion** (antibodies) | Federated partner models; personas |
-| **Internal gen-AI:** CSR drafts **2–3 wks → 3–4 days, 50% fewer errors** | Proof Merck already books AI ROI |
+| **2028 Keytruda cliff** — ~$29.5B, ~46% of revenue; U.S. LOE Dec 2028 | The urgency / "why now" (all blocks) |
+| **~$3B annual savings target by 2027** | CEO cost/scale framing (UC2) |
+| **Google Cloud (Apr 2026)** — up to **$1B**, Gemini Enterprise | Federation, not displacement (spine) |
+| **Moderna V940 / mRNA-4157** — now **Phase 3** | AI-designed therapy proof; watchlist (UC1) |
+| **Mayo Clinic (Feb 2026)** — multimodal + virtual-cell | Data foundation / target ID (UC1) |
+| **Variational AI** (small molecules), **Protillion** (antibodies) | Federated partner models; personas (UC1) |
+| **>80% of staff** draft CSRs with **GPTeal + McKinsey** | "Generation is solved" (UC2) |
+| **Internal gen-AI:** CSR drafts **2–3 wks → 3–4 days, ~50% fewer errors** | Proof Merck already books AI ROI (UC2) |
+| **Each day earlier to market ≈ $1–3M / product** | Days-saved economics (UC2) |
+| **~30–50% faster** deviation closure · **~70% fewer** batch-record errors | Manufacturing value (UC3) |
+| **Regulatory tail-risk $10M–$100M+** per major event | Why the audit gate matters (UC3) |
+| Retained, not migrated: **AWS · eschbach · Google** read in place via OneLake | Federate-don't-migrate proof (UC3) |
 | **Moat = data + platforms + partnerships**, *not* AI patents | CEO governance/strategy framing |
 
-> **Where these slides sit in the deck:** `Merck-AI-First-Three-Use-Cases` — **Discovery / R&D = slides 3–6.** (Use Case 2 · Regulatory Authoring = slides 7–10; Use Case 3 · Manufacturing Quality = slides 11–14; cover = 1, through-line = 2, closing = 15.)
+**Watchlist (how we'll know it's working) `[brief]`:** Google Cloud / Gemini realized productivity gains · Phase 3 V940 / mRNA-4157 readouts · measurable manufacturing gains (yield, deviation cycle time, scrap).
+
+> **Companion note:** this file is named `Merck-RnD-Discovery-Orchestration-Talking-Points.md` for continuity, but now covers the **full `Merck-AI-First-Three-Use-Cases` deck** (slides 1–15). The standalone 4-slide Discovery deck (`Merck-RnD-Discovery-Orchestration-Deliverables.html`) carries the same Discovery talking points on-screen — press **`S`**.
 
 *Prepared for the Company Intelligence Lead · grounded in public information at time of writing.*

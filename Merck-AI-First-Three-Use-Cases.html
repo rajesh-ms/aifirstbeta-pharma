@@ -1,0 +1,1081 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AI-First Architecture at Merck — Three Use Cases</title>
+<style>
+  /* ============ Microsoft / Fluent theme ============ */
+  :root{
+    --ms-blue:#0078D4; --ms-blue-dk:#005A9E; --navy:#1B3A5B; --navy-2:#10314F;
+    --teal:#0F7B8A; --teal-dk:#0B6673;
+    --red:#F25022; --green:#7FBA00; --cyan:#00A4EF; --yellow:#FFB900;
+    --ink:#201F1E; --ink-2:#3B3A39; --muted:#605E5C; --faint:#8A8886;
+    --line:#E1DFDD; --line-2:#EDEBE9;
+    --bg:#EAF1F8; --surface:#FFFFFF; --surface-2:#F6FAFD;
+    --amber:#9A5B00; --amber-bg:#FFF3E0; --amber-bd:#F2C786;
+    --slate:#56627A; --slate-bg:#EDF1F6; --slate-bd:#D6DEEA;
+    --teal-bg:#E6F4F6; --teal-bd:#A9D7DD;
+    --green-bg:#EAF4D9; --green-ink:#3E6B00;
+    --purple:#7c3aed; --purple-dk:#6d28d9;
+    --radius:16px; --radius-sm:10px; --radius-xs:7px;
+    --shadow:0 1px 2px rgba(16,24,40,.06), 0 8px 22px rgba(16,24,40,.10);
+    --shadow-lg:0 6px 14px rgba(16,24,40,.10), 0 22px 60px rgba(16,24,40,.18);
+    --font:"Segoe UI Variable","Segoe UI",system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    font-family:var(--font); color:var(--ink);
+    background:
+      radial-gradient(1200px 600px at 12% -10%, #DCEAFB 0%, rgba(220,234,251,0) 60%),
+      radial-gradient(1000px 700px at 110% 120%, #E2F1F3 0%, rgba(226,241,243,0) 55%),
+      var(--bg);
+    display:flex; flex-direction:column; height:100vh; overflow:hidden;
+    -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+  }
+
+  /* ============ App bar ============ */
+  .appbar{
+    height:54px; flex:0 0 auto; display:flex; align-items:center; gap:14px;
+    padding:0 22px; background:rgba(255,255,255,.82); backdrop-filter:saturate(140%) blur(10px);
+    border-bottom:1px solid var(--line); z-index:20;
+  }
+  .brand{display:flex; align-items:center; gap:10px; font-weight:600; letter-spacing:.2px}
+  .ms-logo{display:grid; grid-template-columns:1fr 1fr; grid-template-rows:1fr 1fr; gap:2px; width:20px; height:20px}
+  .ms-logo i{display:block; border-radius:1px}
+  .ms-logo i:nth-child(1){background:var(--red)}
+  .ms-logo i:nth-child(2){background:var(--green)}
+  .ms-logo i:nth-child(3){background:var(--cyan)}
+  .ms-logo i:nth-child(4){background:var(--yellow)}
+  .brand b{font-weight:600}
+  .brand .sep{color:var(--faint); font-weight:400}
+  .brand .ctx{color:var(--muted); font-weight:500}
+  .appbar .spacer{flex:1}
+  .appbar .deck-title{color:var(--muted); font-size:13px; font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:46vw}
+  .counter{font-variant-numeric:tabular-nums; color:var(--ink-2); font-weight:600; font-size:13px;
+    background:var(--surface-2); border:1px solid var(--line); border-radius:999px; padding:4px 11px}
+
+  /* ============ Stage ============ */
+  main{flex:1; min-height:0; display:grid; place-items:center; padding:14px}
+  .stage-wrap{
+    width:min(96vw, calc((100vh - 150px) * 16 / 9));
+    aspect-ratio:16/9; container-type:size; container-name:stage; margin:auto;
+    filter:drop-shadow(0 24px 60px rgba(16,24,40,.22));
+  }
+  .stage{position:relative; width:100%; height:100%; border-radius:var(--radius); overflow:hidden;
+    background:var(--surface); border:1px solid var(--line);
+    font-size:16px; font-size:clamp(12.5px, 1.62cqi, 23.5px);}
+
+  .slide{position:absolute; inset:0; padding:2.7em 3.3em 2.1em; opacity:0; visibility:hidden;
+    transform:translateX(26px) scale(.995); transition:opacity .5s cubic-bezier(.2,.7,.2,1),
+    transform .5s cubic-bezier(.2,.7,.2,1), visibility .5s; overflow:hidden; display:flex; flex-direction:column}
+  .slide.active{opacity:1; visibility:visible; transform:none}
+  .slide.past{transform:translateX(-26px) scale(.995)}
+
+  /* slide chrome */
+  .eyebrow{display:inline-flex; align-items:center; gap:.5em; font-size:.72em; font-weight:700;
+    letter-spacing:.14em; text-transform:uppercase; color:var(--teal-dk)}
+  .eyebrow::before{content:""; width:1.7em; height:2px; border-radius:2px; background:linear-gradient(90deg,var(--teal),var(--ms-blue))}
+  .eyebrow.uc1{color:var(--teal-dk)} .eyebrow.uc1::before{background:linear-gradient(90deg,var(--teal),var(--cyan))}
+  .eyebrow.uc2{color:var(--ms-blue-dk)} .eyebrow.uc2::before{background:linear-gradient(90deg,var(--ms-blue),var(--green))}
+  .eyebrow.uc3{color:var(--purple-dk)} .eyebrow.uc3::before{background:linear-gradient(90deg,var(--purple),var(--ms-blue))}
+  h1.title{font-size:2.05em; line-height:1.12; font-weight:700; letter-spacing:-.01em; color:var(--ink); margin:.18em 0 .12em}
+  h2.h{font-size:1.66em; line-height:1.1; font-weight:700; letter-spacing:-.01em; margin:.05em 0 .15em}
+  h2.h .accent{color:var(--teal-dk)}
+  .sub{color:var(--muted); font-size:1.02em; font-weight:500}
+  .slidehead{flex:0 0 auto; margin-bottom:.75em}
+
+  .pill{display:inline-flex; align-items:center; gap:.5em; padding:.42em .85em; border-radius:999px;
+    font-size:.74em; font-weight:600; background:var(--surface-2); border:1px solid var(--line); color:var(--ink-2)}
+  .pill .dot{width:.6em; height:.6em; border-radius:50%}
+
+  .sayit{display:flex; gap:.8em; align-items:flex-start; background:linear-gradient(180deg,#F3F9FD,#ECF5FB);
+    border:1px solid #CFE4F4; border-left:4px solid var(--ms-blue); border-radius:var(--radius-sm);
+    padding:.8em 1.1em; color:var(--navy); font-size:.98em; line-height:1.42}
+  .sayit svg{flex:0 0 auto; width:1.25em; height:1.25em; margin-top:.05em; fill:var(--ms-blue)}
+  .sayit b{font-weight:700}
+
+  .grow{flex:1; min-height:0; display:flex; flex-direction:column; justify-content:center}
+
+  /* ============ Title slide ============ */
+  .slide.cover{background:
+      radial-gradient(900px 520px at 88% -20%, rgba(0,164,239,.32), rgba(0,164,239,0) 60%),
+      radial-gradient(760px 520px at -10% 120%, rgba(15,123,138,.42), rgba(15,123,138,0) 60%),
+      linear-gradient(135deg,var(--navy),var(--navy-2) 55%,#0C2A45);
+    color:#fff; justify-content:flex-start}
+  .cover-main{flex:1 1 auto; display:flex; flex-direction:column; justify-content:center; min-height:0}
+  .slide.cover .squares{position:absolute; right:3.2em; top:3.0em; display:grid;
+    grid-template-columns:repeat(2,1.5em); grid-auto-rows:1.5em; gap:.28em; opacity:.92}
+  .slide.cover .squares i{display:block; border-radius:2px}
+  .squares i:nth-child(1){background:var(--red)} .squares i:nth-child(2){background:var(--green)}
+  .squares i:nth-child(3){background:var(--cyan)} .squares i:nth-child(4){background:var(--yellow)}
+  .slide.cover .eyebrow{color:#9FE0EA}
+  .slide.cover .eyebrow::before{background:linear-gradient(90deg,var(--cyan),#9FE0EA)}
+  .slide.cover h1{font-size:2.9em; color:#fff; margin:.32em 0 .18em; letter-spacing:-.02em}
+  .slide.cover .lede{font-size:1.12em; color:#CFE0F0; max-width:24em; line-height:1.42; font-weight:500}
+  .cover-pills{display:flex; gap:.6em; margin-top:1.4em; flex-wrap:wrap}
+  .cover-pills .pill{background:rgba(255,255,255,.10); border-color:rgba(255,255,255,.22); color:#EaF3Fb; backdrop-filter:blur(4px)}
+  .cover-foot{position:static; margin-top:1em; display:flex; justify-content:space-between;
+    align-items:center; color:#9FB6CC; font-size:.76em; border-top:1px solid rgba(255,255,255,.14); padding-top:.9em}
+  .cover-foot .brand{color:#fff}
+  .ucrow{display:flex; gap:.6em; margin-top:1.5em; flex-wrap:wrap}
+  .ucpill{display:flex; align-items:center; gap:.55em; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.20);
+    border-radius:var(--radius-sm); padding:.55em .8em; backdrop-filter:blur(4px)}
+  .ucpill .ucn{width:1.6em; height:1.6em; border-radius:7px; display:grid; place-items:center; font-weight:800; font-size:.78em; color:#0C2A45}
+  .ucpill:nth-child(1) .ucn{background:#9FE0EA} .ucpill:nth-child(2) .ucn{background:#BBD9FB} .ucpill:nth-child(3) .ucn{background:#D8C9FB}
+  .ucpill .uct{display:flex; flex-direction:column; line-height:1.12}
+  .ucpill .uct b{font-size:.72em; color:#fff; font-weight:700}
+  .ucpill .uct span{font-size:.6em; color:#9FB6CC; font-weight:500}
+
+  /* ============ value chain (through-line) ============ */
+  .vcintro{text-align:center; font-size:.82em; line-height:1.36; color:var(--ink-2)}
+  .vcintro b{color:var(--teal-dk)}
+  .vchain{display:flex; align-items:stretch; gap:.55em}
+  .vc{flex:1; background:#fff; border:1px solid var(--line); border-top:4px solid var(--teal); border-radius:var(--radius-sm);
+    padding:.95em .9em; box-shadow:var(--shadow); display:flex; flex-direction:column; gap:.38em}
+  .vc.c2{border-top-color:var(--ms-blue)} .vc.c3{border-top-color:var(--purple)}
+  .vc .vcs{font-size:.64em; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:var(--teal-dk)}
+  .vc.c2 .vcs{color:var(--ms-blue-dk)} .vc.c3 .vcs{color:var(--purple-dk)}
+  .vc .vct{font-size:.88em; font-weight:800; line-height:1.14; color:var(--ink)}
+  .vc .vcd{font-size:.67em; color:var(--muted); line-height:1.32}
+  .vcar{flex:0 0 auto; align-self:center; display:grid; place-items:center; width:1.2em}
+  .vcar svg{width:1.1em; height:1.1em; fill:var(--ms-blue)}
+  .spine{margin-top:.4em; background:linear-gradient(180deg,#E9F5F7,#E2F1F4); border:1px solid var(--teal-bd);
+    border-radius:var(--radius-sm); padding:.85em .95em; display:flex; flex-direction:column; gap:.5em}
+  .spine .sl{font-size:.67em; font-weight:800; letter-spacing:.08em; text-transform:uppercase; color:var(--teal-dk)}
+  .spinechips{display:flex; flex-wrap:wrap; gap:.4em}
+  .spinechips .sc{font-size:.67em; font-weight:600; color:var(--ink-2); background:#fff; border:1px solid var(--teal-bd); border-radius:999px; padding:.34em .7em}
+  .threadline{margin-top:.25em; text-align:center; font-size:.8em; font-weight:600; color:var(--navy)}
+
+  /* ============ intro ("what it is") ============ */
+  .intro{display:grid; grid-template-columns:1.18fr .82fr; gap:1.2em; flex:1; min-height:0}
+  .intro .lead{font-size:1.04em; line-height:1.46; color:var(--ink-2); margin-bottom:.5em}
+  .intro .lead b{color:var(--ink)}
+  .icards{display:flex; flex-direction:column; gap:.7em; flex:1; justify-content:space-between}
+  .icard{background:#fff; border:1px solid var(--line); border-left:4px solid var(--ms-blue); border-radius:var(--radius-xs); padding:.75em .9em; box-shadow:var(--shadow); flex:1; display:flex; flex-direction:column; justify-content:center}
+  .icard.t2{border-left-color:var(--teal)} .icard.t3{border-left-color:var(--green)}
+  .icard .il{font-size:.67em; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:var(--ms-blue)}
+  .icard.t2 .il{color:var(--teal-dk)} .icard.t3 .il{color:var(--green-ink)}
+  .icard .ix{font-size:.74em; color:var(--ink-2); line-height:1.4; margin-top:.22em}
+  .icard .ix b{color:var(--ink)}
+  .glance{background:var(--surface-2); border:1px solid var(--line); border-radius:var(--radius-sm); padding:1em 1.1em; display:flex; flex-direction:column; gap:.8em; justify-content:space-between}
+  .glance .gh{font-size:.68em; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:var(--muted)}
+  .gkpis{display:flex; flex-direction:column; gap:.55em; flex:1; justify-content:space-between}
+  .gkpi{background:#fff; border:1px solid var(--line); border-top:3px solid var(--teal); border-radius:var(--radius-xs); padding:.65em .75em; box-shadow:var(--shadow); flex:1; display:flex; flex-direction:column; justify-content:center}
+  .gkpi.k2{border-top-color:var(--ms-blue)} .gkpi.k3{border-top-color:var(--green)}
+  .gkpi .gv{font-size:1.06em; font-weight:800; color:var(--ink); line-height:1.08}
+  .gkpi .gk{font-size:.64em; color:var(--muted); font-weight:600; line-height:1.22; margin-top:.12em}
+  .gtags{display:flex; flex-wrap:wrap; gap:.35em}
+  .gtag{font-size:.62em; font-weight:600; color:var(--ink-2); background:#fff; border:1px solid var(--line); border-radius:999px; padding:.32em .62em}
+
+  /* ============ S1 architecture (authoring future state) ============ */
+  .arch{display:grid; grid-template-columns:1fr 15em; gap:1.1em; flex:1; min-height:0}
+  .bands{display:flex; flex-direction:column; gap:.5em; min-height:0}
+  .band{position:relative; display:grid; grid-template-columns:8.4em 1fr; align-items:stretch; gap:.7em;
+    border-radius:var(--radius-sm); padding:.55em .7em; flex:1; min-height:0}
+  .band.human{background:var(--amber-bg); border:1px solid var(--amber-bd)}
+  .band.trust{background:linear-gradient(180deg,#E9F5F7,#E2F1F4); border:1px solid var(--teal-bd)}
+  .band.estate{background:var(--slate-bg); border:1px solid var(--slate-bd)}
+  .band .lab{display:flex; flex-direction:column; justify-content:center; gap:.18em}
+  .band .lab .k{font-size:.8em; font-weight:700; line-height:1.12}
+  .band .lab .t{font-size:.67em; color:var(--muted); line-height:1.2}
+  .band.human .lab .k{color:var(--amber)} .band.trust .lab .k{color:var(--teal-dk)} .band.estate .lab .k{color:var(--slate)}
+  .boxrow{display:grid; grid-template-columns:repeat(4,1fr); gap:.5em}
+  .box{background:#fff; border:1px solid var(--line); border-radius:var(--radius-xs); padding:.5em .6em;
+    display:flex; flex-direction:column; gap:.18em; box-shadow:var(--shadow); min-width:0}
+  .box .bt{font-size:.7em; font-weight:700; line-height:1.14; display:flex; align-items:center; gap:.4em}
+  .box .bd{font-size:.62em; color:var(--muted); line-height:1.18}
+  .box .ic{flex:0 0 auto; width:1.15em; height:1.15em}
+  .band.trust .box{border-color:var(--teal-bd)}
+  .band.human .box{border-color:var(--amber-bd)}
+  .connector{display:flex; align-items:center; justify-content:center; gap:.6em; height:1.35em; color:var(--teal-dk)}
+  .connector .chev{width:1.1em; height:1.1em; fill:var(--teal)}
+  .connector span{font-size:.67em; font-weight:700; letter-spacing:.04em; color:var(--teal-dk)}
+  .why{display:flex; flex-direction:column; gap:.5em; min-height:0}
+  .why .wt{font-size:.76em; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--muted)}
+  .whychip{display:flex; gap:.55em; align-items:flex-start; background:#fff; border:1px solid var(--line);
+    border-left:3px solid var(--ms-blue); border-radius:var(--radius-xs); padding:.5em .6em; box-shadow:var(--shadow); flex:1}
+  .whychip:nth-child(2){border-left-color:var(--red)}
+  .whychip:nth-child(3){border-left-color:var(--green)}
+  .whychip:nth-child(4){border-left-color:var(--cyan)}
+  .whychip:nth-child(5){border-left-color:var(--yellow)}
+  .whychip .n{font-weight:800; color:var(--ink); font-size:.78em; line-height:1}
+  .whychip .x{font-size:.67em; line-height:1.24; color:var(--ink-2)}
+  .whychip .x b{color:var(--ink)}
+  .derisk{margin-top:.5em; text-align:center; font-size:.8em; font-weight:600; color:var(--teal-dk)}
+
+  /* ============ discovery pipeline + planes ============ */
+  .pipe{display:flex; align-items:stretch; gap:.25em; margin-bottom:.55em}
+  .pnode{flex:1; background:#fff; border:1px solid var(--teal-bd); border-radius:var(--radius-xs); padding:.5em .4em;
+    display:flex; flex-direction:column; align-items:center; gap:.2em; text-align:center; box-shadow:var(--shadow); min-width:0}
+  .pnode .pk{width:1.55em; height:1.55em; border-radius:50%; display:grid; place-items:center; background:var(--teal-bg); color:var(--teal-dk); font-weight:800; font-size:.62em}
+  .pnode .pt{font-size:.59em; font-weight:700; line-height:1.14; color:var(--ink-2)}
+  .pnode.gate{border-color:var(--amber-bd); background:var(--amber-bg)}
+  .pnode.gate .pk{background:#FCE7C9; color:var(--amber)}
+  .pnode.gate .pt{color:var(--amber)}
+  .parrow{align-self:center; width:.8em; height:.8em; fill:var(--faint); flex:0 0 auto}
+  .planes{display:flex; flex-direction:column; gap:.5em; flex:1; min-height:0}
+  .plane{display:grid; grid-template-columns:10em 1fr; align-items:center; gap:.7em; background:#fff; border:1px solid var(--line);
+    border-left:4px solid var(--teal); border-radius:var(--radius-xs); padding:.62em .75em; box-shadow:var(--shadow); flex:1; min-height:0}
+  .plane.gov{background:linear-gradient(180deg,#E9F5F7,#E2F1F4); border-left-color:var(--ms-blue); border-color:var(--teal-bd)}
+  .plane .pll{display:flex; flex-direction:column; gap:.08em}
+  .plane .pll .pk2{font-size:.71em; font-weight:800; line-height:1.12; color:var(--teal-dk)}
+  .plane.gov .pll .pk2{color:var(--ms-blue-dk)}
+  .plane .pll .pd2{font-size:.56em; color:var(--muted); line-height:1.16}
+  .pchips{display:flex; flex-wrap:wrap; gap:.34em}
+  .pchip{font-size:.61em; font-weight:600; color:var(--ink-2); background:var(--surface-2); border:1px solid var(--line); border-radius:6px; padding:.3em .56em}
+  .pchip b{color:var(--teal-dk); font-weight:700}
+  .outcome{margin-top:.5em; text-align:center; font-size:.8em; font-weight:600; color:var(--teal-dk)}
+
+  /* ============ S4 architecture concept map ============ */
+  .archslide .pnode{border-color:var(--amber-bd); background:var(--amber-bg)}
+  .archslide .pnode .pk{background:#F6D38C; color:#7A4A00}
+  .archslide .pnode .pt{color:var(--ink-2)}
+  .orchon{display:flex; align-items:center; justify-content:center; gap:.45em; color:var(--muted);
+    font-size:.64em; font-weight:700; letter-spacing:.05em; text-transform:uppercase}
+  .orchon svg{width:.9em; height:.9em; fill:var(--faint)}
+  .archmap{display:grid; grid-template-columns:1fr 10.5em; gap:.6em; flex:1; min-height:0}
+  .archplanes{display:flex; flex-direction:column; gap:.5em; min-height:0}
+  .aplane{display:grid; grid-template-columns:7em 1fr; gap:.55em; flex:1; min-height:0}
+  .albl{border-radius:var(--radius-xs); padding:.5em .6em; border:1px solid; display:flex; flex-direction:column; justify-content:center}
+  .albl .alk{font-size:.72em; font-weight:800; line-height:1.16}
+  .acards{display:grid; grid-template-columns:repeat(3,1fr); gap:.5em; min-height:0}
+  .acard{background:#fff; border:1px solid var(--line); border-radius:var(--radius-xs); padding:.46em .6em; box-shadow:var(--shadow);
+    display:flex; flex-direction:column; justify-content:center; gap:.16em; min-width:0}
+  .acard .act{font-size:.66em; font-weight:700; line-height:1.16; color:var(--ink)}
+  .acard .acd{font-size:.57em; color:var(--muted); line-height:1.22}
+  .aplane.p1 .albl{background:#F1ECFB; border-color:#D8C9FB; color:var(--purple-dk)}
+  .aplane.p1 .acard{border-color:#E2D6FB}
+  .aplane.p2 .albl{background:var(--green-bg); border-color:#CDE3A6; color:var(--green-ink)}
+  .aplane.p2 .acard{border-color:#DCE9C2}
+  .aplane.p3 .albl{background:#E4EFFC; border-color:#C2D8F7; color:var(--ms-blue-dk)}
+  .aplane.p3 .acard{border-color:#D5E4F8}
+  .aplane.p4 .albl{background:var(--teal-bg); border-color:var(--teal-bd); color:var(--teal-dk)}
+  .aplane.p4 .acard{border-color:#C7E5EA}
+  .govcol{border:1px solid var(--amber-bd); background:linear-gradient(180deg,#FFFBF4,#FFF6EA); border-radius:var(--radius-sm);
+    padding:.55em .55em; display:flex; flex-direction:column; gap:.4em; min-height:0}
+  .govh{text-align:center; display:flex; flex-direction:column; gap:.05em; padding:.05em 0 .1em}
+  .govh .gvk{font-size:.66em; font-weight:800; color:var(--amber); line-height:1.14}
+  .govh .gvd{font-size:.52em; font-weight:600; color:var(--muted); line-height:1.18}
+  .govbox{flex:1; background:#fff; border:1px solid var(--amber-bd); border-radius:var(--radius-xs); display:flex; flex-direction:column;
+    align-items:center; justify-content:center; text-align:center; padding:.25em .35em; box-shadow:var(--shadow)}
+  .govbox .gbk{font-size:.62em; font-weight:700; color:var(--ink-2); line-height:1.14}
+  .govbox .gbs{font-size:.5em; font-weight:600; color:var(--muted); line-height:1.12; margin-top:.08em}
+  .govbox.hot{background:var(--amber-bg); border-color:#E8B765}
+  .govbox.hot .gbk{color:var(--amber)}
+  .archout{display:grid; grid-template-columns:1fr 10.5em; gap:.6em; align-items:center; margin-top:.1em}
+  .archoutbar{background:linear-gradient(180deg,var(--green-bg),#E2EFD2); border:1px solid #CDE3A6; border-radius:var(--radius-sm);
+    padding:.55em .85em; font-size:.7em; line-height:1.32; color:var(--ink-2)}
+  .archoutbar b{color:var(--green-ink)}
+  .archbtn{justify-self:center; background:var(--amber-bg); border:1px solid #E8B765; color:var(--amber); border-radius:999px;
+    padding:.5em .9em; font-size:.66em; font-weight:800; text-align:center; box-shadow:var(--shadow)}
+
+  /* ============ component grid C1-C8 (deviation) ============ */
+  .uxband{background:linear-gradient(180deg,#FFF6E9,#FDEFD8); border:1px solid var(--amber-bd); border-radius:var(--radius-xs);
+    padding:.55em .8em; font-size:.7em; font-weight:700; color:var(--amber); text-align:center; margin-bottom:.55em}
+  .compgrid{display:grid; grid-template-columns:repeat(4,1fr); grid-template-rows:1fr 1fr; gap:.55em; flex:1; min-height:0}
+  .comp{position:relative; background:#fff; border:1px solid var(--line); border-radius:var(--radius-xs); padding:.6em .7em; box-shadow:var(--shadow); display:flex; flex-direction:column; justify-content:center; gap:.2em}
+  .comp .cid{font-size:.56em; font-weight:800; color:#fff; background:var(--teal-dk); border-radius:5px; padding:.14em .5em; align-self:flex-start}
+  .comp.gate .cid{background:#B3261E} .comp.gov2 .cid{background:var(--ms-blue-dk)} .comp.data2 .cid{background:var(--slate)}
+  .comp .cnm{font-size:.68em; font-weight:700; line-height:1.14; color:var(--ink)}
+  .comp .cds{font-size:.6em; color:var(--muted); line-height:1.22}
+  .agentband{margin-top:.55em; background:linear-gradient(180deg,#F3F9FD,#ECF5FB); border:1px solid #CFE4F4; border-radius:var(--radius-xs);
+    padding:.55em .8em; font-size:.68em; font-weight:600; color:var(--navy); text-align:center}
+  .agentband b{color:var(--ms-blue-dk)}
+  .retain{margin-top:.5em; display:flex; align-items:center; gap:.6em; background:var(--slate-bg); border:1px dashed var(--slate-bd);
+    border-radius:var(--radius-xs); padding:.55em .75em; font-size:.65em; color:var(--slate); font-weight:600; flex-wrap:wrap}
+  .retain .lab{font-weight:800; color:var(--slate)}
+
+  /* ============ persona cards ============ */
+  .pcards{display:grid; grid-template-columns:1fr 1fr; gap:.85em; flex:1; min-height:0}
+  .pcard{background:#fff; border:1px solid var(--line); border-radius:var(--radius-sm); padding:.9em 1.05em; box-shadow:var(--shadow); display:flex; flex-direction:column; gap:.5em; justify-content:space-between}
+  .pcard .pch{display:flex; align-items:center; gap:.6em}
+  .pcard .pav{flex:0 0 auto; width:2.4em; height:2.4em; border-radius:9px; display:grid; place-items:center; background:var(--teal-bg); font-size:1.15em}
+  .pcard .pnm{font-size:.83em; font-weight:800; line-height:1.1; color:var(--ink)}
+  .pcard .prl{font-size:.63em; color:var(--muted); line-height:1.2}
+  .prow{font-size:.66em; line-height:1.36; color:var(--ink-2)}
+  .prow b{color:var(--teal-dk); font-weight:800; text-transform:uppercase; letter-spacing:.03em; font-size:.92em}
+  .prow.owns{background:var(--amber-bg); border:1px solid var(--amber-bd); border-radius:6px; padding:.35em .55em; color:var(--amber); margin-top:.05em}
+  .prow.owns b{color:var(--amber)}
+  .proles{display:flex; flex-wrap:wrap; gap:.3em}
+  .proles .pr2{font-size:.59em; font-weight:600; color:var(--ink-2); background:var(--surface-2); border:1px solid var(--line); border-radius:999px; padding:.28em .56em}
+  .framing{background:linear-gradient(180deg,#F3F9FD,#ECF5FB); border:1px solid #CFE4F4; border-radius:var(--radius-sm);
+    padding:.85em 1.2em; font-size:1.0em; line-height:1.6; color:var(--navy); font-weight:600; text-align:center}
+  .framing .v{display:inline-block; font-weight:800; padding:.04em .5em; border-radius:6px; color:#fff; margin:0 .08em}
+  .framing .v.persona{background:var(--ms-blue)} .framing .v.data{background:var(--teal-dk)}
+  .framing .v.risks{background:#B3261E} .framing .v.actions{background:#2E8B63}
+
+  /* ============ swimlane (authoring + deviation loop) ============ */
+  .flowbanner{font-size:.8em; font-weight:700; color:var(--green-ink); background:var(--green-bg);
+    border:1px solid #C9E29A; border-radius:var(--radius-xs); padding:.55em .8em; text-align:center}
+  .swim{display:flex; align-items:stretch; gap:.3em; flex-wrap:nowrap}
+  .node{flex:1; background:#fff; border:1px solid var(--teal-bd); border-radius:var(--radius-xs); padding:.7em .4em;
+    display:flex; flex-direction:column; align-items:center; gap:.38em; text-align:center; box-shadow:var(--shadow); min-width:0}
+  .node.human{border-color:var(--amber-bd); background:var(--amber-bg)}
+  .node .ni{width:1.7em; height:1.7em; display:grid; place-items:center; border-radius:8px; background:var(--teal-bg); font-size:1em}
+  .node.human .ni{background:#FCE7C9}
+  .node .nt{font-size:.6em; font-weight:700; line-height:1.14; color:var(--ink-2)}
+  .node .nr{font-size:.56em; color:var(--muted); line-height:1.12}
+  .arrowmini{align-self:center; width:.9em; height:.9em; fill:var(--faint); flex:0 0 auto}
+  .legend{display:flex; gap:1.2em; justify-content:center; font-size:.67em; font-weight:600; color:var(--muted)}
+  .legend .lg{display:flex; align-items:center; gap:.4em}
+  .legend .sw{width:.85em; height:.85em; border-radius:3px}
+  .legend .sw.ai{background:var(--teal-bg); border:1px solid var(--teal-bd)}
+  .legend .sw.hu{background:var(--amber-bg); border:1px solid var(--amber-bd)}
+  .split2{display:grid; grid-template-columns:1fr 1fr; gap:.7em}
+  .sidecard{border-radius:var(--radius-sm); padding:.9em 1.05em; border:1px solid var(--line)}
+  .sidecard.ai{background:var(--teal-bg); border-color:var(--teal-bd)}
+  .sidecard.hu{background:var(--amber-bg); border-color:var(--amber-bd)}
+  .sidecard .sh2{font-size:.76em; font-weight:800; margin-bottom:.4em}
+  .sidecard.ai .sh2{color:var(--teal-dk)} .sidecard.hu .sh2{color:var(--amber)}
+  .sidecard ul{list-style:none; display:flex; flex-direction:column; gap:.24em}
+  .sidecard li{font-size:.67em; color:var(--ink-2); line-height:1.34; padding-left:1em; position:relative}
+  .sidecard li::before{content:""; position:absolute; left:0; top:.42em; width:.42em; height:.42em; border-radius:50%}
+  .sidecard.ai li::before{background:var(--teal-dk)} .sidecard.hu li::before{background:var(--amber)}
+  .sidecard li b{color:var(--ink); font-weight:700}
+  .roles-strip{display:flex; align-items:center; gap:.5em; background:var(--slate-bg); border:1px dashed var(--slate-bd);
+    border-radius:var(--radius-xs); padding:.55em .8em; font-size:.67em; color:var(--slate); font-weight:600; flex-wrap:wrap}
+  .roles-strip .lab{font-weight:800; color:var(--slate)}
+
+  /* ============ 3-lens exec grid ============ */
+  .execs3{display:grid; grid-template-columns:repeat(3,1fr); gap:.8em; flex:1; min-height:0}
+  .ex{background:#fff; border:1px solid var(--line); border-radius:var(--radius-sm); box-shadow:var(--shadow); display:flex; flex-direction:column; overflow:hidden}
+  .ex .exh{padding:.75em .9em; border-bottom:1px solid var(--line); background:var(--surface-2)}
+  .ex.ceo .exh{background:#ede9fe; border-bottom-color:#ddd0fb}
+  .ex.ops .exh{background:#fffbeb; border-bottom-color:#f2e3b8}
+  .ex.risk .exh{background:#fff5f5; border-bottom-color:#f6cccc}
+  .ex .extag{font-size:.6em; font-weight:800; letter-spacing:.05em; text-transform:uppercase}
+  .ex.ceo .extag{color:var(--purple)} .ex.ops .extag{color:#b45309} .ex.risk .extag{color:#dc2626}
+  .ex .exnm{font-size:.87em; font-weight:800; line-height:1.1; color:var(--ink); margin-top:.16em}
+  .ex .exrl{font-size:.62em; color:var(--muted); line-height:1.2; margin-top:.06em}
+  .ex .exwhat{font-size:.69em; font-style:italic; color:var(--navy); line-height:1.36; padding:.65em .9em; background:linear-gradient(180deg,#F8FBFE,#F2F8FC); border-bottom:1px solid var(--line)}
+  .ex .expts{padding:.7em .9em; display:flex; flex-direction:column; gap:.42em; flex:1; justify-content:space-evenly}
+  .ept{font-size:.65em; line-height:1.34; color:var(--ink-2); padding-left:1.1em; position:relative}
+  .ept::before{content:""; position:absolute; left:0; top:.4em; width:.45em; height:.45em; border-radius:50%; background:var(--teal-dk)}
+  .ex.ceo .ept::before{background:var(--purple)} .ex.ops .ept::before{background:#f59e0b} .ex.risk .ept::before{background:#ef4444}
+  .ept b{color:var(--ink); font-weight:700}
+  .vetonote{margin-top:.55em; font-size:.7em; font-weight:600; color:var(--muted); text-align:center}
+  .vetonote b{color:#dc2626}
+
+  /* ============ closing ============ */
+  .slide.closing{background:
+      radial-gradient(800px 520px at 90% -20%, rgba(15,123,138,.30), rgba(15,123,138,0) 60%),
+      linear-gradient(135deg,var(--navy),#0C2A45); color:#fff; justify-content:flex-start}
+  .closing-main{flex:1 1 auto; display:flex; flex-direction:column; justify-content:center; min-height:0}
+  .slide.closing h2{color:#fff; font-size:1.82em; margin-bottom:.7em}
+  .twolines{display:flex; flex-direction:column; gap:.7em; max-width:34em}
+  .winline{display:flex; gap:.8em; align-items:flex-start; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.18);
+    border-left:4px solid var(--cyan); border-radius:var(--radius-sm); padding:.95em 1.15em; font-size:1.05em; line-height:1.46}
+  .winline:nth-child(2){border-left-color:var(--green)}
+  .winline .tagn{font-size:.58em; font-weight:800; color:#9FE0EA; letter-spacing:.1em; margin-top:.25em; white-space:nowrap}
+  .winline:nth-child(2) .tagn{color:#CDEBA6}
+  .closing .foot{position:static; margin-top:auto; display:flex; justify-content:space-between;
+    align-items:center; color:#9FB6CC; font-size:.74em; border-top:1px solid rgba(255,255,255,.14); padding-top:.9em}
+
+  /* ============ Controls ============ */
+  .controls{height:60px; flex:0 0 auto; display:flex; align-items:center; gap:14px; padding:0 22px;
+    background:rgba(255,255,255,.82); backdrop-filter:saturate(140%) blur(10px); border-top:1px solid var(--line); position:relative; z-index:20}
+  .progress{position:absolute; top:0; left:0; height:3px; background:linear-gradient(90deg,var(--red),var(--yellow),var(--green),var(--cyan)); transition:width .45s ease}
+  .dots{display:flex; gap:7px; margin:0 auto; flex-wrap:wrap; justify-content:center}
+  .dots button{width:9px; height:9px; border-radius:50%; border:none; background:#C8C6C4; cursor:pointer; padding:0; transition:all .25s}
+  .dots button.on{width:26px; border-radius:6px; background:var(--ms-blue)}
+  .navbtn{display:inline-flex; align-items:center; gap:.4em; font-family:var(--font); font-size:13px; font-weight:600; cursor:pointer;
+    color:var(--ink); background:#fff; border:1px solid var(--line); border-radius:8px; padding:8px 13px; transition:all .18s}
+  .navbtn:hover{border-color:var(--ms-blue); color:var(--ms-blue-dk); box-shadow:var(--shadow)}
+  .navbtn:active{transform:translateY(1px)}
+  .navbtn svg{width:14px;height:14px;fill:currentColor}
+  .navbtn.primary{background:var(--ms-blue); color:#fff; border-color:var(--ms-blue)}
+  .navbtn.primary:hover{background:var(--ms-blue-dk); color:#fff}
+  .hint{font-size:11px; color:var(--faint)}
+  .iconbtn{display:grid;place-items:center; width:34px;height:34px; border-radius:8px; border:1px solid var(--line); background:#fff; cursor:pointer}
+  .iconbtn svg{width:15px;height:15px;fill:var(--ink-2)}
+  .iconbtn:hover{border-color:var(--ms-blue)}
+
+  @media (max-width:680px){ .appbar .deck-title,.hint{display:none} .slide{padding:2.4em 1.8em} }
+
+  /* ============ Print → PDF ============ */
+  @media print{
+    @page{size:1280px 720px; margin:0}
+    body{height:auto; display:block; background:#fff}
+    .appbar,.controls{display:none}
+    main{display:block; padding:0}
+    .stage-wrap{width:1280px; height:720px; filter:none; page-break-after:always; border:none}
+    .stage{border-radius:0; border:none; font-size:16px}
+    .slide{position:relative; opacity:1!important; visibility:visible!important; transform:none!important; page-break-after:always}
+  }
+</style>
+</head>
+<body>
+
+  <header class="appbar">
+    <div class="brand">
+      <span class="ms-logo" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+      <b>Microsoft</b><span class="sep">|</span><span class="ctx">Merck Account Pursuit</span>
+    </div>
+    <div class="spacer" style="flex:1"></div>
+    <div class="deck-title">AI-First Architecture · Three Use Cases · One Governance Spine</div>
+    <div class="counter"><span id="cur">01</span> / <span id="tot">15</span></div>
+  </header>
+
+  <main>
+    <div class="stage-wrap">
+      <div class="stage" id="stage">
+
+        <!-- ================= SLIDE 1 — COVER ================= -->
+        <section class="slide cover active">
+          <div class="squares" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+          <div class="cover-main">
+            <span class="eyebrow">Account Pursuit · Confidential · Three Use Cases</span>
+            <h1>AI-First Architecture at Merck</h1>
+            <p class="lede">One <b style="color:#fff">Governed Human &amp; Trust Layer</b> over the multicloud AI Merck already owns — applied across three points of the value chain. Integrate, don&rsquo;t displace.</p>
+            <div class="ucrow">
+              <div class="ucpill"><span class="ucn">1</span><span class="uct"><b>Discovery Orchestration</b><span>R&amp;D · find candidates faster</span></span></div>
+              <div class="ucpill"><span class="ucn">2</span><span class="uct"><b>Governed Authoring &amp; Review</b><span>Regulatory · file defensibly</span></span></div>
+              <div class="ucpill"><span class="ucn">3</span><span class="uct"><b>Deviation / Investigation Copilot</b><span>Quality · inspection-ready</span></span></div>
+            </div>
+          </div>
+          <div class="cover-foot">
+            <div class="brand"><span class="ms-logo" aria-hidden="true"><i></i><i></i><i></i><i></i></span><b>Microsoft</b></div>
+            <div>Three copilots · one governance spine · refilling the pipeline before 2028</div>
+          </div>
+        </section>
+
+        <!-- ================= SLIDE 2 — THE THROUGH-LINE ================= -->
+        <section class="slide">
+          <div class="slidehead">
+            <span class="eyebrow">The Through-Line · Three independent solutions · one governance spine</span>
+            <h2 class="h">Generation is solved. The gate is <span class="accent">governance.</span></h2>
+          </div>
+          <div class="sayit">
+            <svg viewBox="0 0 24 24"><path d="M12 2 4 6v6c0 5 3.4 8.5 8 10 4.6-1.5 8-5 8-10V6l-8-4Zm0 2.2 6 3v4.8c0 3.9-2.5 6.7-6 8-3.5-1.3-6-4.1-6-8V7.2l6-3Z"/></svg>
+            <div>Merck has already bet ~$1B+ on multicloud agentic AI &mdash; Gemini, Bedrock, GPTeal. <b>The models work &mdash; we&rsquo;re not rebuilding them.</b> Each of these three copilots closes a <b>different gap</b> today&rsquo;s AI leaves open in regulated work, and <b>each stands on its own</b>. What connects them is a shared governance spine &mdash; one connected story, not a dependency.</div>
+          </div>
+          <div class="grow" style="gap:.5em">
+            <div class="vcintro">Each solves a different point of the value chain &mdash; <b>adopt one, two, or all three.</b> None depends on the others.</div>
+            <div class="vchain">
+              <div class="vc c1">
+                <span class="vcs">Discover · R&amp;D</span>
+                <span class="vct">Multi-Step Discovery Orchestration</span>
+                <span class="vcd">Gap today: no governed orchestration across the pipeline. A scientist owns the wet-lab call.</span>
+              </div>
+              <div class="vc c2">
+                <span class="vcs">File · Regulatory</span>
+                <span class="vct">Governed Authoring &amp; Review Copilot</span>
+                <span class="vcd">Gap today: drafts aren&rsquo;t review-signed or defensible. A human reviews, signs and defends in Word.</span>
+              </div>
+              <div class="vc c3">
+                <span class="vcs">Make · Quality</span>
+                <span class="vct">Deviation / Investigation Copilot</span>
+                <span class="vcd">Gap today: investigations aren&rsquo;t inspection-ready. A human owns every regulated gate.</span>
+              </div>
+            </div>
+            <div class="spine">
+              <span class="sl">One shared governance spine across all three</span>
+              <div class="spinechips">
+                <span class="sc">Azure AI Foundry</span>
+                <span class="sc">Entra Agent ID</span>
+                <span class="sc">Microsoft Purview lineage</span>
+                <span class="sc">Human-in-the-loop · four-eyes</span>
+                <span class="sc">Annex 22</span>
+                <span class="sc">Part 11 / ALCOA+</span>
+                <span class="sc">OneLake shortcuts · read S3 + GCS in place</span>
+              </div>
+            </div>
+            <div class="threadline">Same spine, same principle &mdash; AI accelerates, a human owns every regulated decision. <b>Connected by governance, adopted independently.</b></div>
+          </div>
+        </section>
+
+        <!-- ================= SLIDE 3 — UC1 DISCOVERY · WHAT IT IS ================= -->
+        <section class="slide">
+          <div class="slidehead">
+            <span class="eyebrow uc1">Use Case 1 · Discovery (R&amp;D) · What it is</span>
+            <h2 class="h">Multi-Step Discovery Orchestration</h2>
+          </div>
+          <div class="intro">
+            <div style="display:flex;flex-direction:column;min-height:0">
+              <p class="lead">A <b>Cloud-Centric Platform for governed agentic drug discovery</b> &mdash; multi-step orchestration over protein/antibody + foundation models, federated across Azure, Google &amp; AWS.</p>
+              <div class="icards">
+                <div class="icard"><div class="il">The problem</div><div class="ix">Refill the pipeline before the <b>2028 Keytruda cliff</b>. Discovery runs <b>4&ndash;6 years to clinic</b>; too few validated candidates per cycle.</div></div>
+                <div class="icard t2"><div class="il">What it does</div><div class="ix">Agents run the pipeline &mdash; <b>Target ID &rarr; generative design &rarr; structure &amp; docking &rarr; in-silico triage</b> &mdash; and hand a ranked shortlist to a human gate before any wet-lab work.</div></div>
+                <div class="icard t3"><div class="il">The principle</div><div class="ix">AI triages at portfolio scale; <b>the scientist owns the wet-lab call</b> (four-eyes, Annex 22).</div></div>
+              </div>
+            </div>
+            <div class="glance">
+              <span class="gh">At a glance</span>
+              <div class="gkpis">
+                <div class="gkpi"><div class="gv">12&ndash;18 mo</div><div class="gk">to clinic vs 4&ndash;6 yr norm</div></div>
+                <div class="gkpi k2"><div class="gv">More candidates</div><div class="gk">validated per cycle, at portfolio scale</div></div>
+                <div class="gkpi k3"><div class="gv">~46% revenue</div><div class="gk">protected at the cliff</div></div>
+              </div>
+              <span class="gh">Models &amp; partners</span>
+              <div class="gtags">
+                <span class="gtag">ESM</span><span class="gtag">AlphaFold3</span><span class="gtag">Boltz-2</span><span class="gtag">IgLM</span><span class="gtag">RFdiffusion</span>
+                <span class="gtag">Protillion</span><span class="gtag">Variational</span><span class="gtag">Gemini</span><span class="gtag">Azure Quantum Elements</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= SLIDE 4 — UC1 DISCOVERY · FUTURE STATE ================= -->
+        <section class="slide archslide">
+          <div class="slidehead">
+            <span class="eyebrow uc1">Use Case 1 · Discovery · Future State</span>
+            <h2 class="h">Cloud-Centric Platform &mdash; <span class="accent">governed agentic discovery</span></h2>
+            <div class="sub" style="font-size:.8em; margin-top:.18em">Multi-step discovery orchestration over protein/antibody + foundation models &middot; federated across Azure, Google &amp; AWS</div>
+          </div>
+          <div class="grow" style="justify-content:flex-start; gap:.45em">
+            <div class="pipe">
+              <div class="pnode"><span class="pk">1</span><span class="pt">Target ID &amp; validation</span></div>
+              <svg class="parrow" viewBox="0 0 24 24"><path d="M9 6 15 12 9 18Z"/></svg>
+              <div class="pnode"><span class="pk">2</span><span class="pt">Generative design</span></div>
+              <svg class="parrow" viewBox="0 0 24 24"><path d="M9 6 15 12 9 18Z"/></svg>
+              <div class="pnode"><span class="pk">3</span><span class="pt">Structure &amp; docking</span></div>
+              <svg class="parrow" viewBox="0 0 24 24"><path d="M9 6 15 12 9 18Z"/></svg>
+              <div class="pnode"><span class="pk">4</span><span class="pt">In-silico triage</span></div>
+              <svg class="parrow" viewBox="0 0 24 24"><path d="M9 6 15 12 9 18Z"/></svg>
+              <div class="pnode gate"><span class="pk">5</span><span class="pt">Rank &rarr; human gate</span></div>
+            </div>
+            <div class="orchon"><span>orchestrated on</span><svg viewBox="0 0 24 24"><path d="M6 9 12 15 18 9Z"/></svg></div>
+            <div class="archmap">
+              <div class="archplanes">
+                <div class="aplane p1">
+                  <div class="albl"><span class="alk">Orchestration plane</span></div>
+                  <div class="acards">
+                    <div class="acard"><span class="act">Azure AI Foundry Agent Service</span><span class="acd">multi-agent Target·Design·Structure·Triage·Rank</span></div>
+                    <div class="acard"><span class="act">A2A interoperability</span><span class="acd">calls Gemini · Protillion · Variational agents</span></div>
+                    <div class="acard"><span class="act">Human-in-the-loop gate</span><span class="acd">four-eyes before wet-lab (Annex 22)</span></div>
+                  </div>
+                </div>
+                <div class="aplane p2">
+                  <div class="albl"><span class="alk">Foundation models</span></div>
+                  <div class="acards">
+                    <div class="acard"><span class="act">Foundry catalog + Azure ML</span><span class="acd">ESM · AlphaFold3 · Boltz-2 · IgLM · RFdiffusion</span></div>
+                    <div class="acard"><span class="act">Azure Quantum Elements</span><span class="acd">generative chemistry + tox · accel. DFT ~20&times;</span></div>
+                    <div class="acard"><span class="act">Federated partner models</span><span class="acd">Protillion (Ab) · Variational · Gemini (R&amp;D)</span></div>
+                  </div>
+                </div>
+                <div class="aplane p3">
+                  <div class="albl"><span class="alk">Compute plane</span></div>
+                  <div class="acards">
+                    <div class="acard"><span class="act">Azure HPC &mdash; ND-series GPU</span><span class="acd">structure prediction &amp; molecular dynamics</span></div>
+                    <div class="acard"><span class="act">CycleCloud / Azure Batch</span><span class="acd">docking &amp; screening at scale</span></div>
+                    <div class="acard"><span class="act">Burst &amp; on-demand</span><span class="acd">capacity without on-prem rebuild</span></div>
+                  </div>
+                </div>
+                <div class="aplane p4">
+                  <div class="albl"><span class="alk">Data foundation</span></div>
+                  <div class="acards">
+                    <div class="acard"><span class="act">Microsoft Fabric / OneLake</span><span class="acd">shortcuts read S3 + GCS in place (GA)</span></div>
+                    <div class="acard"><span class="act">Azure Health Data Services</span><span class="acd">FHIR/DICOM/genomics · Mayo multimodal</span></div>
+                    <div class="acard"><span class="act">Azure AI Search</span><span class="acd">hybrid RAG over assay &amp; precedent data</span></div>
+                  </div>
+                </div>
+              </div>
+              <div class="govcol">
+                <div class="govh"><span class="gvk">Governance &amp; Identity</span><span class="gvd">cross-cutting across all planes</span></div>
+                <div class="govbox"><span class="gbk">Entra Agent ID</span></div>
+                <div class="govbox"><span class="gbk">Purview lineage</span></div>
+                <div class="govbox"><span class="gbk">Microsoft Defender</span></div>
+                <div class="govbox"><span class="gbk">Azure Arc</span><span class="gbs">multicloud / edge</span></div>
+                <div class="govbox hot"><span class="gbk">Part 11 / ALCOA+ ready</span></div>
+              </div>
+            </div>
+            <div class="archout">
+              <div class="archoutbar"><b>Outcome:</b> more validated candidates / cycle &middot; 12&ndash;18 mo to clinic vs 4&ndash;6 yr norm &middot; human owns the wet-lab call &mdash; AI triages at portfolio scale, the human approves.</div>
+              <div class="archbtn">Federate, don&rsquo;t migrate</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= SLIDE 5 — UC1 DISCOVERY · PERSONAS ================= -->
+        <section class="slide">
+          <div class="slidehead">
+            <span class="eyebrow uc1">Use Case 1 · Discovery · Persona-Driven Scenarios</span>
+            <h2 class="h">Decisions the copilot <span class="accent">supports, not replaces</span></h2>
+          </div>
+          <div class="grow" style="gap:.75em; justify-content:flex-start">
+            <div class="framing" style="font-size:.9em; padding:.7em 1.1em">
+              An AI copilot that assists the <span class="v persona">discovery scientist &amp; protein-design engineer</span> by synthesizing <span class="v data">target + multimodal data</span>, flagging <span class="v risks">non-synthesizable or toxic candidates</span>, and recommending <span class="v actions">a ranked shortlist</span>. The human retains scientific accountability.
+            </div>
+            <div class="flowbanner">AI triages at portfolio scale · the scientist owns the wet-lab call · everything is traced</div>
+            <div class="swim">
+              <div class="node"><span class="ni">🎯</span><span class="nt">Target ID</span><span class="nr">validation</span></div>
+              <svg class="arrowmini" viewBox="0 0 24 24"><path d="M9 6 15 12 9 18Z"/></svg>
+              <div class="node"><span class="ni">🧬</span><span class="nt">Generative design</span><span class="nr">scaffolds · sequences</span></div>
+              <svg class="arrowmini" viewBox="0 0 24 24"><path d="M9 6 15 12 9 18Z"/></svg>
+              <div class="node"><span class="ni">🔬</span><span class="nt">Structure &amp; docking</span><span class="nr">AlphaFold3 · ABodyBuilder</span></div>
+              <svg class="arrowmini" viewBox="0 0 24 24"><path d="M9 6 15 12 9 18Z"/></svg>
+              <div class="node"><span class="ni">⚖️</span><span class="nt">In-silico triage</span><span class="nr">ranked shortlist</span></div>
+              <svg class="arrowmini" viewBox="0 0 24 24"><path d="M9 6 15 12 9 18Z"/></svg>
+              <div class="node human"><span class="ni">👥</span><span class="nt">Human gate</span><span class="nr">four-eyes · Annex 22</span></div>
+              <svg class="arrowmini" viewBox="0 0 24 24"><path d="M9 6 15 12 9 18Z"/></svg>
+              <div class="node human"><span class="ni">🧪</span><span class="nt">Wet-lab call</span><span class="nr">scientist owns</span></div>
+            </div>
+            <div class="split2">
+              <div class="sidecard hu">
+                <div class="sh2">Decisions a human owns</div>
+                <ul>
+                  <li><b>Which candidates advance to wet-lab?</b> &mdash; Discovery Scientist</li>
+                  <li><b>Target go / no-go</b> &mdash; Discovery Scientist</li>
+                  <li><b>Which scaffolds / sequences to synthesize?</b> &mdash; Protein-Design Engineer</li>
+                  <li><b>Approve the ranked shortlist</b> (four-eyes) &mdash; validates the biology</li>
+                </ul>
+              </div>
+              <div class="sidecard ai">
+                <div class="sh2">New roles &amp; interfaces</div>
+                <ul>
+                  <li><b>In-silico triage scientist</b> &mdash; agent workbench over Foundry</li>
+                  <li><b>Model-catalog curator</b> &amp; <b>Biologics agent-ops engineer</b></li>
+                  <li><b>HPC cost steward</b> &mdash; burst compute, no capex</li>
+                </ul>
+              </div>
+            </div>
+            <div class="legend"><span class="lg"><span class="sw ai"></span>AI accelerates</span><span class="lg"><span class="sw hu"></span>Human decides &amp; owns</span></div>
+          </div>
+        </section>
+
+        <!-- ================= SLIDE 6 — UC1 DISCOVERY · C-SUITE ================= -->
+        <section class="slide">
+          <div class="slidehead">
+            <span class="eyebrow uc1">Use Case 1 · Discovery · C-Suite Relevance</span>
+            <h2 class="h">Multi-step discovery orchestration &mdash; <span class="accent">three executive lenses</span></h2>
+          </div>
+          <div class="execs3">
+            <div class="ex ceo">
+              <div class="exh"><div class="extag">CEO · Modernization · scale · governance</div><div class="exnm">Rob Davis</div><div class="exrl">Chairman &amp; CEO</div></div>
+              <div class="exwhat">"Refill the pipeline before the 2028 cliff &mdash; without abandoning our Google &amp; AWS bets."</div>
+              <div class="expts">
+                <div class="ept">Federated platform = <b>durable speed as a strategic moat</b> (data + platforms + partnerships)</div>
+                <div class="ept">Protects <b>~46% of revenue</b> exposed at the Keytruda cliff</div>
+                <div class="ept">AI scaled responsibly &mdash; a <b>board-grade governance</b> story</div>
+              </div>
+            </div>
+            <div class="ex ops">
+              <div class="exh"><div class="extag">Business / Ops · Speed · throughput</div><div class="exnm">Dean Li</div><div class="exrl">President, Merck Research Labs</div></div>
+              <div class="exwhat">"More validated candidates per cycle, at portfolio scale &mdash; with scientists deciding, not running tools."</div>
+              <div class="expts">
+                <div class="ept"><b>12&ndash;18 mo to clinic</b> vs 4&ndash;6 yr norm</div>
+                <div class="ept">Scientists <b>shift from running tools to deciding</b></div>
+                <div class="ept">Fewer costly late-stage failures (pre-lab triage); on-demand HPC <b>without capex</b></div>
+              </div>
+            </div>
+            <div class="ex risk">
+              <div class="exh"><div class="extag">Risk / Compliance · Safety · trust</div><div class="exnm">Stelios Tsinontides</div><div class="exrl">VP Global Quality · ex-FDA/CDER</div></div>
+              <div class="exwhat">"Inspection-ready from research onward &mdash; AI triages, a human owns every regulated call."</div>
+              <div class="expts">
+                <div class="ept"><b>Purview lineage + Part 11 / ALCOA+</b>-ready provenance on every candidate</div>
+                <div class="ept"><b>Annex 22 honored</b> &mdash; GenAI never makes the critical decision</div>
+                <div class="ept">Agents governed by <b>Entra Agent ID</b> &mdash; least privilege, full audit</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= SLIDE 7 — UC2 AUTHORING · WHAT IT IS ================= -->
+        <section class="slide">
+          <div class="slidehead">
+            <span class="eyebrow uc2">Use Case 2 · Regulatory Authoring (Development) · What it is</span>
+            <h2 class="h">Governed Authoring &amp; Review Copilot</h2>
+          </div>
+          <div class="intro">
+            <div style="display:flex;flex-direction:column;min-height:0">
+              <p class="lead">A <b>governed last mile for regulatory writing</b> &mdash; the place where a human reviews, signs and defends AI-drafted submissions, on the tools already on every desk (M365 Copilot · Word · Teams).</p>
+              <div class="icards">
+                <div class="icard"><div class="il">The problem</div><div class="ix"><b>&gt;80% of staff</b> already draft CSRs with GPTeal + McKinsey, but pilots stall at the <b>audit wall</b> &mdash; the output isn&rsquo;t defensible.</div></div>
+                <div class="icard t2"><div class="il">What it does</div><div class="ix">Assembles the evidence pack, surfaces a <b>grounded draft in Word</b>, and runs deterministic QA (citations, consistency, completeness) before a human ever sees it.</div></div>
+                <div class="icard t3"><div class="il">The principle</div><div class="ix"><b>AI never signs. Humans never start from a blank page.</b> Backend model interchangeable &mdash; GPTeal / Gemini / Bedrock.</div></div>
+              </div>
+            </div>
+            <div class="glance">
+              <span class="gh">At a glance</span>
+              <div class="gkpis">
+                <div class="gkpi"><div class="gv">Days saved</div><div class="gk">on the submission critical path</div></div>
+                <div class="gkpi k2"><div class="gv">~$1&ndash;3M / day</div><div class="gk">value of each day earlier to market</div></div>
+                <div class="gkpi k3"><div class="gv">~20 launches</div><div class="gk">in the window · 30+ oncology studies</div></div>
+              </div>
+              <span class="gh">Trust layer</span>
+              <div class="gtags">
+                <span class="gtag">M365 Copilot · Word · Teams</span><span class="gtag">Copilot Studio (four-eyes + Part 11 e-sign)</span><span class="gtag">Entra Agent ID</span><span class="gtag">Microsoft Purview</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= SLIDE 8 — UC2 AUTHORING · FUTURE STATE ================= -->
+        <section class="slide">
+          <div class="slidehead">
+            <span class="eyebrow uc2">Use Case 2 · Authoring · Future State</span>
+            <h2 class="h">A trust layer over the AI Merck <span class="accent">already owns</span></h2>
+          </div>
+          <div class="sayit">
+            <svg viewBox="0 0 24 24"><path d="M12 2 4 6v6c0 5 3.4 8.5 8 10 4.6-1.5 8-5 8-10V6l-8-4Zm0 2.2 6 3v4.8c0 3.9-2.5 6.7-6 8-3.5-1.3-6-4.1-6-8V7.2l6-3Z"/></svg>
+            <div>Keep every AI bet you&rsquo;ve made. We add the one layer none of them gives you: the place where a human reviews, signs and defends AI output, with an audit trail, on the tools already on every desk.</div>
+          </div>
+          <div class="arch" style="margin-top:.7em;font-size:.88em">
+            <div class="bands">
+              <div class="band human">
+                <div class="lab"><span class="k">Human owners</span><span class="t">work surfaces &amp; accountable signatories</span></div>
+                <div class="boxrow" style="grid-template-columns:repeat(3,1fr)">
+                  <div class="box"><span class="bt">Medical writer</span><span class="bd">grounded draft + evidence pane</span></div>
+                  <div class="box"><span class="bt">QA / Reg reviewer</span><span class="bd">four-eyes review</span></div>
+                  <div class="box"><span class="bt">Accountable signatory</span><span class="bd">Part 11 sign-off</span></div>
+                </div>
+              </div>
+              <div class="connector"><svg class="chev" viewBox="0 0 24 24"><path d="M12 6 4 14h16z"/></svg><span>REVIEW · SIGN · DEFEND</span><svg class="chev" viewBox="0 0 24 24"><path d="M12 6 4 14h16z"/></svg></div>
+              <div class="band trust">
+                <div class="lab"><span class="k">Microsoft trust layer</span><span class="t">already in the building</span></div>
+                <div class="boxrow">
+                  <div class="box"><span class="bt">M365 Copilot · Word · Teams</span><span class="bd">human review &amp; approval surface</span></div>
+                  <div class="box"><span class="bt">Copilot Studio</span><span class="bd">four-eyes + Part 11 e-sign flow</span></div>
+                  <div class="box"><span class="bt">Microsoft Entra (+ Agent ID)</span><span class="bd">one identity, people &amp; agents, cross-cloud</span></div>
+                  <div class="box"><span class="bt">Microsoft Purview</span><span class="bd">AI governance · DLP · immutable audit</span></div>
+                </div>
+              </div>
+              <div class="connector"><svg class="chev" viewBox="0 0 24 24"><path d="M12 6 4 14h16z"/></svg><span>DRAFT FROM ANY MODEL</span><svg class="chev" viewBox="0 0 24 24"><path d="M12 6 4 14h16z"/></svg></div>
+              <div class="band estate">
+                <div class="lab"><span class="k">AI you already own</span><span class="t">we don&rsquo;t touch it · generation = solved</span></div>
+                <div class="boxrow">
+                  <div class="box"><span class="bt">Google Gemini Enterprise</span><span class="bd">agentic R&amp;D / ops (~$1B)</span></div>
+                  <div class="box"><span class="bt">AWS Bedrock</span><span class="bd">deviation / RAG</span></div>
+                  <div class="box"><span class="bt">GPTeal + McKinsey</span><span class="bd">CSR drafting · &gt;80% staff</span></div>
+                  <div class="box"><span class="bt">Snowflake</span><span class="bd">enterprise data cloud</span></div>
+                </div>
+              </div>
+            </div>
+            <div class="why">
+              <span class="wt">Why these decisions</span>
+              <div class="whychip"><span class="n">1</span><span class="x"><b>Why not rebuild?</b> Rivals already won generation; re-fighting loses.</span></div>
+              <div class="whychip"><span class="n">2</span><span class="x"><b>Why the trust layer?</b> Auditability is the wall most pilots fail.</span></div>
+              <div class="whychip"><span class="n">3</span><span class="x"><b>Why M365 / Entra / Purview?</b> Already licensed &amp; deployed.</span></div>
+              <div class="whychip"><span class="n">4</span><span class="x"><b>Why start here?</b> Low GxP risk, fast proof, then data gravity.</span></div>
+            </div>
+          </div>
+          <div class="derisk">Not a migration. Not a rip-and-replace. A governance + accountability layer on software Merck already owns.</div>
+        </section>
+
+        <!-- ================= SLIDE 9 — UC2 AUTHORING · PERSONAS ================= -->
+        <section class="slide">
+          <div class="slidehead">
+            <span class="eyebrow uc2">Use Case 2 · Authoring · Persona-Driven Scenarios</span>
+            <h2 class="h">Supports the decision, <span class="accent">never replaces it</span></h2>
+          </div>
+          <div class="grow" style="gap:.75em; justify-content:flex-start">
+            <div class="framing" style="font-size:.9em; padding:.7em 1.1em">
+              An AI copilot that assists <span class="v persona">medical writers &amp; reviewers</span> by synthesizing <span class="v data">the evidence pack</span>, flagging <span class="v risks">unsupported claims</span>, and recommending <span class="v actions">a grounded draft &amp; review route</span>. The human always retains accountability.
+            </div>
+            <div class="flowbanner">AI accelerates · Humans decide · Everything is traced</div>
+            <div class="swim">
+              <div class="node"><span class="ni">📁</span><span class="nt">Evidence pack</span><span class="nr">Protocol · SAP · TLF</span></div>
+              <svg class="arrowmini" viewBox="0 0 24 24"><path d="M9 6 15 12 9 18Z"/></svg>
+              <div class="node"><span class="ni">✍️</span><span class="nt">Grounded draft</span><span class="nr">in Word</span></div>
+              <svg class="arrowmini" viewBox="0 0 24 24"><path d="M9 6 15 12 9 18Z"/></svg>
+              <div class="node"><span class="ni">⚙️</span><span class="nt">Deterministic QA</span><span class="nr">citations · consistency</span></div>
+              <svg class="arrowmini" viewBox="0 0 24 24"><path d="M9 6 15 12 9 18Z"/></svg>
+              <div class="node human"><span class="ni">👥</span><span class="nt">Four-eyes review</span><span class="nr">human</span></div>
+              <svg class="arrowmini" viewBox="0 0 24 24"><path d="M9 6 15 12 9 18Z"/></svg>
+              <div class="node human"><span class="ni">🖊️</span><span class="nt">Part 11 sign-off</span><span class="nr">human</span></div>
+              <svg class="arrowmini" viewBox="0 0 24 24"><path d="M9 6 15 12 9 18Z"/></svg>
+              <div class="node"><span class="ni">🛡️</span><span class="nt">Purview audit</span><span class="nr">immutable record</span></div>
+            </div>
+            <div class="split2">
+              <div class="sidecard hu">
+                <div class="sh2">Decisions a human owns</div>
+                <ul>
+                  <li><b>Ready for author review?</b> &mdash; lead medical writer</li>
+                  <li><b>Claims supported &amp; consistent?</b> &mdash; study author / reviewer</li>
+                  <li><b>Package defensible?</b> &mdash; Reg lead / QA</li>
+                  <li><b>Sign &amp; release?</b> &mdash; accountable signatory (QPPV / Reg)</li>
+                </ul>
+              </div>
+              <div class="sidecard ai">
+                <div class="sh2">New roles &amp; interfaces</div>
+                <ul>
+                  <li><b>Medical-Writing AI Editor</b> &mdash; curates grounded drafts</li>
+                  <li><b>AI Validation &amp; Evidence Steward</b> &mdash; owns the evidence pack &amp; checks</li>
+                  <li><b>Agent Security Administrator</b> &mdash; identity &amp; access for agents</li>
+                </ul>
+              </div>
+            </div>
+            <div class="legend"><span class="lg"><span class="sw ai"></span>AI accelerates</span><span class="lg"><span class="sw hu"></span>Human decides &amp; signs</span></div>
+          </div>
+        </section>
+
+        <!-- ================= SLIDE 10 — UC2 AUTHORING · C-SUITE ================= -->
+        <section class="slide">
+          <div class="slidehead">
+            <span class="eyebrow uc2">Use Case 2 · Authoring · C-Suite Relevance</span>
+            <h2 class="h">Governed authoring &mdash; <span class="accent">three executive lenses</span></h2>
+          </div>
+          <div class="execs3">
+            <div class="ex ceo">
+              <div class="exh"><div class="extag">CEO · Modernization · scalability</div><div class="exnm">Rob Davis</div><div class="exrl">Chairman &amp; CEO · co-sponsor Dave Williams (CIDO)</div></div>
+              <div class="exwhat">"Governed multicloud scale before the Keytruda LOE &mdash; with no disruptive migration."</div>
+              <div class="expts">
+                <div class="ept"><b>Keytruda LOE Dec 2028</b> &mdash; refill the pipeline; ~$3B savings target</div>
+                <div class="ept">Scale GenAI value that pilots leave stranded &mdash; only <b>~24% of firms</b> capture it</div>
+                <div class="ept"><b>No rip-and-replace</b> &mdash; a governance layer on tools already owned</div>
+              </div>
+            </div>
+            <div class="ex ops">
+              <div class="exh"><div class="extag">Business / Ops · Speed · reliability</div><div class="exnm">Dean Li</div><div class="exrl">President, Merck Research Labs</div></div>
+              <div class="exwhat">"Days off the submission critical path &mdash; defensibly, at launch scale."</div>
+              <div class="expts">
+                <div class="ept">Days saved across <b>Draft &rarr; Review &rarr; QC &rarr; Lock &rarr; Submit</b></div>
+                <div class="ept">Each day earlier ≈ <b>$1&ndash;3M</b> per product</div>
+                <div class="ept"><b>~20 launches</b> in the window · 30+ registrational oncology studies</div>
+              </div>
+            </div>
+            <div class="ex risk">
+              <div class="exh"><div class="extag">Risk / Compliance · Safety · trust</div><div class="exnm">Jennifer Zachary + Stelios Tsinontides</div><div class="exrl">EVP &amp; General Counsel · VP Global Quality</div></div>
+              <div class="exwhat">"Black box &rarr; glass box &mdash; source-linked, signed, immutable, audited."</div>
+              <div class="expts">
+                <div class="ept">Evidence is <b>source-linked, signed, immutable, audited</b>, identity-bound across clouds</div>
+                <div class="ept"><b>Annex 22 + Part 11 / ALCOA+</b> built in, not bolted on</div>
+                <div class="ept">A defensible <b>credibility framework</b> for FDA / EMA</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= SLIDE 11 — UC3 DEVIATION · WHAT IT IS ================= -->
+        <section class="slide">
+          <div class="slidehead">
+            <span class="eyebrow uc3">Use Case 3 · Manufacturing Quality (GxP) · What it is</span>
+            <h2 class="h">Gen-AI Deviation / Investigation Copilot</h2>
+          </div>
+          <div class="intro">
+            <div style="display:flex;flex-direction:column;min-height:0">
+              <p class="lead"><b>Inspection-ready by construction</b> &mdash; faster GMP investigations on Azure, without migrating the multi-cloud estate. The copilot drafts; a human signs; every step is audit-clean.</p>
+              <div class="icards">
+                <div class="icard"><div class="il">The problem</div><div class="ix">Investigations take <b>2&ndash;8 hours</b> of manual search; the <b>audit-credibility gate</b> blocks AI from regulated work; regulatory tail-risk runs <b>$10M&ndash;$100M+</b>.</div></div>
+                <div class="icard t2"><div class="il">What it does</div><div class="ix">Grounds on validated precedent (RAG), drafts the investigation, <b>blocks any ungrounded output</b>, routes four-eyes sign-off, writes an immutable audit trail.</div></div>
+                <div class="icard t3"><div class="il">The principle</div><div class="ix"><b>Federate, don&rsquo;t migrate</b> &mdash; read AWS S3 + eschbach + GCS in place via OneLake. The human owns every regulated call.</div></div>
+              </div>
+            </div>
+            <div class="glance">
+              <span class="gh">At a glance</span>
+              <div class="gkpis">
+                <div class="gkpi"><div class="gv">~30&ndash;50% faster</div><div class="gk">deviation / investigation closure (pilot-gated)</div></div>
+                <div class="gkpi k2"><div class="gv">~70% fewer</div><div class="gk">batch-record errors · ~50% fewer CSR errors</div></div>
+                <div class="gkpi k3"><div class="gv">$10M&ndash;$100M+</div><div class="gk">regulatory tail-risk actively managed</div></div>
+              </div>
+              <span class="gh">Azure components</span>
+              <div class="gtags">
+                <span class="gtag">Azure AI Search</span><span class="gtag">Azure OpenAI</span><span class="gtag">Content Safety</span><span class="gtag">Purview</span><span class="gtag">Entra Agent ID</span><span class="gtag">Azure Monitor</span><span class="gtag">OneLake</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= SLIDE 12 — UC3 DEVIATION · FUTURE STATE ================= -->
+        <section class="slide">
+          <div class="slidehead">
+            <span class="eyebrow uc3">Use Case 3 · Deviation · Future State</span>
+            <h2 class="h">Inspection-ready by construction &mdash; <span class="accent">over the multi-cloud estate</span></h2>
+          </div>
+          <div class="grow" style="justify-content:flex-start; gap:.2em">
+            <div class="uxband">Deviation Copilot UI &mdash; M365 Copilot (Word) · existing QMS · Teams</div>
+            <div class="compgrid">
+              <div class="comp"><span class="cid">C1</span><span class="cnm">Azure AI Search</span><span class="cds">RAG over validated GxP precedent · hybrid + semantic + ACLs</span></div>
+              <div class="comp"><span class="cid">C2</span><span class="cnm">Azure OpenAI / Agent Service</span><span class="cds">drafting + four-eyes gate · pinned model/prompt/eval</span></div>
+              <div class="comp gate"><span class="cid">C3</span><span class="cnm">Content Safety + Groundedness</span><span class="cds">block-on-ungrounded gate</span></div>
+              <div class="comp gov2"><span class="cid">C4</span><span class="cnm">Purview + Compliance Manager</span><span class="cds">Part 11 / ALCOA+ / GAMP 5 + cross-cloud lineage</span></div>
+              <div class="comp gov2"><span class="cid">C5</span><span class="cnm">Entra ID + Agent ID</span><span class="cds">least privilege per action · Annex 22</span></div>
+              <div class="comp gov2"><span class="cid">C6</span><span class="cnm">Azure Monitor / Log Analytics</span><span class="cds">immutable audit trail</span></div>
+              <div class="comp"><span class="cid">C7</span><span class="cnm">AI Vision on Arc / IoT Ops</span><span class="cds">Phase 2 · shop-floor CV</span></div>
+              <div class="comp data2"><span class="cid">C8</span><span class="cnm">Fabric / OneLake</span><span class="cds">SSOT · shortcuts read S3 + eschbach + GCS in place</span></div>
+            </div>
+            <div class="agentband"><b>Agent 365</b> (cross-cutting) &mdash; register · identity-bind · Defender runtime · Purview DLP / audit · lifecycle</div>
+            <div class="retain"><span class="lab">Retained, not migrated:</span> AWS deviation management · eschbach Visual Factory (SSOT) · Google Cloud estate</div>
+            <div class="outcome">BB-2 inspection-ready auditability &middot; BB-1 faster, lower-cost investigations &middot; BB-3 federation without migration.</div>
+          </div>
+        </section>
+
+        <!-- ================= SLIDE 13 — UC3 DEVIATION · PERSONAS ================= -->
+        <section class="slide">
+          <div class="slidehead">
+            <span class="eyebrow uc3">Use Case 3 · Deviation · Persona-Driven Scenarios</span>
+            <h2 class="h">Ten roles, one daily loop &mdash; <span class="accent">the human owns every gate</span></h2>
+          </div>
+          <div class="grow" style="gap:.8em; justify-content:flex-start">
+            <div class="framing" style="font-size:.88em; padding:.7em 1.1em">
+              An AI copilot that assists the <span class="v persona">quality investigator</span> by synthesizing <span class="v data">prior deviations &amp; SOPs</span>, flagging <span class="v risks">ungrounded or unsupported root cause</span>, and recommending <span class="v actions">a cited, four-eyes-ready investigation</span>. The human owns every gate.
+            </div>
+            <div class="flowbanner">Initiate · Author · Approve · Release · Assure &mdash; AI drafts, humans decide</div>
+            <div class="swim">
+              <div class="node"><span class="ni">🏭</span><span class="nt">Initiators</span><span class="nr">Sofia · Operator<br>Lena · QC Analyst</span></div>
+              <svg class="arrowmini" viewBox="0 0 24 24"><path d="M9 6 15 12 9 18Z"/></svg>
+              <div class="node human"><span class="ni">🔎</span><span class="nt">Author</span><span class="nr">Maria · Quality Investigator</span></div>
+              <svg class="arrowmini" viewBox="0 0 24 24"><path d="M9 6 15 12 9 18Z"/></svg>
+              <div class="node"><span class="ni">🧠</span><span class="nt">SME input</span><span class="nr">Raj · MSAT / Process</span></div>
+              <svg class="arrowmini" viewBox="0 0 24 24"><path d="M9 6 15 12 9 18Z"/></svg>
+              <div class="node human"><span class="ni">✅</span><span class="nt">Approver</span><span class="nr">James · QA · four-eyes</span></div>
+              <svg class="arrowmini" viewBox="0 0 24 24"><path d="M9 6 15 12 9 18Z"/></svg>
+              <div class="node human"><span class="ni">⚖️</span><span class="nt">Release</span><span class="nr">Pierre · QP (EU)</span></div>
+              <svg class="arrowmini" viewBox="0 0 24 24"><path d="M9 6 15 12 9 18Z"/></svg>
+              <div class="node"><span class="ni">🔍</span><span class="nt">Assurance</span><span class="nr">Aisha · Auditor</span></div>
+            </div>
+            <div class="split2">
+              <div class="sidecard hu">
+                <div class="sh2">Decisions a human owns</div>
+                <ul>
+                  <li><b>Phase I lab-error</b> determination &mdash; Lena (QC)</li>
+                  <li><b>Investigation authorship</b> &amp; root cause &mdash; Maria</li>
+                  <li><b>Four-eyes approval</b> &mdash; James (QA)</li>
+                  <li><b>Batch certification &amp; release</b> &mdash; Pierre (QP)</li>
+                </ul>
+              </div>
+              <div class="sidecard ai">
+                <div class="sh2">New roles keeping the validated state</div>
+                <ul>
+                  <li><b>Tom</b> &mdash; CSV / Validation Engineer (GAMP 5)</li>
+                  <li><b>Nadia</b> &mdash; Document Controller / RAG Curator</li>
+                  <li><b>Daniel</b> &mdash; AI Platform Engineer / GxP-MLOps</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= SLIDE 14 — UC3 DEVIATION · C-SUITE ================= -->
+        <section class="slide">
+          <div class="slidehead">
+            <span class="eyebrow uc3">Use Case 3 · Deviation · C-Suite Relevance</span>
+            <h2 class="h">Same architecture (C1&ndash;C8), <span class="accent">three value stories</span></h2>
+          </div>
+          <div class="execs3">
+            <div class="ex ceo">
+              <div class="exh"><div class="extag">CEO · Strategy · executive sponsor</div><div class="exnm">Rob Davis</div><div class="exrl">Chairman &amp; CEO</div></div>
+              <div class="exwhat">"A credible, defensible way to scale AI fast enough to matter before the 2028 cliff."</div>
+              <div class="expts">
+                <div class="ept">Removing the audit gate (<b>BB-2</b>) is what lets <b>every</b> AI use case scale &mdash; R&amp;D, trials, quality</div>
+                <div class="ept">Protects <b>~$1&ndash;3M/day</b> earlier revenue per product (sibling trials use case)</div>
+                <div class="ept">Auditability is the <b>enabler tax</b> that keeps AI value from being clawed back</div>
+              </div>
+            </div>
+            <div class="ex ops">
+              <div class="exh"><div class="extag">Business / Ops · Economic buyer</div><div class="exnm">Dave Maraldo</div><div class="exrl">EVP Manufacturing · owns deviation-closure P&amp;L</div></div>
+              <div class="exwhat">"Faster deviation closure and more predictable release &mdash; with zero added audit risk."</div>
+              <div class="expts">
+                <div class="ept"><b>~30&ndash;50% faster</b> deviation closure (pilot-gated)</div>
+                <div class="ept"><b>~70% fewer</b> batch-record errors · ~50% fewer CSR errors</div>
+                <div class="ept">Speed and compliance are the <b>same path</b> &mdash; faster is also defensible</div>
+              </div>
+            </div>
+            <div class="ex risk">
+              <div class="exh"><div class="extag">Risk / Compliance · Win this gate first</div><div class="exnm">Stelios Tsinontides</div><div class="exrl">VP Global Quality · compliance veto</div></div>
+              <div class="exwhat">"Inspection-ready by construction &mdash; I can defend it to FDA / EMA."</div>
+              <div class="expts">
+                <div class="ept"><b>Grounded-only</b> output (C1 + C3) &mdash; eliminates the confident summary it can&rsquo;t source</div>
+                <div class="ept"><b>Four-eyes</b> as an enforced release precondition (C2); Annex 22 + agent identity (C5)</div>
+                <div class="ept"><b>Part 11 / ALCOA+</b> evidence + cross-cloud lineage (C4 / C6)</div>
+              </div>
+            </div>
+          </div>
+          <div class="vetonote">Also in the room: <b style="color:var(--ms-blue-dk)">CIO/CDO Dave Williams</b> (one governed platform; federate, don&rsquo;t migrate) &middot; <b style="color:var(--green-ink)">CFO Caroline Litchfield</b> (V5 migration avoided ✓ · V4 tail-risk managed). <b>Win the Quality gate first &mdash; it unblocks every other conversation.</b></div>
+        </section>
+
+        <!-- ================= SLIDE 15 — CLOSING ================= -->
+        <section class="slide closing">
+          <div class="closing-main">
+            <span class="eyebrow">The Ask · Land · Attach · Expand</span>
+            <h2>Three copilots. <span style="color:#9FE0EA">One governance spine.</span></h2>
+            <div class="twolines">
+              <div class="winline">
+                <span class="tagn">KEEP THE BETS</span>
+                <div>Keep every AI bet Merck has made &mdash; Google, AWS, GPTeal. We add the one layer none of them gives you: where a human <b>reviews, signs and defends</b> AI output, with an audit trail, identity-bound across clouds.</div>
+              </div>
+              <div class="winline">
+                <span class="tagn">WIN THE GATE</span>
+                <div><b>Land</b> narrow on one lighthouse workflow &rarr; <b>Attach</b> governance across clouds (Agent 365: Entra Agent ID + Purview) &rarr; <b>Expand</b> on proof. Win the Quality gate first &mdash; defensible by construction, not by retrofit.</div>
+              </div>
+            </div>
+          </div>
+          <div class="foot">
+            <div class="brand" style="display:flex;align-items:center;gap:10px;color:#fff"><span class="ms-logo" aria-hidden="true"><i></i><i></i><i></i><i></i></span><b>Microsoft</b></div>
+            <div>Discovery · Authoring · Deviation &mdash; refilling the pipeline before 2028, inspection-ready by design.</div>
+          </div>
+        </section>
+
+      </div>
+    </div>
+  </main>
+
+  <footer class="controls">
+    <div class="progress" id="progress"></div>
+    <button class="iconbtn" id="fs" title="Fullscreen (F)" aria-label="Toggle fullscreen"><svg viewBox="0 0 24 24"><path d="M4 9V4h5v2H6v3H4Zm11-5h5v5h-2V6h-3V4ZM4 15h2v3h3v2H4v-5Zm14 0h2v5h-5v-2h3v-3Z"/></svg></button>
+    <span class="hint">Use &larr; &rarr; · Space · F for fullscreen</span>
+    <div class="dots" id="dots" aria-label="Slide navigation"></div>
+    <button class="navbtn" id="prev" aria-label="Previous slide"><svg viewBox="0 0 24 24"><path d="M15 6 9 12l6 6V6Z"/></svg>Prev</button>
+    <button class="navbtn primary" id="next" aria-label="Next slide">Next<svg viewBox="0 0 24 24"><path d="m9 6 6 6-6 6V6Z"/></svg></button>
+  </footer>
+
+<script>
+  (function(){
+    var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+    var total = slides.length;
+    var i = 0;
+    var curEl = document.getElementById('cur');
+    var totEl = document.getElementById('tot');
+    var progress = document.getElementById('progress');
+    var dotsWrap = document.getElementById('dots');
+
+    totEl.textContent = String(total).padStart(2,'0');
+
+    // build dots
+    slides.forEach(function(_, k){
+      var b = document.createElement('button');
+      b.setAttribute('aria-label','Go to slide '+(k+1));
+      b.addEventListener('click', function(){ go(k); });
+      dotsWrap.appendChild(b);
+    });
+    var dots = Array.prototype.slice.call(dotsWrap.children);
+
+    function go(n){
+      n = Math.max(0, Math.min(total-1, n));
+      slides.forEach(function(s,k){
+        s.classList.toggle('active', k===n);
+        s.classList.toggle('past', k<n);
+      });
+      dots.forEach(function(d,k){ d.classList.toggle('on', k===n); });
+      i = n;
+      curEl.textContent = String(n+1).padStart(2,'0');
+      progress.style.width = ((n)/(total-1)*100) + '%';
+      if (history.replaceState) history.replaceState(null,'','#'+(n+1));
+    }
+
+    document.getElementById('next').addEventListener('click', function(){ go(i+1); });
+    document.getElementById('prev').addEventListener('click', function(){ go(i-1); });
+
+    document.addEventListener('keydown', function(e){
+      if (e.key==='ArrowRight' || e.key==='PageDown' || e.key===' '){ e.preventDefault(); go(i+1); }
+      else if (e.key==='ArrowLeft' || e.key==='PageUp'){ e.preventDefault(); go(i-1); }
+      else if (e.key==='Home'){ go(0); }
+      else if (e.key==='End'){ go(total-1); }
+      else if (e.key==='f' || e.key==='F'){ toggleFs(); }
+    });
+
+    // basic swipe
+    var sx=null;
+    document.addEventListener('touchstart', function(e){ sx = e.touches[0].clientX; }, {passive:true});
+    document.addEventListener('touchend', function(e){
+      if (sx===null) return;
+      var dx = e.changedTouches[0].clientX - sx;
+      if (Math.abs(dx)>50){ go(i + (dx<0?1:-1)); }
+      sx=null;
+    }, {passive:true});
+
+    function toggleFs(){
+      if (!document.fullscreenElement){ (document.documentElement.requestFullscreen||function(){})(); }
+      else if (document.exitFullscreen){ document.exitFullscreen(); }
+    }
+    document.getElementById('fs').addEventListener('click', toggleFs);
+
+    // open from hash
+    var start = parseInt((location.hash||'').replace('#',''),10);
+    go(isNaN(start) ? 0 : start-1);
+  })();
+</script>
+</body>
+</html>
