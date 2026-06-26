@@ -1,0 +1,62 @@
+{
+  "program": {
+    "title": "Next-Gen IO Antibody — PVRIG / CD112R",
+    "subtitle": "Refilling the pipeline after Keytruda",
+    "target": "PVRIG (CD112R)",
+    "alternateTarget": "CCR8",
+    "targetRefs": {
+      "uniprot": "Q6DKI7",
+      "ligand": "CD112 / Nectin-2 (Q92692)",
+      "pdb": "8X6B",
+      "axis": "DNAM-1 (CD226) / TIGIT"
+    },
+    "market": {
+      "drug": "Keytruda (pembrolizumab)",
+      "fy2024RevenueUsdB": 29.5,
+      "shareOfPharmaPct": 46,
+      "usLoeYear": 2028,
+      "citation": "Merck FY2024 results"
+    }
+  },
+  "speed": {
+    "traditionalYears": 6,
+    "acceleratedMonths": 18,
+    "speedMultiplier": 4,
+    "yearsSaved": 4.5
+  },
+  "funnel": { "generated": 240, "advanced": 7 },
+  "references": [
+    { "label": "PVRIG / CD112R — UniProt Q6DKI7", "url": "https://www.uniprot.org/uniprotkb/Q6DKI7" },
+    { "label": "CD112 / Nectin-2 ligand — UniProt Q92692", "url": "https://www.uniprot.org/uniprotkb/Q92692" },
+    { "label": "PVRIG·Nectin-2 complex — PDB 8X6B (X-ray 2.0 Å)", "url": "https://www.rcsb.org/structure/8X6B" },
+    { "label": "COM701 anti-PVRIG Phase 1 — NCT03667716", "url": "https://clinicaltrials.gov/study/NCT03667716" },
+    { "label": "Merck FY2024 results (Keytruda revenue & US LOE)", "url": "https://www.merck.com/news/merck-announces-fourth-quarter-and-full-year-2024-financial-results/" }
+  ],
+  "stages": [
+    { "id": 1, "key": "target-id", "label": "Target ID", "icon": "🎯",
+      "traditional": "6–12 mo", "accelerated": "6 min", "animationMs": 2400, "real": true,
+      "headline": "Validate PVRIG as the next-gen checkpoint",
+      "methods": ["Azure OpenAI (gpt-4o · JSON mode)", "curated evidence retrieval"],
+      "dataSources": ["UniProt Q6DKI7", "PDB 8X6B", "ClinicalTrials NCT03667716"] },
+    { "id": 2, "key": "gen-design", "label": "Gen design", "icon": "🧬",
+      "traditional": "12–18 mo", "accelerated": "2 hr", "animationMs": 2600, "real": false,
+      "headline": "240 candidate antibody sequences generated",
+      "methods": ["IgLM / RFantibody (de novo VH/VL)", "germline-guided sampling"],
+      "dataSources": ["OAS antibody repertoires", "IMGT germline reference"] },
+    { "id": 3, "key": "structure", "label": "Structure & binding", "icon": "🔬",
+      "traditional": "6–9 mo", "accelerated": "45 min", "animationMs": 2400, "real": false,
+      "headline": "Predicted antibody–antigen interfaces",
+      "methods": ["AlphaFold-Multimer", "IgFold", "Rosetta / FoldX ΔG"],
+      "dataSources": ["PDB 8X6B template"] },
+    { "id": 4, "key": "triage", "label": "In-silico triage", "icon": "⚖️",
+      "traditional": "weeks", "accelerated": "90 min", "animationMs": 2200, "real": false,
+      "headline": "Developability + manufacturability narrows 240 → 7",
+      "methods": ["Therapeutic Antibody Profiler (TAP)", "Aggrescan3D", "NetMHCII / IEDB"],
+      "dataSources": ["IEDB immunogenicity sets", "developability rule-sets"] },
+    { "id": 5, "key": "rank", "label": "Rank → human gate", "icon": "👥",
+      "traditional": "weeks", "accelerated": "8 min", "animationMs": 2600, "real": true,
+      "headline": "Ranked shortlist for the four-eyes gate",
+      "methods": ["Azure OpenAI (gpt-4o · JSON mode)", "multi-objective weighting"],
+      "dataSources": ["Stage 1–4 predicted metrics"] }
+  ]
+}

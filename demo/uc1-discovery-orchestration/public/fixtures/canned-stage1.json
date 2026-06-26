@@ -1,0 +1,36 @@
+{
+  "stage": 1,
+  "latencyMs": 0,
+  "target": {
+    "name": "PVRIG (CD112R)",
+    "mechanism": "Inhibitory receptor on T and NK cells that binds CD112 (Nectin-2) and competes with the activating receptor DNAM-1 (CD226). Blocking PVRIG releases the CD226 brake and restores cytotoxic anti-tumor activity, complementary to PD-1 and to TIGIT blockade in the same nectin/PVR axis.",
+    "evidence": [
+      "PVRIG / CD112R (UniProt Q6DKI7) is an emerging next-generation checkpoint with no failed Merck program attached.",
+      "Structurally validated: PVRIG·Nectin-2 complex solved by X-ray at 2.0 Å (PDB 8X6B).",
+      "Clinically explored by COM701 (anti-PVRIG) ± nivolumab in Phase 1 (NCT03667716), validating target relevance and combinability."
+    ],
+    "citations": [
+      { "label": "PVRIG / CD112R — UniProt Q6DKI7", "url": "https://www.uniprot.org/uniprotkb/Q6DKI7" },
+      { "label": "PVRIG·Nectin-2 — PDB 8X6B", "url": "https://www.rcsb.org/structure/8X6B" },
+      { "label": "COM701 Phase 1 — NCT03667716", "url": "https://clinicaltrials.gov/study/NCT03667716" }
+    ],
+    "confidence": 0.78,
+    "recommendation": "go",
+    "recommendationText": "Advance PVRIG as the lead next-gen IO target; structure-enabled antibody design recommended."
+  },
+  "provenance": {
+    "model": "gpt-4o",
+    "deployment": "merck-uc1-gpt4o",
+    "apiVersion": "2024-10-21",
+    "promptTemplate": "target-id@v1.3",
+    "promptHash": "sha256:7f3a1c9e22b40d18",
+    "temperature": 0.2,
+    "seed": 7,
+    "tokens": { "prompt": 1180, "completion": 372, "total": 1552 },
+    "latencyMs": 2143,
+    "requestId": "f1e2a3b4-0000-4a5b-8c6d-7e8f90123456",
+    "timestamp": "2026-06-26T12:00:00.000Z",
+    "grounding": "retrieval over curated PVRIG evidence pack",
+    "mode": "simulated"
+  }
+}
