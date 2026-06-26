@@ -12,7 +12,8 @@ const run = {
   targetResult: null,
   rankResult: null,
   gate: { reviewer: null, approver: null },
-  trace: []
+  trace: [],
+  audit: []
 };
 
 const $ = (sel) => document.querySelector(sel);
@@ -37,6 +38,7 @@ async function init() {
   $('#funnel-value').textContent = `${scenario.funnel.generated} → ${scenario.funnel.advanced}`;
 
   renderPipeline();
+  renderSources();
   wireControls();
 }
 
@@ -52,6 +54,30 @@ function renderPipeline() {
     </article>`;
   }).join('');
   $('#pipeline').innerHTML = html;
+}
+
+function renderSources() {
+  const refs = run.scenario.references || [];
+  $('#sources-list').innerHTML = refs.map((r) =>
+    `<li><a href="${esc(r.url)}" target="_blank" rel="noopener noreferrer">${esc(r.label)}</a></li>`
+  ).join('');
+}
+
+function renderProvenance(sel, res) {
+  const el = $(sel);
+  if (!el) return;
+  const p = res && res.provenance;
+  if (!p) { el.innerHTML = ''; return; }
+  const items = [
+    ['model', p.model],
+    ['api', p.apiVersion],
+    ['prompt', p.promptTemplate],
+    ['tokens', p.tokens ? p.tokens.total : '—'],
+    ['latency', `${p.latencyMs != null ? p.latencyMs : (res.latencyMs ?? '—')} ms`],
+    ['req', String(p.requestId || '').slice(0, 8)],
+    ['mode', p.mode || res.mode]
+  ];
+  el.innerHTML = items.map(([k, v]) => `<span class="prov-item"><b>${esc(k)}</b>${esc(v)}</span>`).join('');
 }
 
 function wireControls() {
@@ -78,6 +104,29 @@ function addTrace(msg) {
   const li = document.createElement('li');
   li.textContent = msg;
   $('#trace').appendChild(li);
+}
+
+async function sha256Hex(str) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, '0')).join('');
+}
+
+async function addAudit(actor, role, action, reason) {
+  const prevHash = run.audit.length ? run.audit[run.audit.length - 1].hash : 'GENESIS';
+  const entry = { actor, role, action, reason: reason || '', ts: new Date().toISOString() };
+  entry.hash = await sha256Hex(prevHash + JSON.stringify(entry));
+  run.audit.push(entry);
+  renderAudit();
+}
+
+function renderAudit() {
+  const el = $('#audit');
+  el.hidden = false;
+  el.innerHTML = `<h3>Audit trail <small>21 CFR Part 11 · EU GMP Annex 11 · ALCOA+ · hash-chained</small></h3>` +
+    `<ol class="audit-list">` + run.audit.map((e) =>
+      `<li><span class="ts">${esc(e.ts)}</span> <b>${esc(e.actor)}</b> <span class="role">(${esc(e.role)})</span> — ${esc(e.action)}` +
+      `${e.reason ? ` · <em>${esc(e.reason)}</em>` : ''} <code class="hash">${esc(e.hash.slice(0, 12))}</code></li>`
+    ).join('') + `</ol>`;
 }
 
 function startClock() {
@@ -129,6 +178,7 @@ async function startRun() {
       markMode(res);
       run.targetResult = res;
       $('#payload-stage1').textContent = JSON.stringify(res, null, 2);
+      renderProvenance('#prov-stage1', res);
       setStage(stage.id, 'done', `Target validated: ${esc(res.target.name)} — ${esc(String(res.target.recommendation).toUpperCase())}`);
     } else if (stage.id === 5) {
       const res = await runStage('/api/rank', {
@@ -138,6 +188,7 @@ async function startRun() {
       markMode(res);
       run.rankResult = res;
       $('#payload-stage5').textContent = JSON.stringify(res, null, 2);
+      renderProvenance('#prov-stage5', res);
       setStage(stage.id, 'done', `Ranked ${res.ranking.length} candidates — awaiting human gate`);
       await sleep(400);
       openGate();   // defined in Task 8
@@ -154,13 +205,41 @@ async function startRun() {
 
 function candidateById(id) { return run.candidates.find((c) => c.id === id); }
 
+function metricChips(c) {
+  const m = c.metrics || {};
+  const chips = [];
+  if (m.kdNm != null) chips.push(`KD ${esc(m.kdNm)} nM`);
+  if (m.tmC != null) chips.push(`Tm ${esc(m.tmC)}°C`);
+  if (m.hmwPct != null) chips.push(`%HMW ${esc(m.hmwPct)}`);
+  if (m.immunogenicity) chips.push(`immuno ${esc(m.immunogenicity.score)}`);
+  return chips.map((t) => `<span class="chip">${t}</span>`).join('');
+}
+
+function liabilityBadges(c) {
+  const ls = c.liabilities || [];
+  if (!ls.length) return `<span class="liability clean">no flagged liabilities</span>`;
+  return ls.map((l) =>
+    `<span class="liability ${esc(l.severity)}">${esc(l.type)} · ${esc(l.region)} ${esc(l.motif)}@${esc(l.pos)}</span>`
+  ).join('');
+}
+
 function shortlistHtml() {
   return `<div class="shortlist">` + run.rankResult.ranking
     .slice().sort((a, b) => a.rank - b.rank).map((r) => {
-      const c = candidateById(r.id) || { name: r.id, kdNm: '—' };
-      return `<div class="row"><span class="rank">#${r.rank}</span>
-        <span><strong>${esc(c.name)}</strong> — ${esc(r.rationale)}</span>
-        <span class="kd">KD ${esc(c.kdNm)} nM</span></div>`;
+      const c = candidateById(r.id) || { name: r.id, metrics: {}, germline: {} };
+      const g = c.germline || {};
+      const m = c.metrics || {};
+      return `<div class="row">
+        <span class="rank">#${r.rank}</span>
+        <div class="cand">
+          <div class="cand-head"><strong>${esc(c.name)}</strong><span class="fmt">${esc(c.format || '')}</span></div>
+          <div class="cand-meta">germline ${esc(g.vh || '—')}/${esc(g.jh || '—')} · CDR-H3 <code>${esc(c.cdrh3 || '—')}</code></div>
+          <div class="chips">${metricChips(c)}</div>
+          <div class="liabilities">${liabilityBadges(c)}</div>
+          <div class="rationale">${esc(r.rationale)}</div>
+        </div>
+        <span class="kd">KD ${esc(m.kdNm != null ? m.kdNm : '—')} nM</span>
+      </div>`;
     }).join('') + `</div>`;
 }
 
@@ -184,9 +263,10 @@ function renderReviewerStep() {
   $('#reviewer-sendback').addEventListener('click', () => onSendBack('Reviewer'));
 }
 
-function onReviewerRecommend() {
+async function onReviewerRecommend() {
   run.gate.reviewer = 'recommend';
   addTrace('Reviewer (Dr. A. Rao): recommended advancing the shortlist.');
+  await addAudit('Dr. A. Rao', 'Reviewer', 'recommended advancing the shortlist', '');
   renderApproverStep();
 }
 
@@ -203,7 +283,7 @@ function renderApproverStep() {
   $('#approver-sendback').addEventListener('click', () => onSendBack('Approver'));
 }
 
-function onSendBack(role) {
+async function onSendBack(role) {
   // Simulated alternate re-rank — demonstrates a real human veto WITHOUT a 3rd real Azure call.
   run.gate = { reviewer: null, approver: null };
   const ranking = run.rankResult.ranking.slice().sort((a, b) => a.rank - b.rank);
@@ -218,13 +298,16 @@ function onSendBack(role) {
   };
   markMode(run.rankResult);
   $('#payload-stage5').textContent = JSON.stringify(run.rankResult, null, 2);
+  renderProvenance('#prov-stage5', run.rankResult);
   addTrace(`${role}: sent back — simulated alternate re-rank applied (no additional Azure call).`);
+  await addAudit(role === 'Reviewer' ? 'Dr. A. Rao' : 'Dr. M. Chen', role, 'sent back for reconsideration', 'simulated alternate re-rank');
   renderReviewerStep();
 }
 
-function onApproverApprove() {
+async function onApproverApprove() {
   run.gate.approver = 'approve';
   addTrace('Approver (Dr. M. Chen): approved → candidates released to wet-lab. Decision traced (21 CFR Part 11 · EU GMP Annex 11).');
+  await addAudit('Dr. M. Chen', 'Approver', 'approved → released to wet-lab', '');
   stopClock();
   setStatus('approved');
   showSummary();
