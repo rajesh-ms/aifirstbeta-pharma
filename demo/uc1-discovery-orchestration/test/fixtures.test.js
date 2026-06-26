@@ -46,3 +46,16 @@ test('canned-stage5 matches the /api/rank success body and references real candi
   }
   assert.equal(typeof s5.overallRecommendation, 'string');
 });
+
+test('no fixture or UI source contains the bogus reg ref "Annex 22"', async () => {
+  const files = [
+    '../public/index.html',
+    '../public/js/app.js',
+    '../public/fixtures/canned-stage5.json',
+    '../README.md'
+  ];
+  for (const f of files) {
+    const text = await readFile(new URL(f, import.meta.url), 'utf8');
+    assert.ok(!/Annex 22/.test(text), `${f} still contains "Annex 22"`);
+  }
+});

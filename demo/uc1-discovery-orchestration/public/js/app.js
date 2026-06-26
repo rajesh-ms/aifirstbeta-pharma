@@ -173,7 +173,7 @@ function renderReviewerStep() {
   $('#gate').hidden = false;
   $('#gate').innerHTML = `
     <h2>Human gate — Step 1 of 2 · Reviewer</h2>
-    <p class="gate-step">Four-eyes control (Annex 22): the Reviewer recommends; a separate Approver must confirm before any wet-lab commitment.</p>
+    <p class="gate-step">Four-eyes control (21 CFR Part 11 · EU GMP Annex 11): the Reviewer recommends; a separate Approver must confirm before any wet-lab commitment.</p>
     ${shortlistHtml()}
     <p class="gate-step"><em>${esc(run.rankResult.overallRecommendation)}</em></p>
     <div class="gate-actions">
@@ -224,7 +224,7 @@ function onSendBack(role) {
 
 function onApproverApprove() {
   run.gate.approver = 'approve';
-  addTrace('Approver (Dr. M. Chen): approved → candidates released to wet-lab. Decision traced (Annex 22 / Part 11).');
+  addTrace('Approver (Dr. M. Chen): approved → candidates released to wet-lab. Decision traced (21 CFR Part 11 · EU GMP Annex 11).');
   stopClock();
   setStatus('approved');
   showSummary();
@@ -243,7 +243,7 @@ function showSummary() {
     <div class="summary-grid">
       <div><span>Speed to clinic</span><b>${sp.speedMultiplier}× faster</b>${sp.yearsSaved} yrs saved</div>
       <div><span>Candidates advanced</span><b>${run.scenario.funnel.advanced}</b>from ${run.scenario.funnel.generated} generated</div>
-      <div><span>Decisions traced</span><b>100%</b>two-person gate · Annex 22</div>
+      <div><span>Decisions traced</span><b>100%</b>two-person gate · Part 11 / Annex 11</div>
     </div>
     <p>Lead candidate <strong>${esc(topName)}</strong> released to wet-lab — the scientist owns the call.</p>`;
   $('#run-btn').hidden = true;
