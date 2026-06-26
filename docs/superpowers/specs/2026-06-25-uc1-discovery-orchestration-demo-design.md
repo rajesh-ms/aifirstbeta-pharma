@@ -38,7 +38,7 @@ A viewer should walk away convinced that:
 
 ## 3. Scenario
 
-**Designing a next-generation immuno-oncology antibody against an emerging checkpoint target (TIGIT, with LAG-3 as an alternate) to refill the pipeline after Keytruda** — itself an anti-PD-1 antibody. This is the demo's concrete, credible storyline and grounds the LLM prompts, the candidate data, and the narrative.
+**Designing a next-generation immuno-oncology antibody against an emerging checkpoint target (PVRIG / CD112R, with CCR8 as an alternate) to refill the pipeline after Keytruda** — itself an anti-PD-1 antibody. PVRIG is a genuinely next-generation target on the DNAM-1 axis (clinically validated by COM701, with no failed Merck program attached). This is the demo's concrete, credible storyline and grounds the LLM prompts, the candidate data, and the narrative.
 
 ---
 
@@ -64,11 +64,11 @@ Both use low temperature and request structured JSON for demo determinism. Env v
 
 ### 5.1 `POST /api/target-id` — Stage 1 (Target ID & validation)
 - **Input:** program context — disease area (immuno-oncology), intent ("refill the pipeline after Keytruda"), optional target hint.
-- **Output (JSON):** validated target (e.g., TIGIT), mechanism of action, 3–5 evidence bullets, a confidence score, and a **human-framed go/no-go recommendation**.
+- **Output (JSON):** validated target (e.g., PVRIG / CD112R), mechanism of action, 3–5 evidence bullets, a confidence score, and a **human-framed go/no-go recommendation**.
 - **Role in demo:** sets a credible "this is real, grounded AI" tone up front; feeds the Stage 1 card and the opening narrative.
 
 ### 5.2 `POST /api/rank` — Stage 5 (Rank → human gate)
-- **Input:** the simulated shortlist of surviving candidates with computed properties (affinity/KD, developability, tox flags, docking score).
+- **Input:** the simulated shortlist of surviving candidates with computed properties (affinity/KD, developability, tox flags, antibody–antigen interface score).
 - **Output (JSON):** a ranked ordering with a **per-candidate rationale** and an **overall recommendation** for the four-eyes human gate.
 - **Role in demo:** the dramatic climax — the ranked shortlist a human approves. Reinforces "AI recommends, human decides."
 
@@ -78,12 +78,12 @@ The **Technical lens** exposes the raw request/response payloads for both calls.
 
 ## 6. Simulated data & scientific content (`fixtures/`)
 
-- **`scenario-tigit.json`** — target, program metadata, and the **traditional-vs-AI timing table** that is the single source of truth for the speed band, the discovery clock, and the per-stage time stamps.
+- **`scenario-pvrig.json`** — target, program metadata, and the **traditional-vs-AI timing table** that is the single source of truth for the speed band, the discovery clock, and the per-stage time stamps.
 - **Stages 2–4 scripted content:**
-  - Stage 2 (generative design): ~240 candidate antibody scaffolds/sequences (RFdiffusion/IgLM/Protillion/Variational framing).
-  - Stage 3 (structure & docking): mock AlphaFold3 / ABodyBuilder structures + docking scores.
-  - Stage 4 (in-silico triage): synthesizability + toxicity filters (Azure Quantum Elements framing) narrowing 240 → **7 advance**.
-- **`candidates.json`** — candidate objects: id, sequence snippet, predicted affinity (KD), developability score, tox flags, docking score — enough for the Stage 5 ranking to read as real.
+  - Stage 2 (generative design): ~240 candidate antibody scaffolds/sequences (RFdiffusion/IgLM/Protillion framing).
+  - Stage 3 (structure & binding): mock AlphaFold3 / ABodyBuilder structures + antibody–antigen interface scores (e.g., AlphaFold-Multimer ipTM / HADDOCK).
+  - Stage 4 (in-silico triage): developability + manufacturability + toxicity filters — aggregation propensity, thermal stability, immunogenicity risk, sequence liabilities (Azure Quantum Elements framing) — narrowing 240 → **7 advance**.
+- **`candidates.json`** — candidate objects: id, sequence snippet, predicted affinity (KD), developability score, tox flags, antibody–antigen interface score — enough for the Stage 5 ranking to read as real.
 - **`canned-stage1.json` / `canned-stage5.json`** — realistic fallback responses matching the real-call output schema, used when no Azure key is present.
 
 ---
@@ -91,11 +91,11 @@ The **Technical lens** exposes the raw request/response payloads for both calls.
 ## 7. UI design (Layout A — lens-toggle command center, speed-led)
 
 - **Top bar:** program title + scenario subtitle, the **Executive ⇄ Technical** lens toggle, and a live **discovery clock** (elapsed time, ticking through the run).
-- **Hero speed band (Executive lens):** a faded "Traditional discovery → clinic: 4–6 years" track with a bright "AI-orchestrated: ~14 months" bar overlaid, headlined **≈ 4× faster · ~4.5 yrs saved**.
-- **Pipeline row:** the five stages (🎯 Target ID → 🧬 Gen design → 🔬 Structure & docking → ⚖️ In-silico triage → 👥 Rank → human gate), each showing a **traditional → AI-accelerated time stamp** (e.g., Target ID *6–12 mo → 6 min*; Triage *weeks → 90 min*). Stages 1 & 5 carry a **"REAL · Azure OpenAI"** badge.
+- **Hero speed band (Executive lens):** a faded "Traditional discovery → clinic: 4–6 years" track with a bright "AI-orchestrated: ~18 months" bar overlaid, headlined **4× faster · 4.5 yrs saved** (anchored on a 6-year baseline → 18 months).
+- **Pipeline row:** the five stages (🎯 Target ID → 🧬 Gen design → 🔬 Structure & binding → ⚖️ In-silico triage → 👥 Rank → human gate), each showing a **traditional → AI-accelerated time stamp** (e.g., Target ID *6–12 mo → 6 min*; Triage *weeks → 90 min*). Stages 1 & 5 carry a **"REAL · Azure OpenAI"** badge.
 - **Supporting meters (Executive lens):** validated candidates this cycle (240→7 funnel), revenue exposure addressed (~46% · $29.5B at the Keytruda LOE), and decisions traced (100% · Annex 22 · Part 11 / ALCOA+).
-- **Human gate card:** "Approve the ranked shortlist (four-eyes · Annex 22)" with **Approve** and **Send back** actions.
-- **Technical lens (toggle):** replaces the meters/hero region with the **architecture planes** (Orchestration · Foundation models · Compute · Data · Governance), per-stage **agent traces**, the A2A/MCP calls, **Entra Agent ID + Purview lineage** badges, and the two real request/response payloads. Lens toggle shares run state at any time.
+- **Human gate card (two-step four-eyes · Annex 22):** **Step 1 — Reviewer** examines the ranked shortlist + rationale and **Recommends** (or **Sends back**); **Step 2 — a separate Approver** gives the final **Approve** (or **Sends back**). Both roles' identities are stamped into the trace, satisfying dual control.
+- **Technical lens (toggle):** replaces the meters/hero region with the **architecture planes** (Orchestration · Foundation models · Compute · Data · Governance), per-stage **agent traces**, the A2A/MCP calls, **Entra Agent ID + Purview lineage** badges — all **simulated/illustrative** demo artifacts — and the two **real** Stage 1 & Stage 5 request/response payloads. Lens toggle shares run state at any time.
 
 ---
 
@@ -104,9 +104,9 @@ The **Technical lens** exposes the raw request/response payloads for both calls.
 1. Presenter clicks **Run discovery**.
 2. The engine steps through stages with animated delays; the **discovery clock ticks**, each completed stage stamps its time-saved, and the meters animate (candidate funnel narrows, the time-to-clinic bar visibly compresses).
 3. Stages 1 and 5 call the backend (or fall back to canned JSON); a spinner shows while awaiting.
-4. At Stage 5 the pipeline **pauses at the human gate**. The ranked shortlist + rationale (from the real call) is presented.
-5. **Approve** → "approved candidates → wet-lab (the scientist owns the call)" + a final summary (≈4× faster, N candidates advanced, 100% traced). **Send back** demonstrates a real human veto and re-runs the rank.
-6. **Speed is data-driven:** the hero band, clock, and per-stage stamps all read from the one timing table in `scenario-tigit.json`, so the speed story is internally consistent.
+4. At Stage 5 the pipeline **pauses at the two-step human gate**. The ranked shortlist + rationale (from the real call) is presented to the **Reviewer**, who recommends; a **separate Approver** then confirms.
+5. **Approve** (the Approver role) → "approved candidates → wet-lab (the scientist owns the call)" + a final summary (4× faster, N candidates advanced, 100% traced). **Send back** (available to either role) demonstrates a real human veto and re-runs the rank from a canned alternate ranking (simulated, so the run keeps exactly two real Azure calls).
+6. **Speed is data-driven:** the hero band, clock, and per-stage stamps all read from the one timing table in `scenario-pvrig.json`, so the speed story is internally consistent.
 
 ---
 
@@ -125,7 +125,7 @@ demo/uc1-discovery-orchestration/
     js/app.js            # pipeline engine, lens toggle, gate, meters, clock
     js/azure.js          # client calls to /api with canned fallback
   fixtures/
-    scenario-tigit.json
+    scenario-pvrig.json
     candidates.json
     canned-stage1.json
     canned-stage5.json
@@ -159,14 +159,14 @@ Grounded in `UC1-Discovery-Outcomes-Citations.md` and the source deck:
 - **12–18 months to clinic vs 4–6 year norm** — an **industry benchmark, illustrative**, not a guaranteed Merck result.
 - **More validated candidates per cycle** — supported by the 173-AI-programs / higher Phase I success data.
 - **~46% revenue exposure** — Keytruda = $29.5B of $64.2B 2024 sales; US patent expires Dec 2028. "Addressed/protected" = the exposure the use case targets, not a measured result.
-- **Annex 22 / Part 11 / ALCOA+** — GenAI prohibited for critical GxP decisions; human-in-the-loop mandatory.
+- **Annex 22 / Part 11 / ALCOA+** — GenAI prohibited for critical GxP decisions; human-in-the-loop mandatory. *(EU GMP Annex 22 is in draft, 7 Jul 2025; final expected ~2026, enforcement ~2027–28.)*
 
-**Claims-integrity rule for the demo:** the on-screen speed figures (e.g., "6 min," "≈4× faster," "~14 months") are **illustrative demo values grounded in the published benchmark**, not guaranteed outcomes. The app labels them as illustrative so the demo informs without overclaiming — consistent with the deck's *Assumptions vs Facts vs Must-Validate* ethos.
+**Claims-integrity rule for the demo:** the on-screen speed figures (e.g., "6 min," "4× faster," "~18 months") are **illustrative demo values grounded in the published benchmark**, not guaranteed outcomes. The app labels them as illustrative so the demo informs without overclaiming — consistent with the deck's *Assumptions vs Facts vs Must-Validate* ethos.
 
 ---
 
 ## 13. Open items to confirm during implementation
 
 - Exact Azure OpenAI deployment/model name available to the presenter (set in `.env`).
-- Final per-stage illustrative timings (tunable in `scenario-tigit.json`).
-- Whether to surface a small "scenario picker" (TIGIT ↔ LAG-3) or hard-code TIGIT for v1 (default: hard-code TIGIT, keep the data structured so a picker is a later add).
+- Final per-stage illustrative timings (tunable in `scenario-pvrig.json`).
+- Whether to surface a small "scenario picker" (PVRIG ↔ CCR8) or hard-code PVRIG for v1 (default: hard-code PVRIG, keep the data structured so a picker is a later add).
