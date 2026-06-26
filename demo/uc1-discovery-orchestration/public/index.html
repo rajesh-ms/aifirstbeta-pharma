@@ -63,13 +63,22 @@
         <ol id="trace" class="trace"></ol>
       </div>
       <div class="payloads">
-        <div><h4>Stage 1 — /api/target-id</h4><pre id="payload-stage1">—</pre></div>
-        <div><h4>Stage 5 — /api/rank</h4><pre id="payload-stage5">—</pre></div>
+        <div><h4>Stage 1 — /api/target-id</h4><div id="prov-stage1" class="prov"></div><pre id="payload-stage1">—</pre></div>
+        <div><h4>Stage 5 — /api/rank</h4><div id="prov-stage5" class="prov"></div><pre id="payload-stage5">—</pre></div>
       </div>
+    </section>
+
+    <!-- Sources & evidence (visible in both lenses) -->
+    <section id="sources" class="sources" aria-label="Sources and evidence">
+      <h3>Sources &amp; evidence <small>curated &amp; verified — not model-generated</small></h3>
+      <ul id="sources-list" class="sources-list"></ul>
     </section>
 
     <!-- Human gate -->
     <section id="gate" class="gate" hidden></section>
+
+    <!-- Tamper-evident audit trail -->
+    <section id="audit" class="audit" hidden></section>
 
     <!-- Final summary -->
     <section id="summary" class="summary" hidden></section>
