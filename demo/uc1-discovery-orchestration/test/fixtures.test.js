@@ -44,7 +44,7 @@ test('canned-stage1 matches the /api/target-id body and carries citations + simu
   assert.equal(typeof s1.provenance.tokens.total, 'number');
 });
 
-test('canned-stage5 matches the /api/rank success body and references real candidate ids', async () => {
+test('canned-stage5 matches the /api/rank body with per-entry scores, citations + provenance', async () => {
   const s5 = await load('canned-stage5.json');
   const { candidates } = await load('candidates.json');
   const ids = new Set(candidates.map(c => c.id));
@@ -55,8 +55,13 @@ test('canned-stage5 matches the /api/rank success body and references real candi
   for (const r of s5.ranking) {
     assert.ok(ids.has(r.id), `ranking references unknown id ${r.id}`);
     assert.equal(typeof r.rationale, 'string');
+    assert.equal(typeof r.scores.affinity, 'number');
+    assert.equal(typeof r.method, 'string');
   }
   assert.equal(typeof s5.overallRecommendation, 'string');
+  assert.ok(Array.isArray(s5.citations) && s5.citations.length >= 1);
+  assert.equal(s5.provenance.mode, 'simulated');
+  assert.equal(typeof s5.provenance.tokens.total, 'number');
 });
 
 test('no fixture or UI source contains the bogus reg ref "Annex 22"', async () => {
