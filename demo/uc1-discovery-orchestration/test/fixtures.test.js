@@ -59,3 +59,22 @@ test('no fixture or UI source contains the bogus reg ref "Annex 22"', async () =
     assert.ok(!/Annex 22/.test(text), `${f} still contains "Annex 22"`);
   }
 });
+
+test('scenario has verified targetRefs, cited market, per-stage methods, and references', async () => {
+  const s = await load('scenario-pvrig.json');
+  assert.equal(s.program.targetRefs.uniprot, 'Q6DKI7');
+  assert.equal(s.program.targetRefs.pdb, '8X6B');
+  assert.equal(s.program.market.usLoeYear, 2028);
+  assert.equal(s.program.market.fy2024RevenueUsdB, 29.5);
+  for (const stage of s.stages) {
+    assert.ok(Array.isArray(stage.methods) && stage.methods.length >= 1, `stage ${stage.id} methods`);
+    assert.ok(Array.isArray(stage.dataSources) && stage.dataSources.length >= 1, `stage ${stage.id} dataSources`);
+  }
+  assert.ok(Array.isArray(s.references) && s.references.length >= 5);
+  for (const r of s.references) {
+    assert.equal(typeof r.label, 'string');
+    assert.match(r.url, /^https:\/\//);
+  }
+  assert.ok(s.references.some(r => /Q6DKI7/.test(r.url)));
+  assert.ok(s.references.some(r => /NCT03667716/.test(r.url)));
+});
