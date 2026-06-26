@@ -1,0 +1,624 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Accelerating Discovery, Safely — UC1 Win Deck · Merck (MSD) × Microsoft</title>
+<meta name="description" content="A de-risked, governed AI-first program for Multi-Step Discovery Orchestration (UC1). Pressure, proof, and a gated 5-phase program — engineered to win a full commitment, safely." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+:root{
+  --green-900:#0b3526; --green-800:#0e3b2c; --green-700:#13503b; --green-600:#1b6a4b;
+  --teal-700:#0f766e; --teal-600:#0d8a80; --olive-600:#5f7d33;
+  --gold-500:#d8a431; --gold-600:#c2871d;
+  --ink:#16241d; --muted:#5c6b62; --line:#e3e8e2;
+  --surface:#f6f8f4; --sage-50:#eef3ea; --card:#ffffff;
+  --font-display:"Fraunces","Georgia",serif;
+  --font-sans:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{
+  background:#0a2c20;
+  color:var(--ink);
+  font-family:var(--font-sans);
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+  overflow:hidden;
+}
+#viewport{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(120% 120% at 50% -10%, #0e3b2c 0%, #0a2c20 60%, #082018 100%);}
+#stage{position:relative;width:min(100vw,177.78vh);aspect-ratio:16/9;
+  box-shadow:0 40px 120px -40px rgba(0,0,0,.75);overflow:hidden;background:var(--surface);}
+
+/* ---- slide scaffold (fixed 1280x720 design space, scaled) ---- */
+.slide{position:absolute;inset:0;opacity:0;pointer-events:none;
+  transition:opacity .5s ease, transform .5s ease;transform:translateX(24px);}
+.slide.active{opacity:1;pointer-events:auto;transform:none;}
+body.booting .slide{transition:none!important;}
+.slide-inner{position:absolute;top:0;left:0;width:1280px;height:720px;
+  transform:scale(var(--s,1));transform-origin:top left;}
+.pad{position:absolute;inset:0;padding:56px 68px;}
+
+/* light slide texture */
+.slide--light .slide-inner{background:
+  radial-gradient(60% 70% at 100% 0%, rgba(27,106,75,.07), transparent 60%),
+  radial-gradient(50% 60% at 0% 100%, rgba(15,118,110,.06), transparent 55%),
+  var(--surface);}
+
+/* ---- shared header ---- */
+.eyebrow{font:600 12px/1 var(--font-sans);letter-spacing:.2em;text-transform:uppercase;color:var(--teal-700);}
+.kgroup{display:flex;align-items:center;gap:18px;margin-bottom:18px;}
+.h1{font-family:var(--font-display);font-weight:600;color:var(--green-900);
+  font-size:50px;line-height:1.02;letter-spacing:-.01em;margin:0;}
+.h1.small{font-size:42px;}
+.rule{width:74px;height:5px;border-radius:3px;background:var(--gold-500);margin:16px 0 0;}
+.subtitle{font-family:var(--font-display);font-style:italic;color:var(--muted);font-size:20px;margin:14px 0 0;}
+
+/* ---- tables ---- */
+.tblwrap{border-radius:14px;overflow:hidden;box-shadow:0 1px 0 var(--line),0 26px 50px -34px rgba(11,53,38,.55);
+  border:1px solid var(--line);margin-top:16px;}
+.tbl{width:100%;border-collapse:separate;border-spacing:0;}
+.tbl th{background:var(--green-800);color:#fff;text-align:left;
+  font:600 14px/1.2 var(--font-sans);letter-spacing:.01em;padding:15px 18px;vertical-align:bottom;
+  border-top:3px solid var(--gold-500);}
+.tbl td{padding:13px 18px;border-bottom:1px solid var(--line);vertical-align:top;color:var(--ink);}
+.tbl tbody tr:last-child td{border-bottom:0;}
+.tbl tbody tr:nth-child(even) td{background:rgba(238,243,234,.6);}
+.tbl td.lead{font-weight:600;color:var(--green-900);}
+.src{color:var(--muted);font-style:italic;}
+.tsrc{margin-top:14px;color:var(--muted);font-style:italic;font-size:12.5px;}
+/* compress dense tables to fit 720h */
+.slide--tight .tbl th{padding:10px 16px;}
+.slide--tight .tbl td{padding:9px 16px;line-height:1.34;}
+
+/* ---- callout ---- */
+.callout{margin-top:16px;border-left:5px solid var(--gold-500);background:#fff;border-radius:0 12px 12px 0;
+  padding:14px 18px;box-shadow:0 16px 36px -30px rgba(11,53,38,.6);}
+.callout .lbl{color:var(--gold-600);font-weight:700;letter-spacing:.12em;text-transform:uppercase;font-size:12px;margin-right:8px;}
+.callout .punch{color:var(--teal-700);font-weight:600;font-style:italic;}
+
+/* ---- source line (absolute, for non-table slides) ---- */
+.srcline{position:absolute;left:68px;right:68px;bottom:66px;font:italic 500 12.5px/1.45 var(--font-sans);color:var(--muted);}
+
+/* ---- title slide ---- */
+.slide--title .slide-inner{background:
+  radial-gradient(80% 90% at 88% -10%, rgba(216,164,49,.16), transparent 55%),
+  radial-gradient(70% 80% at 0% 110%, rgba(15,118,110,.22), transparent 55%),
+  linear-gradient(135deg,#0e3f2e 0%, #0b3526 55%, #082018 100%);}
+.slide--title .goldbar{position:absolute;left:0;top:0;bottom:0;width:14px;background:var(--gold-500);}
+.title-wrap{position:absolute;left:96px;right:96px;top:50%;transform:translateY(-50%);}
+.title-eyebrow{color:#7fd0bf;letter-spacing:.22em;}
+.title-h1{font-family:var(--font-display);font-weight:600;color:#fff;font-size:92px;line-height:.98;
+  letter-spacing:-.015em;margin:22px 0 0;}
+.title-sub{font-family:var(--font-display);font-weight:500;color:var(--gold-500);font-size:34px;margin:22px 0 0;}
+.title-quote{color:#cfe0d6;font-size:19px;line-height:1.5;margin:30px 0 0;max-width:900px;}
+.title-quote i{color:#eaf2ec;}
+.title-byline{color:#8aa094;font-size:15px;letter-spacing:.04em;margin:46px 0 0;}
+.title-byline a{color:#7fd0bf;text-decoration:none;border-bottom:1px solid rgba(127,208,191,.4);}
+
+/* ---- stat grid (slide 2) ---- */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;margin-top:34px;}
+.stat{background:#fff;border:1px solid var(--line);border-top:4px solid var(--gold-500);border-radius:14px;
+  padding:24px 22px;box-shadow:0 26px 50px -34px rgba(11,53,38,.55);display:flex;flex-direction:column;}
+.stat:nth-child(2),.stat:nth-child(4){border-top-color:var(--teal-600);}
+.stat .val{font-family:var(--font-display);font-weight:600;color:var(--green-900);font-size:46px;line-height:1;letter-spacing:-.02em;}
+.stat .lbl{margin-top:14px;font:600 15px/1.3 var(--font-sans);color:var(--ink);}
+.stat .ft{margin-top:9px;font:500 12.5px/1.4 var(--font-sans);color:var(--muted);}
+
+/* ---- statement slides (3 alert, 5 dark) ---- */
+.slide--statement .slide-inner{display:flex;}
+.stmt{margin:auto;max-width:1020px;padding:0 96px;}
+.stmt .eyebrow{margin-bottom:18px;}
+.stmt .headline{font-family:var(--font-display);font-weight:600;font-size:54px;line-height:1.08;letter-spacing:-.015em;margin:0;}
+.stmt .headline em{font-style:normal;}
+.stmt .sub{margin-top:24px;font:500 21px/1.5 var(--font-sans);max-width:940px;}
+.slide--alert .slide-inner{background:
+  radial-gradient(70% 80% at 100% 0%, rgba(216,164,49,.14), transparent 60%), var(--surface);}
+.slide--alert .stmt .eyebrow{color:var(--gold-600);}
+.slide--alert .stmt .headline{color:var(--green-900);}
+.slide--alert .stmt .headline em{color:var(--gold-600);}
+.slide--alert .stmt .sub{color:var(--muted);}
+.slide--dark .slide-inner{background:
+  radial-gradient(80% 90% at 88% -10%, rgba(216,164,49,.18), transparent 55%),
+  radial-gradient(70% 80% at 0% 110%, rgba(15,118,110,.22), transparent 55%),
+  linear-gradient(135deg,#0e3f2e 0%, #0b3526 55%, #082018 100%);}
+.slide--dark .stmt .eyebrow{color:#7fd0bf;}
+.slide--dark .stmt .headline{color:#fff;}
+.slide--dark .stmt .headline em{color:var(--gold-500);}
+.slide--dark .stmt .sub{color:#cfe0d6;}
+.slide--dark .stmt .sub b{color:#fff;font-weight:700;}
+.slide--dark .srcline{color:#8aa094;}
+
+/* ---- numbered rows (4, 8, 9, 10) ---- */
+.rows{display:flex;flex-direction:column;gap:14px;margin-top:26px;}
+.row{display:grid;grid-template-columns:54px 1fr;gap:20px;align-items:start;
+  background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px 22px;
+  box-shadow:0 18px 40px -34px rgba(11,53,38,.55);}
+.row .rn{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;
+  font:700 18px/1 var(--font-sans);background:rgba(15,118,110,.12);color:var(--teal-700);}
+.row .rh{font:700 18px/1.2 var(--font-sans);color:var(--green-900);}
+.row .rd{margin-top:5px;font:500 15px/1.45 var(--font-sans);color:var(--muted);}
+.rows--five{gap:11px;margin-top:20px;}
+.rows--five .row{padding:12px 20px;}
+.rows--five .row .rn{width:38px;height:38px;font-size:16px;}
+.rows--five .row .rh{font-size:17px;}
+.rows--five .row .rd{font-size:14px;}
+
+/* ---- horizontal flow (6, 11) ---- */
+.flow{display:flex;align-items:stretch;gap:0;margin-top:44px;}
+.fstep{flex:1;background:#fff;border:1px solid var(--line);border-top:4px solid var(--teal-600);border-radius:12px;
+  padding:22px 14px;text-align:center;box-shadow:0 18px 40px -34px rgba(11,53,38,.55);}
+.fstep .fl{font:700 18px/1.2 var(--font-sans);color:var(--green-900);}
+.fstep .fs{margin-top:8px;font:500 13px/1.35 var(--font-sans);color:var(--muted);}
+.farr{display:flex;align-items:center;padding:0 8px;color:var(--gold-500);font-size:26px;font-weight:700;}
+.flownote{margin-top:34px;border-left:5px solid var(--gold-500);background:#fff;border-radius:0 12px 12px 0;
+  padding:18px 22px;font:500 18px/1.45 var(--font-sans);color:var(--ink);box-shadow:0 16px 36px -30px rgba(11,53,38,.6);}
+
+/* ---- two-card comparison (15) ---- */
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:26px;margin-top:18px;}
+.card{border-radius:14px;overflow:hidden;background:#fff;border:1px solid var(--line);
+  box-shadow:0 26px 50px -34px rgba(11,53,38,.55);}
+.card__h{padding:15px 22px;color:#fff;font:700 18px/1.2 var(--font-sans);letter-spacing:.01em;}
+.card--teal .card__h{background:var(--teal-700);}
+.card--gold .card__h{background:var(--gold-500);color:#3a2b06;}
+.card__b{padding:8px 22px 18px;}
+.cmplist{margin:0;padding:0;list-style:none;}
+.cmplist li{position:relative;padding:11px 0 11px 28px;border-bottom:1px solid var(--line);font:500 15px/1.4 var(--font-sans);color:var(--ink);}
+.cmplist li:last-child{border-bottom:0;}
+.cmplist li::before{position:absolute;left:0;top:11px;font-weight:700;}
+.card--gold .cmplist li::before{content:"\26A0";color:var(--gold-600);}
+.card--teal .cmplist li::before{content:"\2713";color:var(--teal-700);}
+.verdict{margin-top:22px;border-left:5px solid var(--gold-500);background:#fff;border-radius:0 12px 12px 0;
+  padding:16px 20px;font:600 17px/1.45 var(--font-sans);color:var(--green-900);box-shadow:0 16px 36px -30px rgba(11,53,38,.6);}
+
+/* ---- ask slide (16) ---- */
+.asklist{display:flex;flex-direction:column;gap:14px;margin-top:26px;}
+.askrow{display:grid;grid-template-columns:54px 1fr;gap:20px;align-items:center;
+  background:#fff;border:1px solid var(--line);border-left:5px solid var(--gold-500);border-radius:0 12px 12px 0;
+  padding:16px 22px;box-shadow:0 18px 40px -34px rgba(11,53,38,.55);}
+.askrow .an{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;
+  font:700 18px/1 var(--font-sans);background:var(--gold-500);color:#3a2b06;}
+.askrow .at{font:600 18px/1.4 var(--font-sans);color:var(--green-900);}
+.asktl{margin-top:22px;background:rgba(15,118,110,.08);border:1px solid rgba(15,118,110,.3);border-radius:12px;
+  padding:16px 20px;font:600 16px/1.45 var(--font-sans);color:var(--teal-700);}
+.asktl b{color:var(--green-900);}
+
+/* ===== chrome (outside scaled stage) ===== */
+#progress{position:fixed;top:0;left:0;height:3px;background:var(--gold-500);width:0;z-index:40;
+  transition:width .45s ease;box-shadow:0 0 12px rgba(216,164,49,.6);}
+.nav-arrow{position:fixed;top:50%;transform:translateY(-50%);width:54px;height:54px;border-radius:50%;
+  border:1px solid rgba(255,255,255,.22);background:rgba(8,32,24,.45);color:#fff;cursor:pointer;
+  display:grid;place-items:center;z-index:35;opacity:0;transition:opacity .25s, background .2s;backdrop-filter:blur(6px);}
+#viewport:hover .nav-arrow{opacity:.55;}
+.nav-arrow:hover{opacity:1;background:rgba(15,118,110,.7);}
+.nav-arrow.left{left:22px;} .nav-arrow.right{right:22px;}
+.nav-arrow svg{width:22px;height:22px;}
+.dock{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:35;display:flex;align-items:center;
+  gap:6px;padding:7px 9px;border-radius:999px;background:rgba(8,32,24,.55);border:1px solid rgba(255,255,255,.16);
+  backdrop-filter:blur(10px);box-shadow:0 16px 40px -16px rgba(0,0,0,.6);}
+.dock button{appearance:none;border:0;background:transparent;color:#dfeae3;cursor:pointer;border-radius:999px;
+  height:34px;min-width:34px;padding:0 10px;display:grid;place-items:center;font:600 13px/1 var(--font-sans);}
+.dock button:hover{background:rgba(255,255,255,.12);color:#fff;}
+.dock .count{font-variant-numeric:tabular-nums;letter-spacing:.12em;color:#cfe0d6;padding:0 8px;}
+.dock .sep{width:1px;height:20px;background:rgba(255,255,255,.16);margin:0 2px;}
+.dock svg{width:18px;height:18px;}
+#toc{position:fixed;inset:0;z-index:50;display:none;align-items:center;justify-content:center;
+  background:rgba(6,24,18,.72);backdrop-filter:blur(6px);}
+body.toc-open #toc{display:flex;}
+.toc-card{width:min(760px,90vw);background:#0e3b2c;border:1px solid rgba(255,255,255,.12);border-radius:18px;
+  padding:30px 34px;box-shadow:0 40px 100px -30px rgba(0,0,0,.7);}
+.toc-card h2{font-family:var(--font-display);color:#fff;margin:0 0 4px;font-size:26px;font-weight:600;}
+.toc-card p{color:#8aa094;margin:0 0 18px;font-size:13px;}
+.toc-list{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.toc-list button{display:flex;gap:14px;align-items:baseline;text-align:left;width:100%;cursor:pointer;
+  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:11px 14px;color:#eaf2ec;
+  font:500 14px/1.3 var(--font-sans);transition:background .15s,border-color .15s;}
+.toc-list button:hover{background:rgba(15,118,110,.35);border-color:rgba(216,164,49,.5);}
+.toc-list button .n{color:var(--gold-500);font-weight:700;font-variant-numeric:tabular-nums;min-width:22px;}
+.toc-hint{margin-top:18px;color:#7f9388;font-size:12px;text-align:center;}
+kbd{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);border-radius:5px;padding:1px 6px;font:600 11px/1.4 var(--font-sans);color:#dfeae3;}
+#hint{position:fixed;bottom:74px;left:50%;transform:translateX(-50%);z-index:34;color:#cfe0d6;
+  font-size:12.5px;letter-spacing:.04em;background:rgba(8,32,24,.5);padding:7px 14px;border-radius:999px;
+  border:1px solid rgba(255,255,255,.14);transition:opacity .6s ease;}
+@media (max-width:640px){ .title-h1{font-size:74px} }
+
+/* print -> clean PDF, one slide per page */
+@page{size:1280px 720px;margin:0;}
+@media print{
+  body{overflow:visible;background:#fff;}
+  #viewport{position:static;display:block;}
+  #stage{width:1280px;height:auto;box-shadow:none;}
+  .slide{position:relative;opacity:1!important;transform:none!important;page-break-after:always;height:720px;}
+  .slide-inner{transform:none!important;}
+  #progress,.nav-arrow,.dock,#hint,#toc{display:none!important;}
+}
+</style>
+</head>
+<body class="booting">
+<div id="progress"></div>
+
+<div id="viewport">
+  <button class="nav-arrow left" aria-label="Previous" onclick="prev()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+
+  <div id="stage">
+
+    <!-- ===== SLIDE 1 — TITLE ===== -->
+    <section class="slide slide--title active" aria-label="Title">
+      <div class="slide-inner">
+        <div class="goldbar"></div>
+        <div class="title-wrap">
+          <div class="eyebrow title-eyebrow">Merck (MSD) × Microsoft &nbsp;·&nbsp; Discovery / R&amp;D</div>
+          <h1 class="title-h1">Accelerating Discovery, Safely</h1>
+          <div class="title-sub">A de-risked, governed AI-first program for Multi-Step Discovery Orchestration (UC1)</div>
+          <p class="title-quote">Speed <i>with</i> commitment — made safe by gates. One program, five phases, a customer go/no-go at every step.</p>
+          <div class="title-byline">Confidential · Prepared for R&amp;D / Discovery leadership · June 2026 &nbsp;·&nbsp; <a href="index.html">← Business-pressures brief</a></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== SLIDE 2 — PRESSURE, QUANTIFIED ===== -->
+    <section class="slide slide--light" aria-label="The pressure, quantified">
+      <div class="slide-inner"><div class="pad">
+        <h1 class="h1">The pressure on Discovery is real — and timed</h1>
+        <div class="rule"></div>
+        <div class="stats">
+          <div class="stat"><div class="val">4–6 yrs</div><div class="lbl">Target ID → clinic today</div><div class="ft">too few validated candidates per cycle</div></div>
+          <div class="stat"><div class="val">~46%</div><div class="lbl">of revenue exposed at the cliff</div><div class="ft">Keytruda $29.5B of $64.2B 2024 sales</div></div>
+          <div class="stat"><div class="val">Dec 2028</div><div class="lbl">core US Keytruda patent expiry</div><div class="ft">the deadline the pipeline must beat</div></div>
+          <div class="stat"><div class="val">$3B</div><div class="lbl">annual savings target by 2027</div><div class="ft">productivity mandate</div></div>
+        </div>
+        <div class="srcline">Source: UC1-Discovery-Outcomes-Citations.md; Merck FY2024 results. “~46%” = revenue exposure at the cliff, not a protected result.</div>
+      </div></div>
+    </section>
+
+    <!-- ===== SLIDE 3 — COST OF STAYING HERE ===== -->
+    <section class="slide slide--statement slide--alert" aria-label="The cost of standing still">
+      <div class="slide-inner">
+        <div class="stmt">
+          <div class="eyebrow">The cost of standing still</div>
+          <h2 class="headline">Every year discovery stays at 4–6 years is a year of pipeline value <em>deferred</em> — while competitors compound their AI advantage.</h2>
+          <p class="sub">AI-discovered programs in the clinic grew from ~24 (late 2023) to 173+ (2026). The field is moving with or without us.</p>
+        </div>
+        <div class="srcline">Source: sciencereader.com (173 AI programs, 2026); UC1-Discovery-Outcomes-Citations.md.</div>
+      </div>
+    </section>
+
+    <!-- ===== SLIDE 4 — WHAT GOOD LOOKS LIKE ===== -->
+    <section class="slide slide--light" aria-label="What good looks like">
+      <div class="slide-inner"><div class="pad">
+        <h1 class="h1">What “good” looks like for Discovery</h1>
+        <div class="rule"></div>
+        <div class="rows">
+          <div class="row"><div class="rn">1</div><div><div class="rh">Faster shots on goal</div><div class="rd">Compress Target ID → clinic so more validated assets reach trials per cycle.</div></div></div>
+          <div class="row"><div class="rn">2</div><div><div class="rh">Better odds, earlier</div><div class="rd">In-silico triage cuts costly late-stage failures before the wet lab.</div></div></div>
+          <div class="row"><div class="rn">3</div><div><div class="rh">A human owns every call</div><div class="rd">AI triages and ranks; a scientist approves. Four-eyes by design.</div></div></div>
+          <div class="row"><div class="rn">4</div><div><div class="rh">Auditable by construction</div><div class="rd">Full lineage and provenance on every candidate — Annex 22 / Part 11 ready.</div></div></div>
+        </div>
+        <div class="srcline">Source: UC1-Discovery-Outcomes-Citations.md (customer-value lenses).</div>
+      </div></div>
+    </section>
+
+    <!-- ===== SLIDE 5 — THE REFRAME (PIVOTAL) ===== -->
+    <section class="slide slide--statement slide--dark" aria-label="The real risk is pilot purgatory">
+      <div class="slide-inner">
+        <div class="stmt">
+          <div class="eyebrow">The real risk</div>
+          <h2 class="headline">The risk isn’t committing to the program. It’s <em>pilot purgatory</em>.</h2>
+          <p class="sub">Standalone POCs that prove a point but never scale — 12–18 months lost to re-mobilization, momentum, and budget cycles, while the cliff gets closer. The answer is speed <b>with</b> commitment, made safe by gates.</p>
+        </div>
+        <div class="srcline">Framing per design spec; the gates are detailed on slide 12.</div>
+      </div>
+    </section>
+
+    <!-- ===== SLIDE 6 — UC1 IN ONE PICTURE ===== -->
+    <section class="slide slide--light" aria-label="UC1 in one picture">
+      <div class="slide-inner"><div class="pad">
+        <h1 class="h1">UC1: Multi-Step Discovery Orchestration</h1>
+        <div class="rule"></div>
+        <div class="flow">
+          <div class="fstep"><div class="fl">Target ID</div><div class="fs">evidence + prior art</div></div>
+          <div class="farr">→</div>
+          <div class="fstep"><div class="fl">Hypothesis</div><div class="fs">agentic reasoning</div></div>
+          <div class="farr">→</div>
+          <div class="fstep"><div class="fl">Generate</div><div class="fs">design / docking</div></div>
+          <div class="farr">→</div>
+          <div class="fstep"><div class="fl">Evaluate</div><div class="fs">automated scoring</div></div>
+          <div class="farr">→</div>
+          <div class="fstep"><div class="fl">Rank</div><div class="fs">shortlist</div></div>
+        </div>
+        <div class="flownote">Five governed agents, one human-in-the-loop gate before any wet-lab commitment. Scientists decide; agents do the legwork.</div>
+        <div class="srcline">Source: UC1-Solution-Design.md (§4–6).</div>
+      </div></div>
+    </section>
+
+    <!-- ===== SLIDE 7 — OUTCOMES, EVIDENCE-BACKED (PROOF) ===== -->
+    <section class="slide slide--light" aria-label="Outcomes evidence-backed">
+      <div class="slide-inner"><div class="pad">
+        <h1 class="h1 small">The outcomes — evidence-backed</h1>
+        <div class="rule"></div>
+        <div class="tblwrap">
+          <table class="tbl">
+            <colgroup><col style="width:30%"><col style="width:46%"><col style="width:24%"></colgroup>
+            <thead><tr><th>Outcome</th><th>Evidence</th><th>Source</th></tr></thead>
+            <tbody>
+              <tr><td class="lead">12–18 mo to clinic (vs 4–6 yr norm)</td><td>AI-designed candidates (Insilico ~18 mo; Exscientia) — illustrative benchmark</td><td class="src">Outcomes brief [1][2]</td></tr>
+              <tr><td class="lead">More validated candidates per cycle</td><td>173+ AI programs by 2026; AI Phase I success 80–90% vs 40–65%</td><td class="src">sciencereader.com</td></tr>
+              <tr><td class="lead">Human owns the wet-lab call</td><td>EU GMP Annex 22 (Jul 2025): GenAI barred from critical GxP calls; HITL mandatory</td><td class="src">Merit Solutions</td></tr>
+              <tr><td class="lead">100% lineage on every candidate</td><td>Purview + Part 11 / ALCOA+ provenance (solution design)</td><td class="src">UC1-Solution-Design.md</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="tsrc">“12–18 mo” is an industry benchmark, not a guaranteed result. Full citations in UC1-Discovery-Outcomes-Citations.md.</div>
+      </div></div>
+    </section>
+
+    <!-- ===== SLIDE 8 — BUSINESS BENEFITS ===== -->
+    <section class="slide slide--light" aria-label="Five business benefits">
+      <div class="slide-inner"><div class="pad">
+        <h1 class="h1 small">Five business benefits</h1>
+        <div class="rule"></div>
+        <div class="rows rows--five">
+          <div class="row"><div class="rn">1</div><div><div class="rh">Faster pipeline velocity</div><div class="rd">More assets to the clinic per year before the 2028 cliff.</div></div></div>
+          <div class="row"><div class="rn">2</div><div><div class="rh">Revenue-cliff protection</div><div class="rd">Helps refill the ~46% of revenue exposed when Keytruda’s US patent expires.</div></div></div>
+          <div class="row"><div class="rn">3</div><div><div class="rh">Higher R&amp;D productivity</div><div class="rd">In-silico triage + burst HPC support the $3B-by-2027 savings goal.</div></div></div>
+          <div class="row"><div class="rn">4</div><div><div class="rh">Compliance-grade speed</div><div class="rd">Annex 22 / Part 11 / four-eyes let Merck lead, not react, on AI governance.</div></div></div>
+          <div class="row"><div class="rn">5</div><div><div class="rh">Protects prior AI bets</div><div class="rd">Federates ~$1B+ in deals (Google $1B, Protillion $510M, Variational $349M) — no rip-and-replace.</div></div></div>
+        </div>
+        <div class="srcline">Source: UC1-Discovery-Outcomes-Citations.md (business benefits, web-verified).</div>
+      </div></div>
+    </section>
+
+    <!-- ===== SLIDE 9 — HOW IT WORKS ON AZURE ===== -->
+    <section class="slide slide--light" aria-label="How it works on Azure">
+      <div class="slide-inner"><div class="pad">
+        <h1 class="h1">How it works on Azure — feasibility at a glance</h1>
+        <div class="rule"></div>
+        <div class="rows">
+          <div class="row"><div class="rn">A</div><div><div class="rh">Identity &amp; governance</div><div class="rd">Entra Agent ID, Purview lineage, Defender for Cloud, Arc.</div></div></div>
+          <div class="row"><div class="rn">B</div><div><div class="rh">Data foundation</div><div class="rd">Microsoft Fabric / OneLake shortcuts to S3 &amp; GCS; AI Search index.</div></div></div>
+          <div class="row"><div class="rn">C</div><div><div class="rh">Models &amp; compute</div><div class="rd">Foundry model catalog, Azure ML endpoints, Quantum Elements, HPC / Batch.</div></div></div>
+          <div class="row"><div class="rn">D</div><div><div class="rh">Agent orchestration</div><div class="rd">Foundry Agent Service pipeline with A2A / MCP partner integration.</div></div></div>
+        </div>
+        <div class="srcline">Source: UC1-Solution-Design.md; business-pressures deck (slide 8). Microsoft control mappings are solution-design positioning.</div>
+      </div></div>
+    </section>
+
+    <!-- ===== SLIDE 10 — FEDERATE + COMPLIANT ===== -->
+    <section class="slide slide--light" aria-label="Federate and compliant by design">
+      <div class="slide-inner"><div class="pad">
+        <h1 class="h1">Protects your multicloud — and compliant by design</h1>
+        <div class="rule"></div>
+        <div class="rows">
+          <div class="row"><div class="rn">I</div><div><div class="rh">Identity plane</div><div class="rd">One governed identity fabric across clouds (Entra Agent ID).</div></div></div>
+          <div class="row"><div class="rn">II</div><div><div class="rh">Governance plane</div><div class="rd">Unified lineage, policy &amp; audit (Purview, Defender).</div></div></div>
+          <div class="row"><div class="rn">III</div><div><div class="rh">Data plane</div><div class="rd">Read S3 / GCS in place via OneLake shortcuts — no migration.</div></div></div>
+          <div class="row"><div class="rn">IV</div><div><div class="rh">Control plane</div><div class="rd">Arc-governed resources; partner agents called as tools (A2A / MCP).</div></div></div>
+        </div>
+        <div class="srcline">Federate, don’t migrate (deck slide 9). Annex 22 / 21 CFR Part 11 / ALCOA+ honored throughout.</div>
+      </div></div>
+    </section>
+
+    <!-- ===== SLIDE 11 — THE PROGRAM ===== -->
+    <section class="slide slide--light" aria-label="The program five phases">
+      <div class="slide-inner"><div class="pad">
+        <h1 class="h1">The program: five phases, ~15 months</h1>
+        <div class="rule"></div>
+        <div class="flow">
+          <div class="fstep"><div class="fl">P0 Foundation</div><div class="fs">Mo 0–3 · govern</div></div>
+          <div class="farr">→</div>
+          <div class="fstep"><div class="fl">P1 Pilot</div><div class="fs">Mo 3–6 · prove</div></div>
+          <div class="farr">→</div>
+          <div class="fstep"><div class="fl">P2 Orchestrate</div><div class="fs">Mo 6–9 · automate</div></div>
+          <div class="farr">→</div>
+          <div class="fstep"><div class="fl">P3 Federate</div><div class="fs">Mo 9–11 · multicloud</div></div>
+          <div class="farr">→</div>
+          <div class="fstep"><div class="fl">P4 Scale</div><div class="fs">Mo 11–15 · production</div></div>
+        </div>
+        <div class="flownote">Govern → pilot → orchestrate → federate → scale. Each phase ends in a customer go/no-go gate.</div>
+        <div class="srcline">Source: UC1-Solution-Implementation-Plan.md (§4–5).</div>
+      </div></div>
+    </section>
+
+    <!-- ===== SLIDE 12 — GATES AS OFF-RAMPS (PIVOTAL) ===== -->
+    <section class="slide slide--light slide--tight" aria-label="Off-ramps decision gates">
+      <div class="slide-inner"><div class="pad">
+        <h1 class="h1 small">Your off-ramps: G0–G4 decision gates</h1>
+        <div class="rule"></div>
+        <div class="tblwrap">
+          <table class="tbl">
+            <colgroup><col style="width:8%"><col style="width:20%"><col style="width:26%"><col style="width:46%"></colgroup>
+            <thead><tr><th>Gate</th><th>At end of</th><th>Customer decides</th><th>Exit criteria</th></tr></thead>
+            <tbody>
+              <tr><td class="lead">G0</td><td>P0 Foundation</td><td>Proceed / hold</td><td>Identity, lineage, audit operational; security passed</td></tr>
+              <tr><td class="lead">G1</td><td>P1 Pilot</td><td>Proceed / stop</td><td>AI ≥ manual baseline; four-eyes works; Annex 22 evidence</td></tr>
+              <tr><td class="lead">G2</td><td>P2 Orchestration</td><td>Proceed / hold</td><td>Reproducible multi-agent runs; one human gate</td></tr>
+              <tr><td class="lead">G3</td><td>P3 Federation</td><td>Proceed / hold</td><td>Cross-cloud provenance &amp; residency validated</td></tr>
+              <tr><td class="lead">G4</td><td>P4 Scale</td><td>Production sign-off</td><td>Throughput, cost and governance met</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="callout"><span class="lbl">The pilot lives inside the commitment</span><span class="punch">Phase 1 still delivers a working pilot + Annex 22 baseline — you get the pilot INSIDE the commitment, with a stop right after it.</span></div>
+        <div class="tsrc">Source: UC1-Solution-Implementation-Plan.md (§8 gates).</div>
+      </div></div>
+    </section>
+
+    <!-- ===== SLIDE 13 — WHAT WE PROVE BY WHEN ===== -->
+    <section class="slide slide--light" aria-label="What we prove by when">
+      <div class="slide-inner"><div class="pad">
+        <h1 class="h1 small">What we prove, and by when</h1>
+        <div class="rule"></div>
+        <div class="tblwrap">
+          <table class="tbl">
+            <colgroup><col style="width:22%"><col style="width:45%"><col style="width:33%"></colgroup>
+            <thead><tr><th>By end of</th><th>We prove</th><th>Measured as</th></tr></thead>
+            <tbody>
+              <tr><td class="lead">P0 (Mo 3)</td><td>Governed, compliant foundation</td><td>Identity + lineage + audit live</td></tr>
+              <tr><td class="lead">P1 (Mo 6)</td><td>AI matches or beats manual triage</td><td>AI ≥ manual baseline; four-eyes approval</td></tr>
+              <tr><td class="lead">P2 (Mo 9)</td><td>Repeatable orchestration</td><td>Reproducible multi-agent runs</td></tr>
+              <tr><td class="lead">P3 (Mo 11)</td><td>Multicloud, fully governed</td><td>Provenance + residency across clouds</td></tr>
+              <tr><td class="lead">P4 (Mo 15)</td><td>Portfolio-scale production</td><td>Sustained throughput within budget</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="tsrc">A manual baseline is documented before each go-live (Annex 22). Source: UC1-Solution-Implementation-Plan.md (§9).</div>
+      </div></div>
+    </section>
+
+    <!-- ===== SLIDE 14 — INVESTMENT ===== -->
+    <section class="slide slide--light slide--tight" aria-label="Investment">
+      <div class="slide-inner"><div class="pad">
+        <h1 class="h1 small">Investment — staged, unlocked at each gate</h1>
+        <div class="rule"></div>
+        <div class="tblwrap">
+          <table class="tbl">
+            <colgroup><col style="width:30%"><col style="width:13%"><col style="width:16%"><col style="width:23%"><col style="width:18%"></colgroup>
+            <thead><tr><th>Phase</th><th>Weeks</th><th>Hours</th><th>Fees</th><th>Peak FTE</th></tr></thead>
+            <tbody>
+              <tr><td class="lead">P0 Foundation</td><td>13</td><td>1,530</td><td>$392,040</td><td>2.9</td></tr>
+              <tr><td class="lead">P1 Pilot</td><td>13</td><td>2,170</td><td>$606,440</td><td>4.2</td></tr>
+              <tr><td class="lead">P2 Orchestration</td><td>13</td><td>2,410</td><td>$669,040</td><td>4.6</td></tr>
+              <tr><td class="lead">P3 Federation</td><td>9</td><td>1,950</td><td>$503,820</td><td>5.4</td></tr>
+              <tr><td class="lead">P4 Scale</td><td>17</td><td>3,130</td><td>$751,360</td><td>4.6</td></tr>
+              <tr><td class="lead"><b>Total</b></td><td><b>65</b></td><td><b>11,190</b></td><td><b>$2,922,700</b></td><td><b>5.4 peak</b></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="callout"><span class="lbl">Total investment $3.21M</span><span class="punch">fees $2.92M + 7% risk reserve + 3% reimbursable. Blended ≈ $261/hr. Spend released gate-by-gate, not all up-front. Excludes Azure consumption.</span></div>
+        <div class="tsrc">Source: UC1-WBS-Estimates-Staffing.xlsx.</div>
+      </div></div>
+    </section>
+
+    <!-- ===== SLIDE 15 — COMMIT NOW vs PILOT-FIRST ===== -->
+    <section class="slide slide--light" aria-label="Commit now vs pilot first">
+      <div class="slide-inner"><div class="pad">
+        <h1 class="h1">Commit to the program vs pilot-first</h1>
+        <div class="rule"></div>
+        <div class="cards">
+          <div class="card card--gold">
+            <div class="card__h">Standalone pilot first</div>
+            <div class="card__b">
+              <ul class="cmplist">
+                <li>Re-mobilize team + procurement after every step</li>
+                <li>Momentum and context lost between funding cycles</li>
+                <li>Value deferred 12–18 mo; cliff keeps approaching</li>
+                <li>Foundation rebuilt, not reused</li>
+              </ul>
+            </div>
+          </div>
+          <div class="card card--teal">
+            <div class="card__h">Committed program, gated</div>
+            <div class="card__b">
+              <ul class="cmplist">
+                <li>One mobilization; team continuity across phases</li>
+                <li>Pilot delivered inside P1 — with a G1 stop</li>
+                <li>Fastest path to portfolio-scale value</li>
+                <li>Every phase has a customer off-ramp (G0–G4)</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="verdict">Same downside protection as a pilot — without the stalls. You can stop at any gate; you only lose the stalls, not the momentum.</div>
+      </div></div>
+    </section>
+
+    <!-- ===== SLIDE 16 — THE ASK + NEXT STEPS ===== -->
+    <section class="slide slide--light" aria-label="The ask and next steps">
+      <div class="slide-inner"><div class="pad">
+        <h1 class="h1">The ask</h1>
+        <div class="rule"></div>
+        <div class="asklist">
+          <div class="askrow"><div class="an">1</div><div class="at">Approve the full 5-phase UC1 program (~$3.21M), funded gate-by-gate.</div></div>
+          <div class="askrow"><div class="an">2</div><div class="at">Release Phase 0 funding now to mobilize the governed foundation.</div></div>
+          <div class="askrow"><div class="an">3</div><div class="at">Name an executive sponsor and the G0–G4 gate owners (R&amp;D, Quality, IT).</div></div>
+        </div>
+        <div class="asktl"><b>30-day mobilization:</b> landing zone + governance spine stood up; Phase 1 pilot scoped on one target class.</div>
+        <div class="srcline">Leave-behinds: Solution Design · Implementation Plan · Outcomes &amp; Citations · WBS/Estimates workbook.</div>
+      </div></div>
+    </section>
+
+  </div><!-- /#stage -->
+
+  <button class="nav-arrow right" aria-label="Next" onclick="next()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button>
+</div>
+
+<div id="hint">Use <kbd>←</kbd> <kbd>→</kbd> to navigate · <kbd>O</kbd> overview · <kbd>F</kbd> fullscreen</div>
+
+<div class="dock">
+  <button aria-label="Previous slide" onclick="prev()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+  <span class="count" id="counter">01 / 16</span>
+  <button aria-label="Next slide" onclick="next()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button>
+  <span class="sep"></span>
+  <button aria-label="Overview" title="Overview (O)" onclick="toggleToc()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></button>
+  <button aria-label="Fullscreen" title="Fullscreen (F)" onclick="toggleFs()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3m13-5v3a2 2 0 0 1-2 2h-3"/></svg></button>
+</div>
+
+<div id="toc" onclick="if(event.target.id==='toc')toggleToc()">
+  <div class="toc-card">
+    <h2>Accelerating Discovery, Safely</h2>
+    <p>UC1 — Multi-Step Discovery Orchestration · jump to a slide</p>
+    <div class="toc-list" id="tocList"></div>
+    <div class="toc-hint">Press <kbd>O</kbd> or <kbd>Esc</kbd> to close</div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var titles = ['Title','The pressure, quantified','The cost of standing still','What “good” looks like','The real risk: pilot purgatory','UC1 in one picture','Outcomes — evidence-backed','Five business benefits','How it works on Azure','Protects your multicloud','The program: five phases','Your off-ramps: G0–G4 gates','What we prove, and by when','Investment — staged','Commit now vs pilot-first','The ask + next steps'];
+  var i = 0;
+  var stage = document.getElementById('stage');
+  var prog = document.getElementById('progress');
+  var counter = document.getElementById('counter');
+  var hint = document.getElementById('hint');
+  var pad2 = function(n){return (n<10?'0':'')+n;};
+
+  function fit(){ var s = stage.clientWidth/1280; stage.style.setProperty('--s', s); }
+
+  function go(n){
+    i = Math.max(0, Math.min(slides.length-1, n));
+    slides.forEach(function(s,k){ s.classList.toggle('active', k===i); });
+    prog.style.width = ((i+1)/slides.length*100) + '%';
+    counter.textContent = pad2(i+1) + ' / ' + pad2(slides.length);
+    try{ history.replaceState(null,'','#'+(i+1)); }catch(e){}
+  }
+  window.next = function(){ go(i+1); };
+  window.prev = function(){ go(i-1); };
+  window.goTo = go;
+  window.toggleFs = function(){ if(!document.fullscreenElement){ (document.documentElement.requestFullscreen||function(){})(); } else { (document.exitFullscreen||function(){})(); } };
+  window.toggleToc = function(){ document.body.classList.toggle('toc-open'); };
+
+  var tl = document.getElementById('tocList');
+  titles.forEach(function(t,k){
+    var b = document.createElement('button');
+    b.innerHTML = '<span class="n">'+pad2(k+1)+'</span><span>'+t+'</span>';
+    b.onclick = function(){ go(k); document.body.classList.remove('toc-open'); };
+    tl.appendChild(b);
+  });
+
+  document.addEventListener('keydown', function(e){
+    var k = e.key;
+    if(k==='ArrowRight'||k==='PageDown'||k===' '){ e.preventDefault(); next(); }
+    else if(k==='ArrowLeft'||k==='PageUp'){ e.preventDefault(); prev(); }
+    else if(k==='Home'){ e.preventDefault(); go(0); }
+    else if(k==='End'){ e.preventDefault(); go(slides.length-1); }
+    else if(k==='Escape'){ document.body.classList.remove('toc-open'); }
+    else if(k && k.toLowerCase()==='o'){ toggleToc(); }
+    else if(k && k.toLowerCase()==='f'){ toggleFs(); }
+  });
+
+  window.addEventListener('resize', fit);
+  window.addEventListener('hashchange', function(){
+    var h = parseInt((location.hash||'').replace('#',''),10);
+    if(!isNaN(h) && h-1 !== i){ go(h-1); }
+  });
+  fit();
+  var start = parseInt((location.hash||'').replace('#',''),10);
+  go(isNaN(start)?0:start-1);
+  requestAnimationFrame(function(){ requestAnimationFrame(function(){ document.body.classList.remove('booting'); }); });
+  setTimeout(function(){ if(hint){ hint.style.opacity='0'; } }, 4200);
+})();
+</script>
+</body>
+</html>
