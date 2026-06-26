@@ -29,14 +29,19 @@ test('candidates.json has 7 advanced candidates with the enriched schema', async
   }
 });
 
-test('canned-stage1 matches the /api/target-id success body', async () => {
+test('canned-stage1 matches the /api/target-id body and carries citations + simulated provenance', async () => {
   const s1 = await load('canned-stage1.json');
   assert.equal(s1.stage, 1);
   for (const k of ['name', 'mechanism', 'evidence', 'confidence',
-                   'recommendation', 'recommendationText']) {
+                   'recommendation', 'recommendationText', 'citations']) {
     assert.ok(k in s1.target, `target missing ${k}`);
   }
   assert.ok(Array.isArray(s1.target.evidence));
+  assert.ok(Array.isArray(s1.target.citations) && s1.target.citations.length >= 3);
+  assert.ok(s1.target.citations.every(c => /^https:\/\//.test(c.url)));
+  assert.equal(s1.provenance.mode, 'simulated');
+  assert.equal(typeof s1.provenance.model, 'string');
+  assert.equal(typeof s1.provenance.tokens.total, 'number');
 });
 
 test('canned-stage5 matches the /api/rank success body and references real candidate ids', async () => {
