@@ -28,7 +28,8 @@ export function buildRankPrompt(body) {
   return {
     system: 'You are a discovery ranking assistant. Respond ONLY with a JSON object.',
     user: `Rank these antibody candidates against ${target} for advancement to wet-lab. ` +
-      'Lower kdNm is stronger; higher developabilityScore and interfaceScore are better; non-empty toxFlags are penalties. ' +
+      'Each candidate has metrics: lower metrics.kdNm is stronger; higher developabilityScore and interfaceScore are better; ' +
+      'lower immunogenicity.score is better; non-empty liabilities and metrics.tapFlags are penalties. ' +
       `Candidates JSON: ${JSON.stringify(candidates)}. ` +
       'Return a JSON object with keys: ranking (array of {id, rank, rationale}) covering every candidate id with unique ranks 1..N, ' +
       'and overallRecommendation (string).'

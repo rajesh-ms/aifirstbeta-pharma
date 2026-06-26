@@ -5,19 +5,26 @@ import { readFile } from 'node:fs/promises';
 const load = async (f) =>
   JSON.parse(await readFile(new URL(`../public/fixtures/${f}`, import.meta.url)));
 
-test('candidates.json has 7 advanced candidates with the required schema', async () => {
+test('candidates.json has 7 advanced candidates with the enriched schema', async () => {
   const { candidates } = await load('candidates.json');
   assert.equal(candidates.length, 7);
   for (const c of candidates) {
-    for (const k of ['id', 'name', 'target', 'sequenceSnippet', 'kdNm',
-                     'developabilityScore', 'interfaceScore', 'toxFlags',
+    for (const k of ['id', 'name', 'format', 'target', 'germline', 'cdrh3',
+                     'sequenceSnippet', 'metrics', 'liabilities', 'predictedBy',
                      'triageStatus', 'stage4Reason']) {
       assert.ok(k in c, `candidate ${c.id} missing ${k}`);
     }
-    assert.equal(typeof c.kdNm, 'number');
-    assert.equal(typeof c.developabilityScore, 'number');
-    assert.equal(typeof c.interfaceScore, 'number');
-    assert.ok(Array.isArray(c.toxFlags));
+    assert.equal(typeof c.germline.vh, 'string');
+    assert.equal(typeof c.germline.jh, 'string');
+    assert.match(c.germline.vh, /^IG[HKL]V/);
+    assert.equal(typeof c.cdrh3, 'string');
+    assert.equal(typeof c.metrics.kdNm, 'number');
+    assert.equal(typeof c.metrics.developabilityScore, 'number');
+    assert.equal(typeof c.metrics.interfaceScore, 'number');
+    assert.equal(typeof c.metrics.immunogenicity.score, 'number');
+    assert.ok(Array.isArray(c.metrics.tapFlags));
+    assert.ok(Array.isArray(c.liabilities));
+    assert.ok(Array.isArray(c.predictedBy) && c.predictedBy.length >= 1);
     assert.equal(c.triageStatus, 'advanced');
   }
 });
