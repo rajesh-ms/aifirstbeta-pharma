@@ -2,6 +2,7 @@ import 'dotenv/config';
 import express from 'express';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { randomUUID, createHash } from 'node:crypto';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -53,16 +54,43 @@ export async function callAzureJSON({ system, user }, { fetchImpl = fetch } = {}
   });
   if (!resp.ok) throw new Error(`azure-http-${resp.status}`);
   const data = await resp.json();
-  return JSON.parse(data.choices[0].message.content);
+  return { data: JSON.parse(data.choices[0].message.content), usage: data.usage || null };
+}
+
+const PROMPT_TEMPLATE = { 1: 'target-id@v1.3', 5: 'rank@v1.1' };
+
+function buildProvenance({ stage, prompt, usage, started }) {
+  const u = usage || {};
+  const hash = createHash('sha256').update(`${prompt.system}\n${prompt.user}`).digest('hex').slice(0, 16);
+  return {
+    model: process.env.AZURE_OPENAI_MODEL || 'gpt-4o',
+    deployment: process.env.AZURE_OPENAI_DEPLOYMENT,
+    apiVersion: process.env.AZURE_OPENAI_API_VERSION || '2024-10-21',
+    promptTemplate: PROMPT_TEMPLATE[stage],
+    promptHash: `sha256:${hash}`,
+    temperature: 0.2,
+    seed: 7,
+    tokens: { prompt: u.prompt_tokens || 0, completion: u.completion_tokens || 0, total: u.total_tokens || 0 },
+    latencyMs: Date.now() - started,
+    requestId: randomUUID(),
+    timestamp: new Date().toISOString(),
+    grounding: 'retrieval over curated PVRIG evidence pack',
+    mode: 'live'
+  };
 }
 
 function makeHandler({ stage, buildPrompt, shape, azureCall }) {
   return async (req, res) => {
     if (!azureConfigured()) return res.status(501).json({ error: 'azure-not-configured' });
     const started = Date.now();
+    const prompt = buildPrompt(req.body);
     try {
-      const out = await azureCall(buildPrompt(req.body));
-      res.json({ mode: 'live', stage, latencyMs: Date.now() - started, ...shape(out) });
+      const { data, usage } = await azureCall(prompt);
+      res.json({
+        mode: 'live', stage, latencyMs: Date.now() - started,
+        ...shape(data),
+        provenance: buildProvenance({ stage, prompt, usage, started })
+      });
     } catch (err) {
       res.status(502).json({ error: String(err.message || err) });
     }
