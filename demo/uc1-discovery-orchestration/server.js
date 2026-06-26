@@ -87,7 +87,9 @@ const isMain = process.argv[1] && fileURLToPath(import.meta.url) === path.resolv
 if (isMain) {
   const port = process.env.PORT || 3000;
   buildApp().listen(port, () => {
-    const mode = azureConfigured() ? 'LIVE Azure OpenAI' : 'SIMULATED (no Azure key)';
+    const mode = azureConfigured()
+      ? 'LIVE Azure OpenAI'
+      : 'NO-KEY — /api routes return 501; the browser falls back to canned JSON';
     console.log(`UC1 demo running at http://localhost:${port}  [mode: ${mode}]`);
   });
 }

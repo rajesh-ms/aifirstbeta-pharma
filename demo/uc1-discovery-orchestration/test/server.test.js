@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { buildApp, azureConfigured, buildTargetIdPrompt, buildRankPrompt } from '../server.js';
+import { buildApp, azureConfigured, callAzureJSON, buildTargetIdPrompt, buildRankPrompt } from '../server.js';
 
 function startServer(app) {
   return new Promise((resolve) => {
@@ -75,4 +75,60 @@ test('POST /api/rank returns 502 when the azure caller throws', async () => {
 test('prompt builders mention "json" so Azure JSON mode is satisfied', () => {
   assert.match(buildTargetIdPrompt({ diseaseArea: 'io' }).user.toLowerCase(), /json/);
   assert.match(buildRankPrompt({ target: 'PVRIG', candidates: [] }).user.toLowerCase(), /json/);
+});
+
+test('POST /api/target-id returns a live stage-1 body when the azure caller succeeds', async () => {
+  process.env.AZURE_OPENAI_ENDPOINT = 'https://x.openai.azure.com';
+  process.env.AZURE_OPENAI_API_KEY = 'k';
+  process.env.AZURE_OPENAI_DEPLOYMENT = 'gpt-4o';
+  const fakeAzure = async () => ({
+    name: 'PVRIG (CD112R)', mechanism: 'inhibitory receptor', evidence: ['a', 'b', 'c'],
+    confidence: 0.78, recommendation: 'go', recommendationText: 'advance'
+  });
+  const app = buildApp({ azureCall: fakeAzure });
+  const { server, base } = await startServer(app);
+  try {
+    const res = await fetch(`${base}/api/target-id`, {
+      method: 'POST', headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ diseaseArea: 'immuno-oncology' })
+    });
+    assert.equal(res.status, 200);
+    const body = await res.json();
+    assert.equal(body.mode, 'live');
+    assert.equal(body.stage, 1);
+    assert.equal(typeof body.latencyMs, 'number');
+    assert.equal(body.target.name, 'PVRIG (CD112R)');
+    assert.equal(body.target.recommendation, 'go');
+  } finally { server.close(); }
+});
+
+test('callAzureJSON builds the Azure URL, sends JSON-mode body, and returns parsed content', async () => {
+  process.env.AZURE_OPENAI_ENDPOINT = 'https://x.openai.azure.com/';
+  process.env.AZURE_OPENAI_API_KEY = 'secret-key';
+  process.env.AZURE_OPENAI_DEPLOYMENT = 'gpt-4o';
+  process.env.AZURE_OPENAI_API_VERSION = '2024-10-21';
+  let captured;
+  const fetchImpl = async (url, opts) => {
+    captured = { url, opts };
+    return { ok: true, json: async () => ({ choices: [{ message: { content: '{"x":1}' } }] }) };
+  };
+  const out = await callAzureJSON({ system: 's', user: 'u' }, { fetchImpl });
+  assert.deepEqual(out, { x: 1 });
+  assert.match(captured.url, /\/openai\/deployments\/gpt-4o\/chat\/completions\?api-version=2024-10-21$/);
+  assert.ok(captured.url.startsWith('https://x.openai.azure.com/openai/'), 'trailing slash on endpoint is trimmed');
+  assert.equal(captured.opts.headers['api-key'], 'secret-key');
+  const reqBody = JSON.parse(captured.opts.body);
+  assert.equal(reqBody.response_format.type, 'json_object');
+  assert.equal(reqBody.temperature, 0.2);
+});
+
+test('callAzureJSON throws azure-http-<status> on a non-2xx response', async () => {
+  process.env.AZURE_OPENAI_ENDPOINT = 'https://x.openai.azure.com';
+  process.env.AZURE_OPENAI_API_KEY = 'k';
+  process.env.AZURE_OPENAI_DEPLOYMENT = 'gpt-4o';
+  const fetchImpl = async () => ({ ok: false, status: 429, json: async () => ({}) });
+  await assert.rejects(
+    () => callAzureJSON({ system: 's', user: 'u' }, { fetchImpl }),
+    /azure-http-429/
+  );
 });
