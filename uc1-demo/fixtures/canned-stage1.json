@@ -1,0 +1,16 @@
+{
+  "stage": 1,
+  "latencyMs": 0,
+  "target": {
+    "name": "PVRIG (CD112R)",
+    "mechanism": "Inhibitory receptor on T/NK cells in the DNAM-1 (CD226) axis; blocking PVRIG reactivates anti-tumor cytotoxicity, complementary to PD-1 blockade.",
+    "evidence": [
+      "PVRIG/CD112R is an emerging next-generation checkpoint with no failed Merck program attached.",
+      "Clinically explored by COM701 (anti-PVRIG), validating the target's relevance.",
+      "Complementary mechanism to anti-PD-1 (Keytruda), supporting combination strategies post-LOE."
+    ],
+    "confidence": 0.78,
+    "recommendation": "go",
+    "recommendationText": "Advance PVRIG as the lead next-gen IO target; structure-enabled antibody design recommended."
+  }
+}

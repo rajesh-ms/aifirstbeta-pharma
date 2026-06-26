@@ -1,0 +1,32 @@
+{
+  "program": {
+    "title": "Next-Gen IO Antibody — PVRIG / CD112R",
+    "subtitle": "Refilling the pipeline after Keytruda",
+    "target": "PVRIG (CD112R)",
+    "alternateTarget": "CCR8"
+  },
+  "speed": {
+    "traditionalYears": 6,
+    "acceleratedMonths": 18,
+    "speedMultiplier": 4,
+    "yearsSaved": 4.5
+  },
+  "funnel": { "generated": 240, "advanced": 7 },
+  "stages": [
+    { "id": 1, "key": "target-id", "label": "Target ID", "icon": "🎯",
+      "traditional": "6–12 mo", "accelerated": "6 min", "animationMs": 2400, "real": true,
+      "headline": "Validate PVRIG as the next-gen checkpoint" },
+    { "id": 2, "key": "gen-design", "label": "Gen design", "icon": "🧬",
+      "traditional": "12–18 mo", "accelerated": "2 hr", "animationMs": 2600, "real": false,
+      "headline": "240 candidate antibody sequences generated" },
+    { "id": 3, "key": "structure", "label": "Structure & binding", "icon": "🔬",
+      "traditional": "6–9 mo", "accelerated": "45 min", "animationMs": 2400, "real": false,
+      "headline": "Predicted antibody–antigen interfaces" },
+    { "id": 4, "key": "triage", "label": "In-silico triage", "icon": "⚖️",
+      "traditional": "weeks", "accelerated": "90 min", "animationMs": 2200, "real": false,
+      "headline": "Developability + manufacturability narrows 240 → 7" },
+    { "id": 5, "key": "rank", "label": "Rank → human gate", "icon": "👥",
+      "traditional": "weeks", "accelerated": "8 min", "animationMs": 2600, "real": true,
+      "headline": "Ranked shortlist for the four-eyes gate" }
+  ]
+}
