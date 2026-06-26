@@ -2,13 +2,46 @@
   "stage": 5,
   "latencyMs": 0,
   "ranking": [
-    { "id": "AB-014", "rank": 1, "rationale": "Best predicted affinity (KD 2.1 nM) and highest interface confidence with a clean developability profile." },
-    { "id": "AB-031", "rank": 2, "rationale": "Strong, well-balanced profile; low aggregation propensity supports manufacturability." },
-    { "id": "AB-052", "rank": 3, "rationale": "Solid affinity/stability balance; IgG4 backbone suits a checkpoint mechanism." },
-    { "id": "AB-090", "rank": 4, "rationale": "Clean liabilities; affinity moderate but developable." },
-    { "id": "AB-067", "rank": 5, "rationale": "Good affinity offset by a monitorable deamidation site." },
-    { "id": "AB-118", "rank": 6, "rationale": "Acceptable developability with a weaker predicted interface." },
-    { "id": "AB-203", "rank": 7, "rationale": "Viable backup; oxidation liability warrants monitoring." }
+    { "id": "AB-014", "rank": 1, "method": "multi-objective weighted (predicted)",
+      "scores": { "affinity": 0.95, "developability": 0.89, "immunogenicity": 0.91, "manufacturability": 0.88 },
+      "rationale": "Best predicted affinity (KD 2.1 nM) and highest interface confidence with a clean developability profile." },
+    { "id": "AB-031", "rank": 2, "method": "multi-objective weighted (predicted)",
+      "scores": { "affinity": 0.90, "developability": 0.85, "immunogenicity": 0.88, "manufacturability": 0.90 },
+      "rationale": "Strong, well-balanced profile; low aggregation propensity supports manufacturability." },
+    { "id": "AB-052", "rank": 3, "method": "multi-objective weighted (predicted)",
+      "scores": { "affinity": 0.86, "developability": 0.82, "immunogenicity": 0.79, "manufacturability": 0.83 },
+      "rationale": "Solid affinity/stability balance; IgG4 backbone suits a checkpoint mechanism." },
+    { "id": "AB-090", "rank": 4, "method": "multi-objective weighted (predicted)",
+      "scores": { "affinity": 0.78, "developability": 0.78, "immunogenicity": 0.86, "manufacturability": 0.84 },
+      "rationale": "Clean liabilities; affinity moderate but developable." },
+    { "id": "AB-067", "rank": 5, "method": "multi-objective weighted (predicted)",
+      "scores": { "affinity": 0.81, "developability": 0.80, "immunogenicity": 0.72, "manufacturability": 0.80 },
+      "rationale": "Good affinity offset by a monitorable deamidation site (NG, CDR-H2)." },
+    { "id": "AB-118", "rank": 6, "method": "multi-objective weighted (predicted)",
+      "scores": { "affinity": 0.70, "developability": 0.76, "immunogenicity": 0.66, "manufacturability": 0.71 },
+      "rationale": "Acceptable developability with a weaker predicted interface and elevated %HMW." },
+    { "id": "AB-203", "rank": 7, "method": "multi-objective weighted (predicted)",
+      "scores": { "affinity": 0.62, "developability": 0.74, "immunogenicity": 0.77, "manufacturability": 0.79 },
+      "rationale": "Viable backup; oxidation liability (Met, CDR-H3) warrants monitoring." }
   ],
-  "overallRecommendation": "Advance AB-014 and AB-031 to wet-lab confirmation; hold AB-052 as backup. Human approval required before any wet-lab commitment (Annex 22)."
+  "overallRecommendation": "Advance AB-014 and AB-031 to wet-lab confirmation; hold AB-052 as backup. Human approval required before any wet-lab commitment (21 CFR Part 11 · EU GMP Annex 11).",
+  "citations": [
+    { "label": "Therapeutic Antibody Profiler (developability)", "url": "https://opig.stats.ox.ac.uk/webapps/sabdab-sabpred/sabpred/tap" },
+    { "label": "IEDB (immunogenicity reference)", "url": "https://www.iedb.org/" }
+  ],
+  "provenance": {
+    "model": "gpt-4o",
+    "deployment": "merck-uc1-gpt4o",
+    "apiVersion": "2024-10-21",
+    "promptTemplate": "rank@v1.1",
+    "promptHash": "sha256:9c44e0b8d1a72f63",
+    "temperature": 0.2,
+    "seed": 7,
+    "tokens": { "prompt": 1605, "completion": 488, "total": 2093 },
+    "latencyMs": 2671,
+    "requestId": "a7b8c9d0-1111-4e2f-93a4-b5c6d7e8f901",
+    "timestamp": "2026-06-26T12:00:09.000Z",
+    "grounding": "retrieval over curated PVRIG evidence pack",
+    "mode": "simulated"
+  }
 }

@@ -84,3 +84,36 @@ button.ghost{background:transparent;border:1px solid var(--line);border-radius:1
 button.approve{background:var(--good);color:#fff;border:0;border-radius:10px;padding:10px 18px;font:inherit;font-weight:600;cursor:pointer}
 button.sendback{background:#fff;border:1px solid var(--warn);color:var(--warn);border-radius:10px;padding:10px 18px;font:inherit;cursor:pointer}
 button:disabled{opacity:.5;cursor:default}
+/* sources */
+.sources{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin-top:18px}
+.sources h3{margin:0 0 10px;font-size:15px;color:var(--navy)}
+.sources h3 small{font-weight:400;color:var(--muted);font-size:12px}
+.sources-list{margin:0;padding-left:18px;display:grid;gap:6px;font-size:13px}
+.sources-list a{color:var(--ms-blue);text-decoration:none}
+.sources-list a:hover{text-decoration:underline}
+/* provenance strip */
+.prov{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.prov-item{font-size:11px;background:#eef3fb;border:1px solid var(--line);border-radius:6px;padding:2px 7px;color:var(--ink)}
+.prov-item b{color:var(--muted);font-weight:600;margin-right:4px;text-transform:uppercase;letter-spacing:.03em;font-size:10px}
+/* rich candidate cards */
+.shortlist .cand{display:grid;gap:4px}
+.cand-head{font-size:14px}
+.cand-head .fmt{font-size:11px;color:var(--muted);margin-left:6px}
+.cand-meta{font-size:12px;color:var(--muted)}
+.cand-meta code{background:#eef3fb;border-radius:4px;padding:1px 5px;font-size:11px}
+.chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:2px}
+.chip{font-size:11px;background:#eef3fb;border:1px solid var(--line);border-radius:999px;padding:2px 8px}
+.liabilities{display:flex;flex-wrap:wrap;gap:5px;margin-top:2px}
+.liability{font-size:11px;border-radius:999px;padding:2px 8px}
+.liability.clean{background:#dff3e6;color:var(--good);border:1px solid #a8d8bb}
+.liability.low{background:#fff4d6;color:var(--sim);border:1px solid #e8d28a}
+.liability.medium,.liability.high{background:#fde2e2;color:#b42318;border:1px solid #f3b4b4}
+.rationale{font-size:12px;color:var(--ink);margin-top:2px}
+/* audit */
+.audit{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin-top:18px}
+.audit h3{margin:0 0 10px;font-size:15px;color:var(--navy)}
+.audit h3 small{font-weight:400;color:var(--muted);font-size:12px}
+.audit-list{margin:0;padding-left:18px;display:grid;gap:6px;font-size:12px}
+.audit-list .ts{font-variant-numeric:tabular-nums;color:var(--muted)}
+.audit-list .role{color:var(--muted)}
+.audit-list .hash{background:#0f1b2a;color:#cfe3ff;border-radius:4px;padding:1px 6px;font-size:11px}
