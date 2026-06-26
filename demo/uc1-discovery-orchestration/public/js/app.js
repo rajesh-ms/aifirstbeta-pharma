@@ -17,6 +17,8 @@ const run = {
 
 const $ = (sel) => document.querySelector(sel);
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const esc = (v) => String(v).replace(/[&<>"']/g, (c) =>
+  ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
 async function init() {
   const [scenario, candData] = await Promise.all([
@@ -127,7 +129,7 @@ async function startRun() {
       markMode(res);
       run.targetResult = res;
       $('#payload-stage1').textContent = JSON.stringify(res, null, 2);
-      setStage(stage.id, 'done', `Target validated: ${res.target.name} — ${res.target.recommendation.toUpperCase()}`);
+      setStage(stage.id, 'done', `Target validated: ${esc(res.target.name)} — ${esc(String(res.target.recommendation).toUpperCase())}`);
     } else if (stage.id === 5) {
       const res = await runStage('/api/rank', {
         target: run.scenario.program.target,
@@ -157,8 +159,8 @@ function shortlistHtml() {
     .slice().sort((a, b) => a.rank - b.rank).map((r) => {
       const c = candidateById(r.id) || { name: r.id, kdNm: '—' };
       return `<div class="row"><span class="rank">#${r.rank}</span>
-        <span><strong>${c.name}</strong> — ${r.rationale}</span>
-        <span class="kd">KD ${c.kdNm} nM</span></div>`;
+        <span><strong>${esc(c.name)}</strong> — ${esc(r.rationale)}</span>
+        <span class="kd">KD ${esc(c.kdNm)} nM</span></div>`;
     }).join('') + `</div>`;
 }
 
@@ -173,7 +175,7 @@ function renderReviewerStep() {
     <h2>Human gate — Step 1 of 2 · Reviewer</h2>
     <p class="gate-step">Four-eyes control (Annex 22): the Reviewer recommends; a separate Approver must confirm before any wet-lab commitment.</p>
     ${shortlistHtml()}
-    <p class="gate-step"><em>${run.rankResult.overallRecommendation}</em></p>
+    <p class="gate-step"><em>${esc(run.rankResult.overallRecommendation)}</em></p>
     <div class="gate-actions">
       <button class="approve" id="reviewer-recommend">Recommend advancing</button>
       <button class="sendback" id="reviewer-sendback">Send back</button>
@@ -230,8 +232,9 @@ function onApproverApprove() {
 
 function showSummary() {
   const sp = run.scenario.speed;
-  const top = run.rankResult.ranking.slice().sort((a, b) => a.rank - b.rank)[0];
-  const topName = (candidateById(top.id) || { name: top.id }).name;
+  const ranked = run.rankResult.ranking.slice().sort((a, b) => a.rank - b.rank);
+  const top = ranked[0];
+  const topName = top ? (candidateById(top.id) || { name: top.id }).name : '—';
   $('#gate').hidden = true;
   const sum = $('#summary');
   sum.hidden = false;
@@ -242,7 +245,7 @@ function showSummary() {
       <div><span>Candidates advanced</span><b>${run.scenario.funnel.advanced}</b>from ${run.scenario.funnel.generated} generated</div>
       <div><span>Decisions traced</span><b>100%</b>two-person gate · Annex 22</div>
     </div>
-    <p>Lead candidate <strong>${topName}</strong> released to wet-lab — the scientist owns the call.</p>`;
+    <p>Lead candidate <strong>${esc(topName)}</strong> released to wet-lab — the scientist owns the call.</p>`;
   $('#run-btn').hidden = true;
   $('#reset-btn').hidden = false;
 }
