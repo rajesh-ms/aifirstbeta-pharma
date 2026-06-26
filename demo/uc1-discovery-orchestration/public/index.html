@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>UC1 — Discovery Orchestration (Live Demo)</title>
+  <link rel="stylesheet" href="./css/theme.css" />
+</head>
+<body data-lens="executive" data-status="idle">
+  <header class="topbar">
+    <div class="brand">
+      <h1 id="program-title">Next-Gen IO Antibody — PVRIG / CD112R</h1>
+      <p id="program-subtitle">Refilling the pipeline after Keytruda</p>
+    </div>
+    <div class="topbar-right">
+      <span id="mode-badge" class="badge badge-live" hidden>simulated</span>
+      <div class="clock" title="Live discovery clock">
+        <span class="clock-label">discovery clock</span>
+        <span id="clock" class="clock-value">00:00</span>
+      </div>
+      <div class="lens-toggle" role="group" aria-label="Lens toggle">
+        <button id="lens-exec" class="lens-btn is-active" data-lens="executive">Executive</button>
+        <button id="lens-tech" class="lens-btn" data-lens="technical">Technical</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- Hero speed band (executive) -->
+    <section id="hero" class="hero exec-only">
+      <div class="hero-track">
+        <div class="hero-traditional"><span>Traditional discovery → clinic</span><strong id="hero-trad">4–6 years</strong></div>
+        <div class="hero-ai"><span>AI-orchestrated</span><strong id="hero-ai">~18 months</strong></div>
+      </div>
+      <div class="hero-headline" id="hero-headline">4× faster · 4.5 yrs saved</div>
+      <p class="hero-caption">Illustrative, benchmark-grounded — not a guaranteed outcome.</p>
+    </section>
+
+    <!-- Pipeline row -->
+    <section class="pipeline" id="pipeline" aria-label="Discovery pipeline"></section>
+
+    <!-- Supporting meters (executive) -->
+    <section class="meters exec-only" id="meters">
+      <div class="meter"><span class="meter-label">Validated candidates this cycle</span><span class="meter-value" id="funnel-value">240 → 7</span></div>
+      <div class="meter"><span class="meter-label">Revenue exposure addressed</span><span class="meter-value">~46% · $29.5B</span><span class="meter-sub">Keytruda LOE (Dec 2028)</span></div>
+      <div class="meter"><span class="meter-label">Decisions traced</span><span class="meter-value">100%</span><span class="meter-sub">Annex 22 · Part 11 / ALCOA+</span></div>
+    </section>
+
+    <!-- Technical lens panel -->
+    <section class="technical tech-only" id="technical">
+      <div class="planes">
+        <span class="plane">Orchestration</span><span class="plane">Foundation models</span>
+        <span class="plane">Compute</span><span class="plane">Data</span><span class="plane">Governance</span>
+      </div>
+      <div class="tech-badges">
+        <span class="badge badge-sim">A2A / MCP · simulated</span>
+        <span class="badge badge-sim">Entra Agent ID · simulated</span>
+        <span class="badge badge-sim">Purview lineage · simulated</span>
+        <span class="badge badge-real">Stage 1 &amp; 5 payloads · REAL</span>
+      </div>
+      <div class="trace-wrap">
+        <h3>Agent trace <small>(simulated except the two real payloads)</small></h3>
+        <ol id="trace" class="trace"></ol>
+      </div>
+      <div class="payloads">
+        <div><h4>Stage 1 — /api/target-id</h4><pre id="payload-stage1">—</pre></div>
+        <div><h4>Stage 5 — /api/rank</h4><pre id="payload-stage5">—</pre></div>
+      </div>
+    </section>
+
+    <!-- Human gate -->
+    <section id="gate" class="gate" hidden></section>
+
+    <!-- Final summary -->
+    <section id="summary" class="summary" hidden></section>
+  </main>
+
+  <footer class="actionbar">
+    <button id="run-btn" class="primary">▶ Run discovery</button>
+    <button id="reset-btn" class="ghost" hidden>Reset</button>
+  </footer>
+
+  <script type="module" src="./js/app.js"></script>
+</body>
+</html>
