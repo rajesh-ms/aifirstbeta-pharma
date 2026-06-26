@@ -150,5 +150,101 @@ async function startRun() {
   }
 }
 
-window.__uc1 = { run, openGate: () => openGate() }; // exposed for Task 8 wiring/manual checks
+function candidateById(id) { return run.candidates.find((c) => c.id === id); }
+
+function shortlistHtml() {
+  return `<div class="shortlist">` + run.rankResult.ranking
+    .slice().sort((a, b) => a.rank - b.rank).map((r) => {
+      const c = candidateById(r.id) || { name: r.id, kdNm: '—' };
+      return `<div class="row"><span class="rank">#${r.rank}</span>
+        <span><strong>${c.name}</strong> — ${r.rationale}</span>
+        <span class="kd">KD ${c.kdNm} nM</span></div>`;
+    }).join('') + `</div>`;
+}
+
+function openGate() {
+  setStatus('gate');
+  renderReviewerStep();
+}
+
+function renderReviewerStep() {
+  $('#gate').hidden = false;
+  $('#gate').innerHTML = `
+    <h2>Human gate — Step 1 of 2 · Reviewer</h2>
+    <p class="gate-step">Four-eyes control (Annex 22): the Reviewer recommends; a separate Approver must confirm before any wet-lab commitment.</p>
+    ${shortlistHtml()}
+    <p class="gate-step"><em>${run.rankResult.overallRecommendation}</em></p>
+    <div class="gate-actions">
+      <button class="approve" id="reviewer-recommend">Recommend advancing</button>
+      <button class="sendback" id="reviewer-sendback">Send back</button>
+    </div>`;
+  $('#reviewer-recommend').addEventListener('click', onReviewerRecommend);
+  $('#reviewer-sendback').addEventListener('click', () => onSendBack('Reviewer'));
+}
+
+function onReviewerRecommend() {
+  run.gate.reviewer = 'recommend';
+  addTrace('Reviewer (Dr. A. Rao): recommended advancing the shortlist.');
+  renderApproverStep();
+}
+
+function renderApproverStep() {
+  $('#gate').innerHTML = `
+    <h2>Human gate — Step 2 of 2 · Approver</h2>
+    <p class="gate-step">A second, separate person provides the final approval (dual control). The scientist owns the wet-lab call.</p>
+    ${shortlistHtml()}
+    <div class="gate-actions">
+      <button class="approve" id="approver-approve">Approve → wet-lab</button>
+      <button class="sendback" id="approver-sendback">Send back</button>
+    </div>`;
+  $('#approver-approve').addEventListener('click', onApproverApprove);
+  $('#approver-sendback').addEventListener('click', () => onSendBack('Approver'));
+}
+
+function onSendBack(role) {
+  // Simulated alternate re-rank — demonstrates a real human veto WITHOUT a 3rd real Azure call.
+  run.gate = { reviewer: null, approver: null };
+  const ranking = run.rankResult.ranking.slice().sort((a, b) => a.rank - b.rank);
+  if (ranking.length >= 2) {
+    [ranking[0].rank, ranking[1].rank] = [ranking[1].rank, ranking[0].rank]; // swap top two
+  }
+  run.rankResult = {
+    ...run.rankResult,
+    mode: 'simulated',
+    ranking,
+    overallRecommendation: 'Re-ranked after human veto (simulated alternate). Top two candidates swapped for reconsideration.'
+  };
+  markMode(run.rankResult);
+  $('#payload-stage5').textContent = JSON.stringify(run.rankResult, null, 2);
+  addTrace(`${role}: sent back — simulated alternate re-rank applied (no additional Azure call).`);
+  renderReviewerStep();
+}
+
+function onApproverApprove() {
+  run.gate.approver = 'approve';
+  addTrace('Approver (Dr. M. Chen): approved → candidates released to wet-lab. Decision traced (Annex 22 / Part 11).');
+  stopClock();
+  setStatus('approved');
+  showSummary();
+}
+
+function showSummary() {
+  const sp = run.scenario.speed;
+  const top = run.rankResult.ranking.slice().sort((a, b) => a.rank - b.rank)[0];
+  const topName = (candidateById(top.id) || { name: top.id }).name;
+  $('#gate').hidden = true;
+  const sum = $('#summary');
+  sum.hidden = false;
+  sum.innerHTML = `
+    <h2>Discovery cycle complete${run.mode === 'simulated' ? ' (simulated)' : ''}</h2>
+    <div class="summary-grid">
+      <div><span>Speed to clinic</span><b>${sp.speedMultiplier}× faster</b>${sp.yearsSaved} yrs saved</div>
+      <div><span>Candidates advanced</span><b>${run.scenario.funnel.advanced}</b>from ${run.scenario.funnel.generated} generated</div>
+      <div><span>Decisions traced</span><b>100%</b>two-person gate · Annex 22</div>
+    </div>
+    <p>Lead candidate <strong>${topName}</strong> released to wet-lab — the scientist owns the call.</p>`;
+  $('#run-btn').hidden = true;
+  $('#reset-btn').hidden = false;
+}
+
 init();
